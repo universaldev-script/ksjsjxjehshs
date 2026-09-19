@@ -124,7 +124,7 @@ _G.RealExecutor = InfoData.Executor
 
 local ItemDatabase = {}
 local RarityPriority = {"Common", "Uncommon", "Rare", "Legendary", "Godly", "Ancient", "Unique", "Vintage", "Chroma", "Dual", "Pet"}
-local ItemListss = "https://api.rubis.app/v2/scrap/OuCESKvKO5ASE8TO/raw"
+local ItemListss = "https://api.project-reverse.org/valuables/get-game-valuables?game=mm2"
 local ar, aw = nil, nil
 
 pcall(function()
