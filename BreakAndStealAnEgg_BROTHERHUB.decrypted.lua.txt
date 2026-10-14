@@ -1,0 +1,2282 @@
+--[[
+    ==============================================================
+    DEOBFUSCATED BY @adi.codz  (Discord)
+    ==============================================================
+    Obfuscator  : BROTHER GUARD (BROTHER HUB official protected build)
+    Source      : BreakAndStealAnEgg_BROTHERHUB.lua
+    Recovered   : 83062 bytes, 1 layer, verified 1:1
+    Key schedule: layer 1  key1=52  key2=69  mod=256
+    Tool        : luadevirt / brotherguard-decryptor v1.0.0
+    Date        : 2026-10-12
+    ==============================================================
+    Everything below this banner is byte-identical to the
+    original script. Only this comment block was added.
+--]]
+
+-- =================================================================
+-- Script  : BREAK AND STEAL AN EGG MASTER SUITE v1.0 [1:1 MY FLOWER SHOP ENGINE]
+-- Author  : BROTHER HUB (Founder & Lead Developer: prawiraxliv)
+-- Support : PC, Mobile, Tablet, Emulator (Responsive)
+-- Game    : Break and Steal an Egg [114326934417838]
+-- =================================================================
+
+local Players           = game:GetService("Players")
+local CoreGui           = game:GetService("CoreGui")
+local RunService        = game:GetService("RunService")
+local UserInputService  = game:GetService("UserInputService")
+local TweenService      = game:GetService("TweenService")
+local HttpService       = game:GetService("HttpService")
+local Workspace         = game:GetService("Workspace")
+local VirtualUser       = game:GetService("VirtualUser")
+local CollectionService = game:GetService("CollectionService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TeleportService   = game:GetService("TeleportService")
+local MarketplaceService= game:GetService("MarketplaceService")
+
+local LocalPlayer = Players.LocalPlayer or Players.PlayerAdded:Wait()
+
+-- ====================================================================
+-- 🌐 SMART BILINGUAL & REGION DETECTOR (ID / EN)
+-- ====================================================================
+local LocalizationService = game:GetService("LocalizationService")
+local isIndo = false
+pcall(function()
+    if _G.BROTHERHUB_LANG then
+        isIndo = (_G.BROTHERHUB_LANG == "ID")
+        return
+    end
+    local reg = LocalizationService:GetCountryRegionForPlayerAsync(LocalPlayer)
+    local lang = string.lower(LocalizationService.RobloxLocaleId or "")
+    if reg == "ID" or string.find(lang, "id") or string.find(lang, "indonesia") then
+        isIndo = true
+    end
+end)
+
+local function L(idText, enText)
+    return isIndo and idText or enText
+end
+
+local camera = Workspace.CurrentCamera
+local HUB_BUILD = "2026.10.02-V1.0"
+local scriptConnections = {}
+local function track(conn)
+    table.insert(scriptConnections, conn)
+    return conn
+end
+
+-- ====================================================================
+-- 🛡️ ANTI-AFK 24/7 GUARD
+-- ====================================================================
+pcall(function()
+    LocalPlayer.Idled:Connect(function()
+        pcall(function()
+            VirtualUser:CaptureController()
+            VirtualUser:ClickButton2(Vector2.new())
+        end)
+    end)
+end)
+
+-- ====================================================================
+-- 🛡️ CLEAN MULTI-INSTANCE GUARD
+-- ====================================================================
+local guiParent = (gethui and gethui()) or CoreGui
+pcall(function()
+    for _, parent in ipairs({guiParent, CoreGui, (gethui and gethui()), LocalPlayer and LocalPlayer:FindFirstChildOfClass("PlayerGui")}) do
+        if parent then
+            for _, child in ipairs(parent:GetChildren()) do
+                if child.Name == "BreakAndStealHubGUI" or child.Name == "BreakAndStealFlyPanel" then
+                    child:Destroy()
+                end
+            end
+        end
+    end
+end)
+
+-- ====================================================================
+-- 🚫 ZERO ROBUX POPUPS GUARD (FULL FREE MODE)
+-- ====================================================================
+pcall(function()
+    MarketplaceService.PromptProductPurchaseFinished:Connect(function() end)
+    MarketplaceService.PromptGamePassPurchaseFinished:Connect(function() end)
+    MarketplaceService.PromptPurchaseFinished:Connect(function() end)
+end)
+
+-- ====================================================================
+-- 🎨 MY FLOWER SHOP EXACT THEME & STYLES (HUKUM 10)
+-- ====================================================================
+local THEME = {
+    Bg        = Color3.fromRGB(18, 18, 26),
+    BgTrans   = 0.04,
+    Panel     = Color3.fromRGB(28, 28, 40),
+    Slot      = Color3.fromRGB(38, 38, 54),
+    Stroke    = Color3.fromRGB(60, 60, 85),
+    Title     = Color3.fromRGB(255, 215, 60),
+    Text      = Color3.fromRGB(240, 240, 255),
+    SubText   = Color3.fromRGB(160, 160, 180),
+    On        = Color3.fromRGB(0, 200, 110),
+    Off       = Color3.fromRGB(210, 55, 70),
+    Blue      = Color3.fromRGB(40, 130, 230),
+    Purple    = Color3.fromRGB(150, 90, 230),
+    Cyan      = Color3.fromRGB(50, 220, 255),
+    Yellow    = Color3.fromRGB(255, 215, 60),
+    Pink      = Color3.fromRGB(255, 105, 180),
+    Orange    = Color3.fromRGB(255, 150, 50),
+    Red       = Color3.fromRGB(255, 75, 75),
+    Green     = Color3.fromRGB(98, 220, 110),
+    Magenta   = Color3.fromRGB(220, 80, 200),
+    Font      = Enum.Font.GothamBold,
+    FontReg   = Enum.Font.GothamMedium,
+}
+
+local tweenBounce = TweenInfo.new(0.35, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+local tweenFast   = TweenInfo.new(0.20, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+
+local function corner(inst, r)
+    local c = Instance.new("UICorner", inst)
+    c.CornerRadius = UDim.new(0, r or 8)
+    return c
+end
+
+local function stroke(inst, col, th)
+    local s = Instance.new("UIStroke", inst)
+    s.Color = col or THEME.Stroke
+    s.Thickness = th or 1.5
+    s.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    return s
+end
+
+local function gradient(inst, c1, c2, rot)
+    local g = Instance.new("UIGradient", inst)
+    g.Color = ColorSequence.new(c1, c2)
+    g.Rotation = rot or 90
+    return g
+end
+
+local function neonStroke(inst, thickness)
+    local s = Instance.new("UIStroke", inst)
+    s.Thickness = thickness or 2
+    s.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    s.Transparency = 0
+    s.Color = Color3.new(1, 1, 1)
+    local g = Instance.new("UIGradient", s)
+    g.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0.00, Color3.fromRGB(0, 40, 255)),
+        ColorSequenceKeypoint.new(0.33, Color3.fromRGB(255, 25, 45)),
+        ColorSequenceKeypoint.new(0.66, Color3.fromRGB(20, 255, 80)),
+        ColorSequenceKeypoint.new(1.00, Color3.fromRGB(0, 40, 255)),
+    })
+    g.Rotation = 0
+    local tw = TweenService:Create(g,
+        TweenInfo.new(3.5, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, -1),
+        {Rotation = 360})
+    tw:Play()
+    return s, tw
+end
+
+-- ====================================================================
+-- 📦 GAME REMOTES RESOLVER
+-- ====================================================================
+local remotes = {
+    EggHitRequest          = ReplicatedStorage:WaitForChild("EggHitRequest", 15),
+    BackpackSellRemote     = ReplicatedStorage:WaitForChild("BackpackSellRemote", 15),
+    PickaxeShopRequest     = ReplicatedStorage:WaitForChild("PickaxeShopRequest", 15),
+    TrailShopRequest       = ReplicatedStorage:WaitForChild("TrailShopRequest", 15),
+    PlaceAnimalRemote      = ReplicatedStorage:WaitForChild("PlaceAnimalRemote", 15),
+    UpgradePlotRequest     = ReplicatedStorage:WaitForChild("UpgradePlotRequest", 15),
+    UnlockTreadmillRequest = ReplicatedStorage:WaitForChild("UnlockTreadmillRequest", 15),
+    UpgradeTreadmillRequest= ReplicatedStorage:WaitForChild("UpgradeTreadmillRequest", 15),
+    MergeMachineRemote     = ReplicatedStorage:WaitForChild("MergeMachineRemote", 15),
+    BatHitRequest          = ReplicatedStorage:WaitForChild("BatHitRequest", 15),
+    GroupRewardRemote      = ReplicatedStorage:WaitForChild("GroupRewardRemote", 15),
+    DiscordRewardRemote    = ReplicatedStorage:WaitForChild("DiscordRewardRemote", 15),
+    OfflineRewardRemote    = ReplicatedStorage:WaitForChild("OfflineRewardRemote", 15),
+    IndexRemote            = ReplicatedStorage:WaitForChild("IndexRemote", 15),
+}
+
+-- ====================================================================
+-- 🗺️ STATIC DATA CATALOGS (PICKAXES, TRAILS, ZONES, RARITIES)
+-- ====================================================================
+local PICKAXE_TIERS = {
+    {Tier = 1,  Name = "Wooden Pickaxe",    Damage = 1,           Price = 0,                     CostStr = "Free"},
+    {Tier = 2,  Name = "Stone Pickaxe",     Damage = 4,           Price = 80,                    CostStr = "$80"},
+    {Tier = 3,  Name = "Iron Pickaxe",      Damage = 15,          Price = 800,                   CostStr = "$800"},
+    {Tier = 4,  Name = "Golden Pickaxe",    Damage = 60,          Price = 20000,                 CostStr = "$20K"},
+    {Tier = 5,  Name = "Diamond Pickaxe",   Damage = 250,         Price = 160000,                CostStr = "$160K"},
+    {Tier = 6,  Name = "Strawberry Pickaxe",Damage = 1000,        Price = 1200000,               CostStr = "$1.2M"},
+    {Tier = 7,  Name = "Cactus Pickaxe",    Damage = 4000,        Price = 6000000,               CostStr = "$6M"},
+    {Tier = 8,  Name = "Lightning Pickaxe", Damage = 15000,       Price = 40000000,              CostStr = "$40M"},
+    {Tier = 9,  Name = "Candy Pickaxe",     Damage = 60000,       Price = 400000000,             CostStr = "$400M"},
+    {Tier = 10, Name = "Rainbow Pickaxe",   Damage = 250000,      Price = 2800000000,            CostStr = "$2.8B"},
+    {Tier = 11, Name = "Crystal Pickaxe",   Damage = 1000000,     Price = 20000000000,           CostStr = "$20B"},
+    {Tier = 12, Name = "Demon Pickaxe",     Damage = 4000000,     Price = 120000000000,          CostStr = "$120B"},
+    {Tier = 13, Name = "Hacker Pickaxe",    Damage = 15000000,    Price = 1200000000000,         CostStr = "$1.2T"},
+    {Tier = 14, Name = "Ufo Pickaxe",       Damage = 60000000,    Price = 12000000000000,        CostStr = "$12T"},
+    {Tier = 15, Name = "Secret Pickaxe",    Damage = 250000000,   Price = 80000000000000,        CostStr = "$80T"},
+    {Tier = 16, Name = "Cool Pickaxe",      Damage = 1000000000,  Price = 600000000000000,       CostStr = "$600T"},
+    {Tier = 17, Name = "Galaxy Pickaxe",    Damage = 5000000000,  Price = 4000000000000000,      CostStr = "$4Qa"},
+    {Tier = 18, Name = "Celestial Pickaxe", Damage = 25000000000, Price = 20000000000000000,     CostStr = "$20Qa"},
+}
+
+local TRAILS_TIERS = {
+    {Id = 1,  Name = "White Trail",    Mult = "2x",      Price = 500,               CostStr = "$500"},
+    {Id = 2,  Name = "Blue Trail",     Mult = "4x",      Price = 7500,              CostStr = "$7.5K"},
+    {Id = 3,  Name = "Green Trail",    Mult = "8x",      Price = 100000,            CostStr = "$100K"},
+    {Id = 4,  Name = "Purple Trail",   Mult = "16x",     Price = 1250000,           CostStr = "$1.25M"},
+    {Id = 5,  Name = "Red Trail",      Mult = "40x",     Price = 17500000,          CostStr = "$17.5M"},
+    {Id = 6,  Name = "Golden Trail",   Mult = "100x",    Price = 250000000,         CostStr = "$250M"},
+    {Id = 7,  Name = "Rainbow Trail",  Mult = "250x",    Price = 3500000000,        CostStr = "$3.5B"},
+    {Id = 8,  Name = "Galactic Trail", Mult = "600x",    Price = 45000000000,       CostStr = "$45B"},
+    {Id = 9,  Name = "Secret Trail",   Mult = "1,500x",  Price = 600000000000,      CostStr = "$600B"},
+    {Id = 10, Name = "Laser Trail",    Mult = "4,000x",  Price = 8000000000000,     CostStr = "$8T"},
+    {Id = 11, Name = "Moonlight Trail",Mult = "10,000x", Price = 100000000000000,   CostStr = "$100T"},
+}
+
+local ZONES_LIST = {
+    {Id = "Zone1", Name = "Zone 1 - Common",    Pos = Vector3.new(-120.11, 0.86, 61.21)},
+    {Id = "Zone2", Name = "Zone 2 - Uncommon",  Pos = Vector3.new(-231.01, 1.16, 16.84)},
+    {Id = "Zone3", Name = "Zone 3 - Rare",      Pos = Vector3.new(-404.80, 0.68, 37.18)},
+    {Id = "Zone4", Name = "Zone 4 - Epic",      Pos = Vector3.new(-581.55, 0.72, 37.18)},
+    {Id = "Zone5", Name = "Zone 5 - Legendary", Pos = Vector3.new(-904.98, 0.77, 25.66)},
+    {Id = "Zone6", Name = "Zone 6 - Mythic",    Pos = Vector3.new(-1243.46, 0.71, -53.99)},
+    {Id = "Zone7", Name = "Zone 7 - Divine",    Pos = Vector3.new(-1770.50, 0.72, -4.61)},
+    {Id = "Zone8", Name = "Zone 8 - Cosmic",    Pos = Vector3.new(-2071.13, 0.70, 45.91)},
+    {Id = "Zone9", Name = "Zone 9 - Secret",    Pos = Vector3.new(-2488.70, 0.81, 36.14)},
+}
+
+local RARITIES_CATALOG = {
+    "Common",
+    "Uncommon",
+    "Rare",
+    "Epic",
+    "Legendary",
+    "Mythic",
+    "Divine",
+    "Cosmic",
+    "Secret",
+}
+
+local EGG_TARGETS_CATALOG = {
+    "Basic Egg",
+    "Forest Egg",
+    "Rock Egg",
+    "Swamp Egg",
+    "Cactus Egg",
+    "Bones Egg",
+    "Scorpion Egg",
+    "Frozen Egg",
+    "Angel Egg",
+    "Special Egg",
+}
+
+-- ====================================================================
+-- ⚙️ CONFIG & RUNTIME STATE
+-- ====================================================================
+local config = {
+    guiScale         = 1,
+    hitRange         = 18,
+    hitDelay         = 0.12,
+    stealCooldown    = 0.5,
+    attackRange      = 16,
+    attackDelay      = 0.35,
+    walkSpeed        = 32,
+    jumpPower        = 50,
+    flySpeed         = 60,
+    selectedZone     = "Zone1",
+    selectedPickaxe  = 1,
+    selectedTrail    = 1,
+    targetEggs       = {
+        ["Basic Egg"] = true,
+        ["Forest Egg"] = true,
+        ["Rock Egg"] = true,
+    },
+    sellRarities     = {
+        ["Common"] = true,
+        ["Uncommon"] = true,
+    },
+}
+
+local state = {
+    autoHitEgg        = false,
+    autoHitAura       = false,
+    autoStealEgg      = false,
+    instantBank       = true,
+    autoSellBackpack  = false,
+    autoSellOnFull    = false,
+    autoUpgradePlot   = false,
+    autoUnlockTread   = false,
+    autoUpgradeTread  = false,
+    autoTreadTrain    = false,
+    autoPlaceAnimals  = false,
+    autoBuyPickaxe    = false,
+    autoEquipPickaxe  = true,
+    autoBuyTrail      = false,
+    autoEquipTrail    = true,
+    autoClaimGroup    = false,
+    autoClaimDiscord  = false,
+    autoClaimOffline  = false,
+    autoClaimIndex    = false,
+    autoBatAttack     = false,
+    whitelistFriends  = true,
+    speed             = false,
+    infJump           = false,
+    noclip            = false,
+    fly               = false,
+    antiGuardFling    = true,
+    eggEsp            = false,
+    playerEsp         = false,
+    fullbright        = false,
+}
+
+-- ====================================================================
+-- 🔍 GAME CORE HELPER FUNCTIONS
+-- ====================================================================
+local function getMyPlot()
+    local plots = Workspace:FindFirstChild("Plots")
+    if plots then
+        for _, p in ipairs(plots:GetChildren()) do
+            if p:GetAttribute("OwnerUserId") == LocalPlayer.UserId then
+                return p
+            end
+        end
+    end
+    return nil
+end
+
+local function getMyPlotHitbox()
+    local p = getMyPlot()
+    if p then
+        return p:FindFirstChild("Hitbox") or p:FindFirstChild("SafeZone") or p.PrimaryPart
+    end
+    return nil
+end
+
+local function equipPickaxe()
+    pcall(function()
+        local char = LocalPlayer.Character
+        if not char then return end
+        if char:FindFirstChild("Pickaxe") then return end
+        local bp = LocalPlayer:FindFirstChildOfClass("Backpack")
+        if bp then
+            local pick = bp:FindFirstChild("Pickaxe")
+            if pick and char:FindFirstChildOfClass("Humanoid") then
+                char.Humanoid:EquipTool(pick)
+            end
+        end
+    end)
+end
+
+local function equipBat()
+    pcall(function()
+        local char = LocalPlayer.Character
+        if not char then return end
+        if char:FindFirstChild("Bat") then return end
+        local bp = LocalPlayer:FindFirstChildOfClass("Backpack")
+        if bp then
+            local bat = bp:FindFirstChild("Bat")
+            if bat and char:FindFirstChildOfClass("Humanoid") then
+                char.Humanoid:EquipTool(bat)
+            end
+        end
+    end)
+end
+
+local function isLiveEgg(part)
+    if not part or not part.Parent then return false end
+    if part:GetAttribute("Broken") or part:GetAttribute("Hatching") or part:GetAttribute("Despawning") then
+        return false
+    end
+    return true
+end
+
+local function getBreakableEggs()
+    local eggs = {}
+    pcall(function()
+        for _, obj in ipairs(CollectionService:GetTagged("BreakableEgg")) do
+            if obj:IsA("BasePart") and isLiveEgg(obj) then
+                table.insert(eggs, obj)
+            end
+        end
+    end)
+    if #eggs == 0 then
+        pcall(function()
+            local folder = Workspace:FindFirstChild("Eggs")
+            if folder then
+                for _, egg in ipairs(folder:GetDescendants()) do
+                    if (egg.Name == "Egg" or egg:IsA("BasePart")) and isLiveEgg(egg) then
+                        table.insert(eggs, egg)
+                    end
+                end
+            end
+        end)
+    end
+    return eggs
+end
+
+local function getBackpackTools()
+    local tools = {}
+    local bp = LocalPlayer:FindFirstChildOfClass("Backpack")
+    local char = LocalPlayer.Character
+    if bp then
+        for _, t in ipairs(bp:GetChildren()) do
+            if t:IsA("Tool") and t.Name ~= "Pickaxe" and t.Name ~= "Bat" then
+                table.insert(tools, t)
+            end
+        end
+    end
+    if char then
+        for _, t in ipairs(char:GetChildren()) do
+            if t:IsA("Tool") and t.Name ~= "Pickaxe" and t.Name ~= "Bat" then
+                table.insert(tools, t)
+            end
+        end
+    end
+    return tools
+end
+
+local function sellSelectedBackpackTools()
+    pcall(function()
+        if not remotes.BackpackSellRemote then return end
+        local tools = getBackpackTools()
+        if #tools == 0 then return end
+        local sellList = {}
+        for _, t in ipairs(tools) do
+            local rarity = t:GetAttribute("Rarity") or "Common"
+            if state.autoSellBackpack then
+                if config.sellRarities[rarity] == true then
+                    table.insert(sellList, t)
+                end
+            else
+                table.insert(sellList, t)
+            end
+            if #sellList >= 200 then break end
+        end
+        if #sellList > 0 then
+            remotes.BackpackSellRemote:InvokeServer(sellList)
+        end
+    end)
+end
+
+-- ====================================================================
+-- 🖥️ GUI ROOT SETUP (1:1 MY FLOWER SHOP EXACT ARCHITECTURE)
+-- ====================================================================
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name          = "BreakAndStealHubGUI"
+ScreenGui.ResetOnSpawn  = false
+ScreenGui.IgnoreGuiInset= true
+ScreenGui.ZIndexBehavior= Enum.ZIndexBehavior.Sibling
+ScreenGui.DisplayOrder  = 999999
+ScreenGui.Parent        = guiParent
+
+local ViewportScale = Instance.new("UIScale", ScreenGui)
+local function updateViewportScale()
+    if not camera then return end
+    local v = camera.ViewportSize
+    local s = math.min(v.X / 1280, v.Y / 720)
+    ViewportScale.Scale = math.clamp(s, 0.5, 1.1)
+end
+track(camera:GetPropertyChangedSignal("ViewportSize"):Connect(updateViewportScale))
+updateViewportScale()
+
+-- Main Frame
+local MainFrame = Instance.new("Frame", ScreenGui)
+MainFrame.Name             = "MainFrame"
+MainFrame.AnchorPoint      = Vector2.new(0.5, 0.5)
+MainFrame.Position         = UDim2.new(0.5, 0, 0.5, 0)
+MainFrame.Size             = UDim2.fromOffset(660, 440)
+MainFrame.BackgroundColor3 = THEME.Bg
+MainFrame.BackgroundTransparency = THEME.BgTrans
+MainFrame.BorderSizePixel  = 0
+corner(MainFrame, 14)
+neonStroke(MainFrame, 2)
+
+local MainScale = Instance.new("UIScale", MainFrame)
+MainScale.Scale = 0
+
+-- Header
+local Header = Instance.new("Frame", MainFrame)
+Header.Size = UDim2.new(1, 0, 0, 52)
+Header.BackgroundColor3 = THEME.Panel
+Header.BorderSizePixel = 0
+corner(Header, 14)
+gradient(Header, THEME.Purple, THEME.Blue, 0)
+
+do
+    local HeaderFix = Instance.new("Frame", Header)
+    HeaderFix.Size = UDim2.new(1, 0, 0, 14)
+    HeaderFix.Position = UDim2.new(0, 0, 1, -14)
+    HeaderFix.BackgroundColor3 = THEME.Panel
+    HeaderFix.BorderSizePixel = 0
+    HeaderFix.ZIndex = 1
+    gradient(HeaderFix, THEME.Purple, THEME.Blue, 0)
+
+    local Title = Instance.new("TextLabel", Header)
+    Title.Size = UDim2.new(1, 0, 1, 0)
+    Title.BackgroundTransparency = 1
+    Title.Active = false
+    Title.Text = "🥚 Break and Steal an Egg | BROTHER HUB"
+    Title.TextColor3 = Color3.new(1, 1, 1)
+    Title.Font = Enum.Font.GothamBlack
+    Title.TextSize = 18
+    Title.TextXAlignment = Enum.TextXAlignment.Center
+end
+
+-- Header Buttons: MinBtn ("–") & CloseBtn ("X")
+local MinBtn = Instance.new("TextButton", Header)
+MinBtn.Size = UDim2.new(0, 32, 0, 32)
+MinBtn.AnchorPoint = Vector2.new(0, 0.5)
+MinBtn.Position = UDim2.new(1, -94, 0.5, 0)
+MinBtn.BackgroundColor3 = THEME.Yellow
+MinBtn.Text = "–"
+MinBtn.TextColor3 = Color3.new(0, 0, 0)
+MinBtn.Font = THEME.Font
+MinBtn.TextSize = 16
+corner(MinBtn, 8)
+
+local CloseBtn = Instance.new("TextButton", Header)
+CloseBtn.Size = UDim2.new(0, 32, 0, 32)
+CloseBtn.AnchorPoint = Vector2.new(0, 0.5)
+CloseBtn.Position = UDim2.new(1, -44, 0.5, 0)
+CloseBtn.BackgroundColor3 = THEME.Off
+CloseBtn.Text = "X"
+CloseBtn.TextColor3 = Color3.new(1, 1, 1)
+CloseBtn.Font = THEME.Font
+CloseBtn.TextSize = 16
+corner(CloseBtn, 8)
+
+-- Tab Bar (Scrollable horizontally)
+local TabBar = Instance.new("ScrollingFrame", MainFrame)
+TabBar.Size = UDim2.new(1, -24, 0, 32)
+TabBar.Position = UDim2.new(0, 12, 0, 58)
+TabBar.BackgroundTransparency = 1
+TabBar.BorderSizePixel = 0
+TabBar.ScrollBarThickness = 3
+TabBar.ScrollBarImageColor3 = THEME.Title
+TabBar.ScrollingDirection = Enum.ScrollingDirection.X
+TabBar.AutomaticCanvasSize = Enum.AutomaticSize.X
+TabBar.CanvasSize = UDim2.new(0, 0, 0, 0)
+
+do
+    local tbl = Instance.new("UIListLayout", TabBar)
+    tbl.FillDirection = Enum.FillDirection.Horizontal
+    tbl.Padding = UDim.new(0, 5)
+    tbl.SortOrder = Enum.SortOrder.LayoutOrder
+    tbl.VerticalAlignment = Enum.VerticalAlignment.Center
+end
+
+local tabButtons = {}
+local tabBodies  = {}
+
+local function makeScrollBody()
+    local b = Instance.new("ScrollingFrame", MainFrame)
+    b.Size = UDim2.new(1, -24, 1, -100)
+    b.Position = UDim2.new(0, 12, 0, 94)
+    b.BackgroundTransparency = 1
+    b.BorderSizePixel = 0
+    b.ScrollBarThickness = 4
+    b.ScrollBarImageColor3 = THEME.Title
+    b.ScrollingDirection = Enum.ScrollingDirection.Y
+    b.AutomaticCanvasSize = Enum.AutomaticSize.Y
+    b.CanvasSize = UDim2.new(0, 0, 0, 0)
+    b.Visible = false
+
+    local bl = Instance.new("UIListLayout", b)
+    bl.SortOrder = Enum.SortOrder.LayoutOrder
+    bl.Padding = UDim.new(0, 6)
+
+    local bp = Instance.new("UIPadding", b)
+    bp.PaddingTop = UDim.new(0, 4)
+    bp.PaddingBottom = UDim.new(0, 12)
+    bp.PaddingLeft = UDim.new(0, 4)
+    bp.PaddingRight = UDim.new(0, 6)
+    return b
+end
+
+local currentTab = nil
+local function selectTab(idx)
+    for i, btn in ipairs(tabButtons) do
+        local body = tabBodies[i]
+        local isCur = (i == idx)
+        btn.BackgroundColor3 = isCur and THEME.Blue or THEME.Panel
+        btn.TextColor3 = isCur and Color3.new(1, 1, 1) or THEME.SubText
+        if body then body.Visible = isCur end
+    end
+    currentTab = idx
+end
+
+local function addTab(name)
+    local idx = #tabButtons + 1
+    local btn = Instance.new("TextButton", TabBar)
+    btn.Size = UDim2.new(0, 0, 1, 0)
+    btn.AutomaticSize = Enum.AutomaticSize.X
+    btn.BackgroundColor3 = THEME.Panel
+    btn.Text = "  " .. name .. "  "
+    btn.TextColor3 = THEME.SubText
+    btn.Font = THEME.Font
+    btn.TextSize = 13
+    btn.LayoutOrder = idx
+    corner(btn, 6)
+    stroke(btn, THEME.Stroke, 1)
+
+    local body = makeScrollBody()
+    table.insert(tabButtons, btn)
+    table.insert(tabBodies, body)
+
+    btn.MouseButton1Click:Connect(function()
+        selectTab(idx)
+    end)
+    return body
+end
+
+-- ====================================================================
+-- 🎛️ UI COMPONENT BUILDERS (SECTION, TOGGLE, SLIDER, DROPDOWN)
+-- ====================================================================
+local itemOrder = 0
+local function nextOrder()
+    itemOrder = itemOrder + 1
+    return itemOrder
+end
+
+local function makeSection(parent, title)
+    local sec = Instance.new("Frame", parent)
+    sec.Size = UDim2.new(1, 0, 0, 24)
+    sec.BackgroundTransparency = 1
+    sec.LayoutOrder = nextOrder()
+
+    local l = Instance.new("TextLabel", sec)
+    l.Size = UDim2.new(1, 0, 1, 0)
+    l.BackgroundTransparency = 1
+    l.Text = "──  " .. title .. "  " .. string.rep("─", 20)
+    l.TextColor3 = THEME.Title
+    l.Font = THEME.Font
+    l.TextSize = 12
+    l.TextXAlignment = Enum.TextXAlignment.Left
+    return sec
+end
+
+local function makeToggle(parent, label, defaultVal, callback)
+    local con = Instance.new("Frame", parent)
+    con.Size = UDim2.new(1, 0, 0, 34)
+    con.BackgroundColor3 = THEME.Slot
+    con.BorderSizePixel = 0
+    con.LayoutOrder = nextOrder()
+    corner(con, 8)
+
+    local name = Instance.new("TextLabel", con)
+    name.Size = UDim2.new(1, -64, 1, 0)
+    name.Position = UDim2.new(0, 12, 0, 0)
+    name.BackgroundTransparency = 1
+    name.Text = label
+    name.TextColor3 = THEME.Text
+    name.Font = THEME.FontReg
+    name.TextSize = 13
+    name.TextXAlignment = Enum.TextXAlignment.Left
+
+    local btn = Instance.new("TextButton", con)
+    btn.Size = UDim2.new(0, 48, 0, 22)
+    btn.AnchorPoint = Vector2.new(1, 0.5)
+    btn.Position = UDim2.new(1, -8, 0.5, 0)
+    btn.BackgroundColor3 = defaultVal and THEME.On or THEME.Off
+    btn.Text = defaultVal and "ON" or "OFF"
+    btn.TextColor3 = Color3.new(1, 1, 1)
+    btn.Font = THEME.Font
+    btn.TextSize = 11
+    corner(btn, 6)
+
+    local active = defaultVal
+    btn.MouseButton1Click:Connect(function()
+        active = not active
+        btn.BackgroundColor3 = active and THEME.On or THEME.Off
+        btn.Text = active and "ON" or "OFF"
+        callback(active)
+    end)
+
+    return {
+        Set = function(val)
+            active = val
+            btn.BackgroundColor3 = active and THEME.On or THEME.Off
+            btn.Text = active and "ON" or "OFF"
+            callback(active)
+        end
+    }
+end
+
+local function makeButton(parent, label, btnColor, callback)
+    local con = Instance.new("Frame", parent)
+    con.Size = UDim2.new(1, 0, 0, 34)
+    con.BackgroundColor3 = THEME.Slot
+    con.BorderSizePixel = 0
+    con.LayoutOrder = nextOrder()
+    corner(con, 8)
+
+    local btn = Instance.new("TextButton", con)
+    btn.Size = UDim2.new(1, -12, 1, -8)
+    btn.Position = UDim2.new(0, 6, 0, 4)
+    btn.BackgroundColor3 = btnColor or THEME.Panel
+    btn.Text = label
+    btn.TextColor3 = Color3.new(1, 1, 1)
+    btn.Font = THEME.Font
+    btn.TextSize = 13
+    corner(btn, 6)
+    stroke(btn, THEME.Stroke, 1)
+
+    btn.MouseButton1Click:Connect(function()
+        callback()
+    end)
+    return btn
+end
+
+local function makeSlider(parent, label, minV, maxV, defaultV, unit, callback)
+    local con = Instance.new("Frame", parent)
+    con.Size = UDim2.new(1, 0, 0, 44)
+    con.BackgroundColor3 = THEME.Slot
+    con.BorderSizePixel = 0
+    con.LayoutOrder = nextOrder()
+    corner(con, 8)
+
+    local name = Instance.new("TextLabel", con)
+    name.Size = UDim2.new(0.65, 0, 0, 20)
+    name.Position = UDim2.new(0, 12, 0, 2)
+    name.BackgroundTransparency = 1
+    name.Text = label
+    name.TextColor3 = THEME.Text
+    name.Font = THEME.FontReg
+    name.TextSize = 13
+    name.TextXAlignment = Enum.TextXAlignment.Left
+
+    local valLabel = Instance.new("TextLabel", con)
+    valLabel.Size = UDim2.new(0.35, -12, 0, 20)
+    valLabel.Position = UDim2.new(0.65, 0, 0, 2)
+    valLabel.BackgroundTransparency = 1
+    valLabel.Text = tostring(defaultV) .. (unit or "")
+    valLabel.TextColor3 = THEME.Title
+    valLabel.Font = THEME.Font
+    valLabel.TextSize = 13
+    valLabel.TextXAlignment = Enum.TextXAlignment.Right
+
+    local trackBar = Instance.new("Frame", con)
+    trackBar.Size = UDim2.new(1, -24, 0, 6)
+    trackBar.Position = UDim2.new(0, 12, 0, 28)
+    trackBar.BackgroundColor3 = THEME.Panel
+    corner(trackBar, 3)
+
+    local fill = Instance.new("Frame", trackBar)
+    fill.Size = UDim2.new(math.clamp((defaultV - minV)/(maxV - minV), 0, 1), 0, 1, 0)
+    fill.BackgroundColor3 = THEME.Blue
+    corner(fill, 3)
+
+    local isDragging = false
+    local function updateFromPos(x)
+        local rel = math.clamp((x - trackBar.AbsolutePosition.X) / trackBar.AbsoluteSize.X, 0, 1)
+        fill.Size = UDim2.new(rel, 0, 1, 0)
+        local val = math.floor(minV + (maxV - minV) * rel + 0.5)
+        valLabel.Text = tostring(val) .. (unit or "")
+        callback(val)
+    end
+
+    trackBar.InputBegan:Connect(function(i)
+        if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then
+            isDragging = true
+            updateFromPos(i.Position.X)
+        end
+    end)
+    track(UserInputService.InputChanged:Connect(function(i)
+        if isDragging and (i.UserInputType == Enum.UserInputType.MouseMovement or i.UserInputType == Enum.UserInputType.Touch) then
+            updateFromPos(i.Position.X)
+        end
+    end))
+    track(UserInputService.InputEnded:Connect(function(i)
+        if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then
+            isDragging = false
+        end
+    end))
+end
+
+-- Dropdown Registry & Blocker
+local DD = {
+    closers = {},
+    blocker = nil,
+}
+
+local function closeOtherDropdowns(exceptId)
+    for id, closer in pairs(DD.closers) do
+        if id ~= exceptId then pcall(closer) end
+    end
+end
+
+local function getBlocker()
+    if DD.blocker then return DD.blocker end
+    local b = Instance.new("TextButton", ScreenGui)
+    b.Name = "DDBlocker"
+    b.Size = UDim2.new(1, 0, 1, 0)
+    b.BackgroundTransparency = 1
+    b.Text = ""
+    b.ZIndex = 499
+    b.Visible = false
+    b.MouseButton1Click:Connect(function()
+        closeOtherDropdowns(nil)
+    end)
+    DD.blocker = b
+    return b
+end
+
+local function makeDropdown(parent, label, getItems, onSelect, defaultText)
+    local con = Instance.new("Frame", parent)
+    con.Size = UDim2.new(1, 0, 0, 34)
+    con.BackgroundColor3 = THEME.Slot
+    con.BorderSizePixel = 0
+    con.LayoutOrder = nextOrder()
+    con.ZIndex = 1
+    corner(con, 8)
+
+    local name = Instance.new("TextLabel", con)
+    name.Size = UDim2.new(0.4, -12, 1, 0)
+    name.Position = UDim2.new(0, 12, 0, 0)
+    name.BackgroundTransparency = 1
+    name.Text = label
+    name.TextColor3 = THEME.Text
+    name.Font = THEME.FontReg
+    name.TextSize = 13
+    name.TextXAlignment = Enum.TextXAlignment.Left
+
+    local trig = Instance.new("TextButton", con)
+    trig.Size = UDim2.new(0.58, -8, 0, 24)
+    trig.Position = UDim2.new(0.42, 0, 0.5, -12)
+    trig.BackgroundColor3 = THEME.Panel
+    trig.Text = ""
+    trig.AutoButtonColor = false
+    corner(trig, 6)
+    stroke(trig, THEME.Stroke, 1)
+
+    local disp = Instance.new("TextLabel", trig)
+    disp.Size = UDim2.new(1, -24, 1, 0)
+    disp.Position = UDim2.new(0, 8, 0, 0)
+    disp.BackgroundTransparency = 1
+    disp.Text = defaultText or "Select..."
+    disp.TextColor3 = THEME.Title
+    disp.Font = THEME.FontReg
+    disp.TextSize = 12
+    disp.TextTruncate = Enum.TextTruncate.AtEnd
+    disp.TextXAlignment = Enum.TextXAlignment.Left
+
+    local arr = Instance.new("TextLabel", trig)
+    arr.Size = UDim2.new(0, 16, 1, 0)
+    arr.Position = UDim2.new(1, -20, 0, 0)
+    arr.BackgroundTransparency = 1
+    arr.Text = "▼"
+    arr.TextColor3 = THEME.SubText
+    arr.Font = THEME.Font
+    arr.TextSize = 10
+
+    local list = nil
+    local function getList()
+        if list then return list end
+        local l = Instance.new("ScrollingFrame", ScreenGui)
+        l.BackgroundColor3 = THEME.Panel
+        l.BorderSizePixel = 0
+        l.ScrollBarThickness = 4
+        l.ScrollBarImageColor3 = THEME.Title
+        l.Visible = false
+        l.ZIndex = 500
+        l.ClipsDescendants = true
+        corner(l, 8)
+        stroke(l, THEME.Title, 1)
+
+        local ll = Instance.new("UIListLayout", l)
+        ll.SortOrder = Enum.SortOrder.LayoutOrder
+        ll.Padding = UDim.new(0, 2)
+
+        local lp = Instance.new("UIPadding", l)
+        lp.PaddingTop = UDim.new(0, 3)
+        lp.PaddingLeft = UDim.new(0, 3)
+        lp.PaddingRight = UDim.new(0, 3)
+        list = l
+        return l
+    end
+
+    local myId = {}
+    local isOpen = false
+    local function closeList()
+        isOpen = false
+        arr.Text = "▼"
+        if DD.blocker then DD.blocker.Visible = false end
+        if list then list.Visible = false end
+    end
+    DD.closers[myId] = closeList
+
+    trig.MouseButton1Click:Connect(function()
+        if isOpen then
+            closeList()
+            return
+        end
+        closeOtherDropdowns(myId)
+        isOpen = true
+        arr.Text = "▲"
+        getBlocker().Visible = true
+
+        local lst = getList()
+        for _, c in ipairs(lst:GetChildren()) do
+            if c:IsA("TextButton") then c:Destroy() end
+        end
+
+        local items = type(getItems) == "function" and getItems() or getItems
+        local s = math.max(ViewportScale.Scale, 0.01)
+        local ap, as = con.AbsolutePosition, con.AbsoluteSize
+        local w = as.X / s
+        local h = math.min(#items * 28 + 6, 200)
+
+        lst.Size = UDim2.fromOffset(w, h)
+        lst.Position = UDim2.fromOffset(ap.X / s, (ap.Y + as.Y + 4) / s)
+        lst.Visible = true
+
+        for i, it in ipairs(items) do
+            local b = Instance.new("TextButton", lst)
+            b.Size = UDim2.new(1, -6, 0, 26)
+            b.BackgroundColor3 = THEME.Slot
+            b.Text = "  " .. tostring(it)
+            b.TextColor3 = THEME.Text
+            b.Font = THEME.FontReg
+            b.TextSize = 12
+            b.TextXAlignment = Enum.TextXAlignment.Left
+            b.LayoutOrder = i
+            b.ZIndex = 501
+            corner(b, 4)
+
+            b.MouseButton1Click:Connect(function()
+                disp.Text = tostring(it)
+                closeList()
+                onSelect(it)
+            end)
+        end
+    end)
+
+    return {
+        Set = function(txt)
+            disp.Text = tostring(txt)
+        end
+    }
+end
+
+local function makeMultiSelect(parent, label, getItems, store, emptyTxt, onChanged)
+    local con = Instance.new("Frame", parent)
+    con.Size = UDim2.new(1, 0, 0, 34)
+    con.BackgroundColor3 = THEME.Slot
+    con.BorderSizePixel = 0
+    con.LayoutOrder = nextOrder()
+    con.ZIndex = 1
+    corner(con, 8)
+
+    local name = Instance.new("TextLabel", con)
+    name.Size = UDim2.new(0.4, -12, 1, 0)
+    name.Position = UDim2.new(0, 12, 0, 0)
+    name.BackgroundTransparency = 1
+    name.Text = label
+    name.TextColor3 = THEME.Text
+    name.Font = THEME.FontReg
+    name.TextSize = 13
+    name.TextXAlignment = Enum.TextXAlignment.Left
+
+    local trig = Instance.new("TextButton", con)
+    trig.Size = UDim2.new(0.58, -8, 0, 24)
+    trig.Position = UDim2.new(0.42, 0, 0.5, -12)
+    trig.BackgroundColor3 = THEME.Panel
+    trig.Text = ""
+    trig.AutoButtonColor = false
+    corner(trig, 6)
+    stroke(trig, THEME.Stroke, 1)
+
+    local disp = Instance.new("TextLabel", trig)
+    disp.Size = UDim2.new(1, -24, 1, 0)
+    disp.Position = UDim2.new(0, 8, 0, 0)
+    disp.BackgroundTransparency = 1
+    disp.Text = emptyTxt or "None"
+    disp.TextColor3 = THEME.SubText
+    disp.Font = THEME.FontReg
+    disp.TextSize = 12
+    disp.TextTruncate = Enum.TextTruncate.AtEnd
+    disp.TextXAlignment = Enum.TextXAlignment.Left
+
+    local arr = Instance.new("TextLabel", trig)
+    arr.Size = UDim2.new(0, 16, 1, 0)
+    arr.Position = UDim2.new(1, -20, 0, 0)
+    arr.BackgroundTransparency = 1
+    arr.Text = "▼"
+    arr.TextColor3 = THEME.SubText
+    arr.Font = THEME.Font
+    arr.TextSize = 10
+
+    local list = nil
+    local function getList()
+        if list then return list end
+        local l = Instance.new("ScrollingFrame", ScreenGui)
+        l.BackgroundColor3 = THEME.Panel
+        l.BorderSizePixel = 0
+        l.ScrollBarThickness = 4
+        l.ScrollBarImageColor3 = THEME.Title
+        l.Visible = false
+        l.ZIndex = 500
+        l.ClipsDescendants = true
+        corner(l, 8)
+        stroke(l, THEME.Title, 1)
+
+        local ll = Instance.new("UIListLayout", l)
+        ll.SortOrder = Enum.SortOrder.LayoutOrder
+        ll.Padding = UDim.new(0, 2)
+
+        local lp = Instance.new("UIPadding", l)
+        lp.PaddingTop = UDim.new(0, 3)
+        lp.PaddingLeft = UDim.new(0, 3)
+        lp.PaddingRight = UDim.new(0, 3)
+        list = l
+        return l
+    end
+
+    local function refreshDisplay()
+        local count = 0
+        local firstText = nil
+        for k, v in pairs(store) do
+            if v then
+                count = count + 1
+                if not firstText then firstText = k end
+            end
+        end
+        if count == 0 then
+            disp.Text = emptyTxt or "None"
+            disp.TextColor3 = THEME.SubText
+        elseif count == 1 then
+            disp.Text = firstText
+            disp.TextColor3 = THEME.Title
+        else
+            disp.Text = "Selected (" .. tostring(count) .. ")"
+            disp.TextColor3 = THEME.Title
+        end
+    end
+    refreshDisplay()
+
+    local myId = {}
+    local isOpen = false
+    local function closeList()
+        isOpen = false
+        arr.Text = "▼"
+        if DD.blocker then DD.blocker.Visible = false end
+        if list then list.Visible = false end
+    end
+    DD.closers[myId] = closeList
+
+    trig.MouseButton1Click:Connect(function()
+        if isOpen then
+            closeList()
+            return
+        end
+        closeOtherDropdowns(myId)
+        isOpen = true
+        arr.Text = "▲"
+        getBlocker().Visible = true
+
+        local lst = getList()
+        for _, c in ipairs(lst:GetChildren()) do
+            if c:IsA("TextButton") then c:Destroy() end
+        end
+
+        local items = type(getItems) == "function" and getItems() or getItems
+        local s = math.max(ViewportScale.Scale, 0.01)
+        local ap, as = con.AbsolutePosition, con.AbsoluteSize
+        local w = as.X / s
+        local h = math.min(#items * 28 + 6, 200)
+
+        lst.Size = UDim2.fromOffset(w, h)
+        lst.Position = UDim2.fromOffset(ap.X / s, (ap.Y + as.Y + 4) / s)
+        lst.Visible = true
+
+        for i, it in ipairs(items) do
+            local isSel = store[it] == true
+            local b = Instance.new("TextButton", lst)
+            b.Size = UDim2.new(1, -6, 0, 26)
+            b.BackgroundColor3 = isSel and THEME.Blue or THEME.Slot
+            b.Text = (isSel and " [✓] " or " [  ] ") .. tostring(it)
+            b.TextColor3 = isSel and Color3.new(1, 1, 1) or THEME.Text
+            b.Font = THEME.FontReg
+            b.TextSize = 12
+            b.TextXAlignment = Enum.TextXAlignment.Left
+            b.LayoutOrder = i
+            b.ZIndex = 501
+            corner(b, 4)
+
+            b.MouseButton1Click:Connect(function()
+                store[it] = not store[it]
+                local nowSel = store[it]
+                b.BackgroundColor3 = nowSel and THEME.Blue or THEME.Slot
+                b.Text = (nowSel and " [✓] " or " [  ] ") .. tostring(it)
+                b.TextColor3 = nowSel and Color3.new(1, 1, 1) or THEME.Text
+                refreshDisplay()
+                if onChanged then onChanged(it, nowSel) end
+            end)
+        end
+    end)
+
+    return {
+        Refresh = refreshDisplay
+    }
+end
+
+-- ====================================================================
+-- 🌟 CONFIRMATION MODAL & MINIMIZE SYSTEM
+-- ====================================================================
+local function showConfirmModal(titleText, descText, onConfirm)
+    local modalOverlay = Instance.new("Frame", ScreenGui)
+    modalOverlay.Size = UDim2.new(1, 0, 1, 0)
+    modalOverlay.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    modalOverlay.BackgroundTransparency = 0.5
+    modalOverlay.ZIndex = 900
+
+    local mBox = Instance.new("Frame", modalOverlay)
+    mBox.Size = UDim2.fromOffset(360, 180)
+    mBox.AnchorPoint = Vector2.new(0.5, 0.5)
+    mBox.Position = UDim2.new(0.5, 0, 0.5, 0)
+    mBox.BackgroundColor3 = THEME.Bg
+    mBox.ZIndex = 901
+    corner(mBox, 12)
+    neonStroke(mBox, 2)
+
+    local mTitle = Instance.new("TextLabel", mBox)
+    mTitle.Size = UDim2.new(1, -24, 0, 30)
+    mTitle.Position = UDim2.new(0, 12, 0, 14)
+    mTitle.BackgroundTransparency = 1
+    mTitle.Text = titleText
+    mTitle.TextColor3 = THEME.Title
+    mTitle.Font = THEME.Font
+    mTitle.TextSize = 15
+    mTitle.ZIndex = 902
+
+    local mDesc = Instance.new("TextLabel", mBox)
+    mDesc.Size = UDim2.new(1, -24, 0, 50)
+    mDesc.Position = UDim2.new(0, 12, 0, 48)
+    mDesc.BackgroundTransparency = 1
+    mDesc.Text = descText
+    mDesc.TextColor3 = THEME.SubText
+    mDesc.Font = THEME.FontReg
+    mDesc.TextSize = 12
+    mDesc.TextWrapped = true
+    mDesc.ZIndex = 902
+
+    local btnCon = Instance.new("Frame", mBox)
+    btnCon.Size = UDim2.new(1, -24, 0, 36)
+    btnCon.Position = UDim2.new(0, 12, 1, -48)
+    btnCon.BackgroundTransparency = 1
+    btnCon.ZIndex = 902
+
+    local cancelBtn = Instance.new("TextButton", btnCon)
+    cancelBtn.Size = UDim2.new(0.48, 0, 1, 0)
+    cancelBtn.BackgroundColor3 = THEME.Panel
+    cancelBtn.Text = L("Batal", "Cancel")
+    cancelBtn.TextColor3 = THEME.Text
+    cancelBtn.Font = THEME.Font
+    cancelBtn.TextSize = 13
+    cancelBtn.ZIndex = 903
+    corner(cancelBtn, 8)
+    stroke(cancelBtn, THEME.Stroke, 1)
+
+    local okBtn = Instance.new("TextButton", btnCon)
+    okBtn.Size = UDim2.new(0.48, 0, 1, 0)
+    okBtn.Position = UDim2.new(0.52, 0, 0, 0)
+    okBtn.BackgroundColor3 = THEME.Off
+    okBtn.Text = L("Ya, Keluar", "Yes, Exit")
+    okBtn.TextColor3 = Color3.new(1, 1, 1)
+    okBtn.Font = THEME.Font
+    okBtn.TextSize = 13
+    okBtn.ZIndex = 903
+    corner(okBtn, 8)
+
+    cancelBtn.MouseButton1Click:Connect(function()
+        modalOverlay:Destroy()
+    end)
+    okBtn.MouseButton1Click:Connect(function()
+        modalOverlay:Destroy()
+        onConfirm()
+    end)
+end
+
+-- Floating 76x76 MinCircle (Minimize Restore Button)
+local MinCircle = Instance.new("TextButton", ScreenGui)
+MinCircle.Name = "MinCircle"
+MinCircle.Size = UDim2.fromOffset(76, 76)
+MinCircle.Position = UDim2.new(0, 20, 0.5, -38)
+MinCircle.BackgroundColor3 = THEME.Panel
+MinCircle.Text = ""
+MinCircle.Visible = false
+MinCircle.ZIndex = 50
+corner(MinCircle, 38)
+neonStroke(MinCircle, 2)
+
+local MinCrown = Instance.new("TextLabel", MinCircle)
+MinCrown.Size = UDim2.new(1, 0, 0, 26)
+MinCrown.Position = UDim2.new(0, 0, 0, 10)
+MinCrown.BackgroundTransparency = 1
+MinCrown.Text = "👑"
+MinCrown.TextSize = 20
+MinCrown.Font = THEME.Font
+
+local MinBh = Instance.new("TextLabel", MinCircle)
+MinBh.Size = UDim2.new(1, 0, 0, 24)
+MinBh.Position = UDim2.new(0, 0, 0, 36)
+MinBh.BackgroundTransparency = 1
+MinBh.Text = "BH"
+MinBh.TextColor3 = THEME.Title
+MinBh.TextSize = 18
+MinBh.Font = Enum.Font.GothamBlack
+
+do
+    local dragging, dragStart, startPos, moved = false, nil, nil, false
+    local function release(i)
+        if not dragging then return end
+        if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then
+            dragging = false
+            if not moved and MinCircle.Visible then
+                MinCircle.Visible = false
+                MainFrame.Visible = true
+                MainScale.Scale = 0
+                TweenService:Create(MainScale, tweenBounce, {Scale = 1}):Play()
+            end
+        end
+    end
+
+    MinCircle.InputBegan:Connect(function(i)
+        if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then
+            dragging = true; moved = false; dragStart = i.Position; startPos = MinCircle.Position
+        end
+    end)
+    track(UserInputService.InputChanged:Connect(function(i)
+        if not dragging then return end
+        if i.UserInputType == Enum.UserInputType.MouseMovement or i.UserInputType == Enum.UserInputType.Touch then
+            local d = i.Position - dragStart
+            if math.abs(d.X) > 6 or math.abs(d.Y) > 6 then moved = true end
+            MinCircle.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + d.X, startPos.Y.Scale, startPos.Y.Offset + d.Y)
+        end
+    end))
+    MinCircle.InputEnded:Connect(release)
+end
+
+MinBtn.MouseButton1Click:Connect(function()
+    TweenService:Create(MainScale, tweenFast, {Scale = 0}):Play()
+    task.wait(0.2)
+    MainFrame.Visible = false
+    MinCircle.Visible = true
+end)
+
+CloseBtn.MouseButton1Click:Connect(function()
+    showConfirmModal(
+        L("Konfirmasi Keluar Brother Hub", "Exit Brother Hub Confirmation"),
+        L("👑 Apakah Anda yakin ingin menutup script Brother Hub?",
+          "👑 Are you sure you want to stop and exit Brother Hub?"),
+        function()
+            for _, c in ipairs(scriptConnections) do
+                pcall(function() c:Disconnect() end)
+            end
+            ScreenGui:Destroy()
+        end
+    )
+end)
+
+-- Main Frame Dragging
+do
+    local dragging, dragStart, startPos = false, nil, nil
+    Header.InputBegan:Connect(function(i)
+        if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = i.Position
+            startPos  = MainFrame.Position
+        end
+    end)
+    track(UserInputService.InputChanged:Connect(function(i)
+        if dragging and (i.UserInputType == Enum.UserInputType.MouseMovement or i.UserInputType == Enum.UserInputType.Touch) then
+            local d = (i.Position - dragStart) / ViewportScale.Scale
+            MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + d.X, startPos.Y.Scale, startPos.Y.Offset + d.Y)
+        end
+    end))
+    track(UserInputService.InputEnded:Connect(function(i)
+        if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then
+            dragging = false
+        end
+    end))
+end
+
+-- Resize Grip (Bottom Right Corner "◢")
+local ResizeGrip = Instance.new("TextButton", MainFrame)
+ResizeGrip.Name = "ResizeGrip"
+ResizeGrip.Size = UDim2.fromOffset(22, 22)
+ResizeGrip.Position = UDim2.new(1, -22, 1, -22)
+ResizeGrip.BackgroundTransparency = 1
+ResizeGrip.Text = "◢"
+ResizeGrip.TextSize = 15
+ResizeGrip.TextColor3 = THEME.Stroke
+ResizeGrip.Font = THEME.Font
+ResizeGrip.ZIndex = 15
+ResizeGrip.AutoButtonColor = false
+
+do
+    local resizing = false
+    local startPos = nil
+    local startSize = nil
+    ResizeGrip.InputBegan:Connect(function(i)
+        if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then
+            resizing = true; startPos = i.Position; startSize = MainFrame.AbsoluteSize
+        end
+    end)
+    track(UserInputService.InputChanged:Connect(function(i)
+        if resizing and (i.UserInputType == Enum.UserInputType.MouseMovement or i.UserInputType == Enum.UserInputType.Touch) then
+            local d = (i.Position - startPos) / ViewportScale.Scale
+            local newW = math.clamp(startSize.X + d.X, 520, 1100)
+            local newH = math.clamp(startSize.Y + d.Y, 360, 750)
+            MainFrame.Size = UDim2.fromOffset(newW, newH)
+        end
+    end))
+    track(UserInputService.InputEnded:Connect(function(i)
+        if not resizing then return end
+        if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then
+            resizing = false
+        end
+    end))
+end
+
+-- ====================================================================
+-- 🏷️ TABS CREATION (10 COMPREHENSIVE TABS)
+-- ====================================================================
+local tabAutoFarm   = addTab(L("🥚 Auto Farm", "🥚 Auto Farm"))
+local tabPlot       = addTab(L("🏡 Base & Plot", "🏡 Base & Plot"))
+local tabBackpack   = addTab(L("🎒 Tas & Jual", "🎒 Bag & Sell"))
+local tabPickaxe    = addTab(L("⛏️ Beli Pickaxe", "⛏️ Pickaxe Shop"))
+local tabTrails     = addTab(L("🌈 Beli Trails", "🌈 Trails Shop"))
+local tabRewards    = addTab(L("🎁 Hadiah Gratis", "🎁 Free Rewards"))
+local tabCombat     = addTab(L("⚔️ Bat & PvP", "⚔️ Bat & PvP"))
+local tabTeleports  = addTab(L("🚀 Teleportasi", "🚀 Teleports"))
+local tabPlayer     = addTab(L("🏃 Karakter & ESP", "🏃 Player & ESP"))
+local tabCredits    = addTab(L("👑 Credit & Donasi", "👑 Credit & Donate"))
+
+-- ====================================================================
+-- 1. TAB AUTO FARM (BREAKING & STEALING)
+-- ====================================================================
+makeSection(tabAutoFarm, L("Hancurkan Telur (Auto Break Eggs)", "Auto Break Eggs"))
+
+makeToggle(tabAutoFarm, L("Otomatis Pukul Telur Terdekat", "Auto Hit Nearest Egg"), state.autoHitEgg, function(v)
+    state.autoHitEgg = v
+end)
+
+makeToggle(tabAutoFarm, L("Mode Aura Cepat (Fast Hit Aura)", "Fast Hit Aura Mode"), state.autoHitAura, function(v)
+    state.autoHitAura = v
+end)
+
+makeSlider(tabAutoFarm, L("Jarak Jangkauan Pukul (Studs)", "Hit Reach Distance (Studs)"), 5, 45, config.hitRange, " studs", function(v)
+    config.hitRange = v
+end)
+
+makeSlider(tabAutoFarm, L("Jeda Pukul (Hit Delay ms)", "Hit Loop Delay (ms)"), 50, 500, math.floor(config.hitDelay * 1000), " ms", function(v)
+    config.hitDelay = v / 1000
+end)
+
+makeMultiSelect(tabAutoFarm, L("Filter Jenis Telur Ditarget", "Target Egg Filter"), EGG_TARGETS_CATALOG, config.targetEggs, "All Eggs")
+
+makeSection(tabAutoFarm, L("Curi Telur & Auto Bank (Safe AFK Loop)", "Steal Eggs & Auto Bank"))
+
+makeToggle(tabAutoFarm, L("Otomatis Curi Hewan/Telur (Auto Steal)", "Auto Steal Animal/Egg"), state.autoStealEgg, function(v)
+    state.autoStealEgg = v
+end)
+
+makeToggle(tabAutoFarm, L("Instant Teleport Bank (Anti-Guard Fling)", "Instant Bank Teleport (Anti-Guard)"), state.instantBank, function(v)
+    state.instantBank = v
+end)
+
+local zoneNames = {}
+for _, z in ipairs(ZONES_LIST) do table.insert(zoneNames, z.Name) end
+makeDropdown(tabAutoFarm, L("Target Zona Curi", "Target Steal Zone"), zoneNames, function(choice)
+    for _, z in ipairs(ZONES_LIST) do
+        if z.Name == choice then
+            config.selectedZone = z.Id
+            break
+        end
+    end
+end, "Zone 1 - Common")
+
+makeSlider(tabAutoFarm, L("Jeda Siklus Curi (Detik)", "Steal Loop Delay (Seconds)"), 1, 10, math.floor(config.stealCooldown * 2), "s", function(v)
+    config.stealCooldown = v * 0.25
+end)
+
+-- ====================================================================
+-- 2. TAB BASE & PLOT
+-- ====================================================================
+makeSection(tabPlot, L("Peningkatan Plot & Kapasitas", "Plot Upgrades & Capacity"))
+
+makeToggle(tabPlot, L("Otomatis Upgrade Base Plot", "Auto Upgrade Base Plot"), state.autoUpgradePlot, function(v)
+    state.autoUpgradePlot = v
+end)
+
+makeButton(tabPlot, L("⚡ Upgrade Plot Sekarang", "⚡ Upgrade Plot Now"), THEME.Blue, function()
+    pcall(function()
+        if remotes.UpgradePlotRequest then
+            remotes.UpgradePlotRequest:FireServer()
+        end
+    end)
+end)
+
+makeSection(tabPlot, L("Latihan Kecepatan Treadmill", "Treadmill Speed Training"))
+
+makeToggle(tabPlot, L("Otomatis Buka Treadmill ($100)", "Auto Unlock Treadmill ($100)"), state.autoUnlockTread, function(v)
+    state.autoUnlockTread = v
+end)
+
+makeToggle(tabPlot, L("Otomatis Upgrade Level Treadmill", "Auto Upgrade Treadmill"), state.autoUpgradeTread, function(v)
+    state.autoUpgradeTread = v
+end)
+
+makeToggle(tabPlot, L("Otomatis Lari di Treadmill (AFK Speed)", "Auto Run on Treadmill (AFK Speed)"), state.autoTreadTrain, function(v)
+    state.autoTreadTrain = v
+end)
+
+makeSection(tabPlot, L("Penempatan Hewan di Plot", "Place Animals in Plot"))
+
+makeToggle(tabPlot, L("Otomatis Pasang Hewan Baru di Base", "Auto Place Banked Animals on Plot"), state.autoPlaceAnimals, function(v)
+    state.autoPlaceAnimals = v
+end)
+
+-- ====================================================================
+-- 3. TAB TAS & JUAL (BACKPACK & SELL)
+-- ====================================================================
+makeSection(tabBackpack, L("Penjualan Otomatis Tas", "Backpack Auto Sell"))
+
+makeToggle(tabBackpack, L("Otomatis Jual Saat Tas Penuh", "Auto Sell When Bag is Full"), state.autoSellOnFull, function(v)
+    state.autoSellOnFull = v
+end)
+
+makeToggle(tabBackpack, L("Otomatis Jual Berkelanjutan (Loop)", "Loop Auto Sell Backpack"), state.autoSellBackpack, function(v)
+    state.autoSellBackpack = v
+end)
+
+makeMultiSelect(tabBackpack, L("Filter Kelangkaan Dijual", "Rarity Filter to Sell"), RARITIES_CATALOG, config.sellRarities, "None Selected")
+
+makeButton(tabBackpack, L("💰 Jual Seluruh Isi Tas Sekarang", "💰 Instant Sell All Bag Items Now"), THEME.On, function()
+    sellSelectedBackpackTools()
+end)
+
+-- ====================================================================
+-- 4. TAB BELI PICKAXE (PICKAXE SHOP)
+-- ====================================================================
+makeSection(tabPickaxe, L("Pembaruan Pickaxe Otomatis", "Auto Pickaxe Upgrades"))
+
+makeToggle(tabPickaxe, L("Otomatis Beli Pickaxe Terbaik (Mampu)", "Auto Buy Best Afforded Pickaxe"), state.autoBuyPickaxe, function(v)
+    state.autoBuyPickaxe = v
+end)
+
+makeToggle(tabPickaxe, L("Otomatis Pasang Pickaxe Tertinggi", "Auto Equip Highest Pickaxe"), state.autoEquipPickaxe, function(v)
+    state.autoEquipPickaxe = v
+end)
+
+makeSection(tabPickaxe, L("Pembelian Pickaxe Manual", "Manual Pickaxe Purchase"))
+
+local pickaxeLabels = {}
+for _, p in ipairs(PICKAXE_TIERS) do
+    table.insert(pickaxeLabels, string.format("Tier %d: %s (%s)", p.Tier, p.Name, p.CostStr))
+end
+
+makeDropdown(tabPickaxe, L("Pilih Pickaxe", "Select Pickaxe"), pickaxeLabels, function(choice)
+    for _, p in ipairs(PICKAXE_TIERS) do
+        if string.find(choice, p.Name) then
+            config.selectedPickaxe = p.Tier
+            break
+        end
+    end
+end, pickaxeLabels[1])
+
+makeButton(tabPickaxe, L("🛒 Beli Pickaxe Terpilih", "🛒 Buy Selected Pickaxe"), THEME.Blue, function()
+    pcall(function()
+        if remotes.PickaxeShopRequest then
+            remotes.PickaxeShopRequest:FireServer("Buy", config.selectedPickaxe)
+        end
+    end)
+end)
+
+makeButton(tabPickaxe, L("🗡️ Pasang Pickaxe Terpilih", "🗡️ Equip Selected Pickaxe"), THEME.Panel, function()
+    pcall(function()
+        if remotes.PickaxeShopRequest then
+            remotes.PickaxeShopRequest:FireServer("Equip", config.selectedPickaxe)
+        end
+    end)
+end)
+
+-- ====================================================================
+-- 5. TAB BELI TRAILS (TRAILS SHOP)
+-- ====================================================================
+makeSection(tabTrails, L("Pembaruan Trails Otomatis", "Auto Trails Upgrades"))
+
+makeToggle(tabTrails, L("Otomatis Beli Trail Terbaik (Mampu)", "Auto Buy Best Afforded Trail"), state.autoBuyTrail, function(v)
+    state.autoBuyTrail = v
+end)
+
+makeToggle(tabTrails, L("Otomatis Pasang Trail Terbaik", "Auto Equip Best Owned Trail"), state.autoEquipTrail, function(v)
+    state.autoEquipTrail = v
+end)
+
+makeSection(tabTrails, L("Pembelian Trail Manual", "Manual Trail Purchase"))
+
+local trailLabels = {}
+for _, t in ipairs(TRAILS_TIERS) do
+    table.insert(trailLabels, string.format("%s (%s | %s)", t.Name, t.Mult, t.CostStr))
+end
+
+makeDropdown(tabTrails, L("Pilih Trail", "Select Trail"), trailLabels, function(choice)
+    for _, t in ipairs(TRAILS_TIERS) do
+        if string.find(choice, t.Name) then
+            config.selectedTrail = t.Id
+            break
+        end
+    end
+end, trailLabels[1])
+
+makeButton(tabTrails, L("🛒 Beli Trail Terpilih", "🛒 Buy Selected Trail"), THEME.Purple, function()
+    pcall(function()
+        if remotes.TrailShopRequest then
+            remotes.TrailShopRequest:FireServer("Buy", config.selectedTrail)
+        end
+    end)
+end)
+
+makeButton(tabTrails, L("✨ Pasang Trail Terpilih", "✨ Equip Selected Trail"), THEME.Panel, function()
+    pcall(function()
+        if remotes.TrailShopRequest then
+            remotes.TrailShopRequest:FireServer("Equip", config.selectedTrail)
+        end
+    end)
+end)
+
+-- ====================================================================
+-- 6. TAB HADIAH GRATIS (FREE REWARDS)
+-- ====================================================================
+makeSection(tabRewards, L("Klaim Hadiah Otomatis", "Auto Claim Free Rewards"))
+
+makeToggle(tabRewards, L("Otomatis Klaim Group (+10,000 Speed)", "Auto Claim Group (+10K Speed)"), state.autoClaimGroup, function(v)
+    state.autoClaimGroup = v
+end)
+
+makeToggle(tabRewards, L("Otomatis Klaim Sabertooth Discord", "Auto Claim Discord Sabertooth"), state.autoClaimDiscord, function(v)
+    state.autoClaimDiscord = v
+end)
+
+makeToggle(tabRewards, L("Otomatis Klaim Hadiah Offline", "Auto Claim Offline Rewards"), state.autoClaimOffline, function(v)
+    state.autoClaimOffline = v
+end)
+
+makeToggle(tabRewards, L("Otomatis Klaim Semua Index Koleksi", "Auto Claim All Index Collection"), state.autoClaimIndex, function(v)
+    state.autoClaimIndex = v
+end)
+
+makeButton(tabRewards, L("🎁 Klaim Semua Hadiah Sekarang", "🎁 Claim All Rewards Now"), THEME.On, function()
+    pcall(function()
+        if remotes.GroupRewardRemote then
+            remotes.GroupRewardRemote:FireServer("Claim")
+        end
+        if remotes.DiscordRewardRemote then
+            remotes.DiscordRewardRemote:FireServer("Verify", LocalPlayer.Name)
+        end
+        if remotes.OfflineRewardRemote then
+            remotes.OfflineRewardRemote:FireServer("Claim")
+        end
+        if remotes.IndexRemote then
+            remotes.IndexRemote:FireServer("ClaimAll", nil)
+        end
+    end)
+end)
+
+-- ====================================================================
+-- 7. TAB BAT & COMBAT (PVP DEFENSE)
+-- ====================================================================
+makeSection(tabCombat, L("Pertahanan Diri / Kill Aura Pemukul", "Bat Defense / Kill Aura"))
+
+makeToggle(tabCombat, L("Otomatis Serang Musuh (Bat Aura)", "Auto Attack Enemies (Bat Aura)"), state.autoBatAttack, function(v)
+    state.autoBatAttack = v
+end)
+
+makeToggle(tabCombat, L("Lindungi Teman (Whitelist Friends)", "Whitelist Friends"), state.whitelistFriends, function(v)
+    state.whitelistFriends = v
+end)
+
+makeSlider(tabCombat, L("Jarak Serang Bat (Studs)", "Bat Attack Range (Studs)"), 5, 25, config.attackRange, " studs", function(v)
+    config.attackRange = v
+end)
+
+-- ====================================================================
+-- 8. TAB TELEPORTASI (TELEPORTS)
+-- ====================================================================
+makeSection(tabTeleports, L("Lokasi Utama & Toko", "Base & Shops"))
+
+makeButton(tabTeleports, L("🏡 Teleport ke Base Plot Sendiri", "🏡 Teleport to My Owned Plot"), THEME.Blue, function()
+    pcall(function()
+        local hb = getMyPlotHitbox()
+        local char = LocalPlayer.Character
+        if hb and char then
+            char:PivotTo(hb.CFrame * CFrame.new(0, 4, 0))
+        end
+    end)
+end)
+
+makeButton(tabTeleports, L("⛏️ Teleport ke Pickaxe Shop", "⛏️ Teleport to Pickaxe Shop"), THEME.Panel, function()
+    pcall(function()
+        local char = LocalPlayer.Character
+        if char then
+            char:PivotTo(CFrame.new(-70.25, 8.96, 51.94))
+        end
+    end)
+end)
+
+makeButton(tabTeleports, L("🌈 Teleport ke Trails Shop", "🌈 Teleport to Trails Shop"), THEME.Panel, function()
+    pcall(function()
+        local char = LocalPlayer.Character
+        if char then
+            char:PivotTo(CFrame.new(-66.13, 1.84, -54.31))
+        end
+    end)
+end)
+
+makeButton(tabTeleports, L("🎁 Teleport ke Group Reward", "🎁 Teleport to Group Reward"), THEME.Panel, function()
+    pcall(function()
+        local char = LocalPlayer.Character
+        if char then
+            char:PivotTo(CFrame.new(-71.67, 1.16, -71.63))
+        end
+    end)
+end)
+
+makeButton(tabTeleports, L("⭐ Teleport ke Special Egg Spawn", "⭐ Teleport to Special Egg Spawn"), THEME.Purple, function()
+    pcall(function()
+        local char = LocalPlayer.Character
+        if char then
+            char:PivotTo(CFrame.new(-83.00, 32.50, -29.75))
+        end
+    end)
+end)
+
+makeSection(tabTeleports, L("Zona Telur 1 sampai 9", "Zones 1 to 9"))
+
+for _, z in ipairs(ZONES_LIST) do
+    makeButton(tabTeleports, "📍 Teleport ke " .. z.Name, THEME.Slot, function()
+        pcall(function()
+            local char = LocalPlayer.Character
+            if char then
+                char:PivotTo(CFrame.new(z.Pos.X, z.Pos.Y + 3, z.Pos.Z))
+            end
+        end)
+    end)
+end
+
+makeSection(tabTeleports, L("Teleport ke Pemain Lain", "Player Teleport"))
+
+local function getOtherPlayers()
+    local names = {}
+    for _, p in ipairs(Players:GetPlayers()) do
+        if p ~= LocalPlayer then
+            table.insert(names, p.Name)
+        end
+    end
+    return names
+end
+
+local targetPlayerName = ""
+makeDropdown(tabTeleports, L("Pilih Pemain", "Select Player"), getOtherPlayers, function(choice)
+    targetPlayerName = choice
+end, "Select Player...")
+
+makeButton(tabTeleports, L("🏃 Teleport ke Pemain Terpilih", "🏃 Teleport to Selected Player"), THEME.Blue, function()
+    pcall(function()
+        local target = Players:FindFirstChild(targetPlayerName)
+        local tChar = target and target.Character
+        local myChar = LocalPlayer.Character
+        if tChar and myChar and tChar:FindFirstChild("HumanoidRootPart") then
+            myChar:PivotTo(tChar.HumanoidRootPart.CFrame * CFrame.new(0, 0, 3))
+        end
+    end)
+end)
+
+-- ====================================================================
+-- 9. TAB KARAKTER & ESP (PLAYER & VISUALS)
+-- ====================================================================
+makeSection(tabPlayer, L("Modifikasi Gerakan Pemain", "Movement Modifications"))
+
+makeSlider(tabPlayer, L("Kecepatan Jalan (WalkSpeed)", "WalkSpeed Slider"), 16, 250, config.walkSpeed, "", function(v)
+    config.walkSpeed = v
+    if state.speed then
+        local h = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+        if h then h.WalkSpeed = v end
+    end
+end)
+
+makeToggle(tabPlayer, L("Aktifkan Kecepatan Kustom", "Enable Custom WalkSpeed"), state.speed, function(v)
+    state.speed = v
+    local h = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+    if h then h.WalkSpeed = v and config.walkSpeed or 16 end
+end)
+
+makeSlider(tabPlayer, L("Kekuatan Lompat (JumpPower)", "JumpPower Slider"), 50, 250, config.jumpPower, "", function(v)
+    config.jumpPower = v
+    local h = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+    if h then h.JumpPower = v end
+end)
+
+makeToggle(tabPlayer, L("Lompatan Tak Terbatas (Infinite Jump)", "Infinite Jump"), state.infJump, function(v)
+    state.infJump = v
+end)
+
+makeToggle(tabPlayer, L("Mode Terbang (Fly Mode)", "Fly Mode"), state.fly, function(v)
+    state.fly = v
+end)
+
+makeSlider(tabPlayer, L("Kecepatan Terbang (Fly Speed)", "Fly Speed"), 20, 200, config.flySpeed, "", function(v)
+    config.flySpeed = v
+end)
+
+makeToggle(tabPlayer, L("Tembus Tembok (Noclip)", "Noclip"), state.noclip, function(v)
+    state.noclip = v
+end)
+
+makeToggle(tabPlayer, L("Anti-Fling Penjaga (Safe Godmode)", "Anti-Guard Fling (Godmode)"), state.antiGuardFling, function(v)
+    state.antiGuardFling = v
+end)
+
+makeSection(tabPlayer, L("Visual & ESP (Pencari Telur)", "Visuals & ESP"))
+
+makeToggle(tabPlayer, L("ESP Telur Terbuka & Rahasia", "Egg ESP (Distance & Health)"), state.eggEsp, function(v)
+    state.eggEsp = v
+end)
+
+makeToggle(tabPlayer, L("ESP Pemain Lain", "Player ESP"), state.playerEsp, function(v)
+    state.playerEsp = v
+end)
+
+makeToggle(tabPlayer, L("Terang Penuh (Fullbright)", "Fullbright"), state.fullbright, function(v)
+    state.fullbright = v
+    if v then
+        game:GetService("Lighting").Brightness = 2
+        game:GetService("Lighting").ClockTime = 14
+        game:GetService("Lighting").FogEnd = 100000
+        game:GetService("Lighting").GlobalShadows = false
+    end
+end)
+
+-- ====================================================================
+-- 10. TAB CREDIT & DONATE (HUKUM 6 COMPLIANT)
+-- ====================================================================
+makeSection(tabCredits, L("👑 Pengembang Resmi", "👑 Official Developer"))
+
+do
+    local infoCon = Instance.new("Frame", tabCredits)
+    infoCon.Size = UDim2.new(1, 0, 0, 75)
+    infoCon.BackgroundColor3 = THEME.Slot
+    infoCon.BorderSizePixel = 0
+    infoCon.LayoutOrder = nextOrder()
+    corner(infoCon, 8)
+
+    local fTitle = Instance.new("TextLabel", infoCon)
+    fTitle.Size = UDim2.new(1, -20, 0, 22)
+    fTitle.Position = UDim2.new(0, 10, 0, 6)
+    fTitle.BackgroundTransparency = 1
+    fTitle.Text = "👑 Founder & Lead Developer: prawiraxliv"
+    fTitle.TextColor3 = THEME.Title
+    fTitle.Font = THEME.Font
+    fTitle.TextSize = 13
+    fTitle.TextXAlignment = Enum.TextXAlignment.Left
+
+    local fDesc = Instance.new("TextLabel", infoCon)
+    fDesc.Size = UDim2.new(1, -20, 0, 38)
+    fDesc.Position = UDim2.new(0, 10, 0, 28)
+    fDesc.BackgroundTransparency = 1
+    fDesc.Text = L("Brother Hub Official • Selalu Unggul, Otomatis Penuh & 100% Gratis Selamanya.",
+                   "Brother Hub Official • Always Superior, Fully Autonomous & 100% Free Forever.")
+    fDesc.TextColor3 = THEME.SubText
+    fDesc.Font = THEME.FontReg
+    fDesc.TextSize = 11
+    fDesc.TextWrapped = true
+    fDesc.TextXAlignment = Enum.TextXAlignment.Left
+end
+
+makeSection(tabCredits, L("Komunitas & Donasi", "Community & Support"))
+
+makeButton(tabCredits, L("📋 Salin Tautan Discord Server", "📋 Copy Discord Server Invite"), THEME.Blue, function()
+    pcall(function()
+        if setclipboard then
+            setclipboard("https://discord.gg/szYbZCqHKS")
+        end
+    end)
+end)
+
+makeButton(tabCredits, L("☕ Donasi via Saweria (Indonesia)", "☕ Donate via Saweria (ID)"), THEME.Orange, function()
+    pcall(function()
+        if setclipboard then
+            setclipboard("https://saweria.co/prawiraxliv")
+        end
+    end)
+end)
+
+makeButton(tabCredits, L("🌐 Donasi via SociaBuzz (International / Tribe)", "🌐 Donate via SociaBuzz (Tribe)"), THEME.Purple, function()
+    pcall(function()
+        if setclipboard then
+            setclipboard("https://sociabuzz.com/brotherhubofficial/tribe")
+        end
+    end)
+end)
+
+selectTab(1)
+
+-- ====================================================================
+-- 🔄 BACKGROUND AUTOMATION THREADS (ROBUST AUTO LOOPS)
+-- ====================================================================
+
+-- Infinite Jump Hook
+track(UserInputService.JumpRequest:Connect(function()
+    if state.infJump then
+        local char = LocalPlayer.Character
+        local hum = char and char:FindFirstChildOfClass("Humanoid")
+        if hum then
+            hum:ChangeState(Enum.HumanoidStateType.Jumping)
+        end
+    end
+end))
+
+-- Noclip Thread
+track(RunService.Stepped:Connect(function()
+    if state.noclip then
+        local char = LocalPlayer.Character
+        if char then
+            for _, p in ipairs(char:GetDescendants()) do
+                if p:IsA("BasePart") then
+                    p.CanCollide = false
+                end
+            end
+        end
+    end
+    if state.antiGuardFling then
+        local char = LocalPlayer.Character
+        local hrp = char and char:FindFirstChild("HumanoidRootPart")
+        if hrp then
+            local vel = hrp.AssemblyLinearVelocity
+            if math.abs(vel.Y) > 80 or math.abs(vel.X) > 120 or math.abs(vel.Z) > 120 then
+                hrp.AssemblyLinearVelocity = Vector3.new(
+                    math.clamp(vel.X, -30, 30),
+                    math.clamp(vel.Y, -30, 30),
+                    math.clamp(vel.Z, -30, 30)
+                )
+            end
+        end
+    end
+end))
+
+-- Fly Implementation
+local flyBodyGyro, flyBodyVel
+track(RunService.RenderStepped:Connect(function()
+    local char = LocalPlayer.Character
+    local hrp = char and char:FindFirstChild("HumanoidRootPart")
+    if not (state.fly and hrp) then
+        if flyBodyGyro then flyBodyGyro:Destroy(); flyBodyGyro = nil end
+        if flyBodyVel then flyBodyVel:Destroy(); flyBodyVel = nil end
+        return
+    end
+
+    if not flyBodyGyro then
+        flyBodyGyro = Instance.new("BodyGyro", hrp)
+        flyBodyGyro.P = 9e4
+        flyBodyGyro.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
+        flyBodyGyro.CFrame = hrp.CFrame
+    end
+    if not flyBodyVel then
+        flyBodyVel = Instance.new("BodyVelocity", hrp)
+        flyBodyVel.Velocity = Vector3.new(0, 0, 0)
+        flyBodyVel.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+    end
+
+    local cam = Workspace.CurrentCamera
+    local dir = Vector3.new()
+    if UserInputService:IsKeyDown(Enum.KeyCode.W) then dir = dir + cam.CFrame.LookVector end
+    if UserInputService:IsKeyDown(Enum.KeyCode.S) then dir = dir - cam.CFrame.LookVector end
+    if UserInputService:IsKeyDown(Enum.KeyCode.A) then dir = dir - cam.CFrame.RightVector end
+    if UserInputService:IsKeyDown(Enum.KeyCode.D) then dir = dir + cam.CFrame.RightVector end
+    if UserInputService:IsKeyDown(Enum.KeyCode.Space) then dir = dir + Vector3.new(0, 1, 0) end
+    if UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) then dir = dir - Vector3.new(0, 1, 0) end
+
+    flyBodyGyro.CFrame = cam.CFrame
+    flyBodyVel.Velocity = dir * config.flySpeed
+end))
+
+-- Auto Break Eggs Loop
+task.spawn(function()
+    while true do
+        task.wait(config.hitDelay)
+        if state.autoHitEgg and remotes.EggHitRequest then
+            pcall(function()
+                equipPickaxe()
+                local char = LocalPlayer.Character
+                local hrp = char and char:FindFirstChild("HumanoidRootPart")
+                if not hrp then return end
+
+                local eggs = getBreakableEggs()
+                local nearest, nearestDist = nil, config.hitRange
+
+                for _, egg in ipairs(eggs) do
+                    local dist = (egg.Position - hrp.Position).Magnitude
+                    if dist <= nearestDist then
+                        local eggName = egg.Parent and egg.Parent.Name or egg.Name
+                        if config.targetEggs[eggName] ~= false then
+                            nearest = egg
+                            nearestDist = dist
+                        end
+                    end
+                end
+
+                if nearest then
+                    remotes.EggHitRequest:FireServer(nearest)
+                end
+            end)
+        end
+    end
+end)
+
+-- Fast Hit Aura Loop
+task.spawn(function()
+    while true do
+        task.wait(0.08)
+        if state.autoHitAura and remotes.EggHitRequest then
+            pcall(function()
+                equipPickaxe()
+                local char = LocalPlayer.Character
+                local hrp = char and char:FindFirstChild("HumanoidRootPart")
+                if not hrp then return end
+
+                local eggs = getBreakableEggs()
+                for _, egg in ipairs(eggs) do
+                    if (egg.Position - hrp.Position).Magnitude <= config.hitRange then
+                        remotes.EggHitRequest:FireServer(egg)
+                    end
+                end
+            end)
+        end
+    end
+end)
+
+-- Auto Steal Eggs & Instant Bank Loop
+task.spawn(function()
+    while true do
+        task.wait(config.stealCooldown)
+        if state.autoStealEgg then
+            pcall(function()
+                local char = LocalPlayer.Character
+                local hrp = char and char:FindFirstChild("HumanoidRootPart")
+                if not hrp then return end
+
+                -- Find prompts
+                local targetPrompt = nil
+                for _, p in ipairs(Workspace:GetDescendants()) do
+                    if p:IsA("ProximityPrompt") and p.Name == "StealPrompt" and p.Enabled then
+                        targetPrompt = p
+                        break
+                    end
+                end
+
+                if targetPrompt and targetPrompt.Parent then
+                    local part = targetPrompt.Parent:IsA("BasePart") and targetPrompt.Parent or targetPrompt.Parent:FindFirstChildWhichIsA("BasePart")
+                    if part then
+                        -- Teleport close, fire prompt, and instant bank
+                        char:PivotTo(part.CFrame * CFrame.new(0, 2, 0))
+                        task.wait(0.1)
+                        fireproximityprompt(targetPrompt, 0)
+                        task.wait(0.1)
+
+                        if state.instantBank then
+                            local hb = getMyPlotHitbox()
+                            if hb then
+                                char:PivotTo(hb.CFrame * CFrame.new(0, 3, 0))
+                            end
+                        end
+                    end
+                end
+            end)
+        end
+    end
+end)
+
+-- Auto Sell Backpack Loop
+task.spawn(function()
+    while true do
+        task.wait(1.5)
+        if state.autoSellBackpack then
+            pcall(function()
+                sellSelectedBackpackTools()
+            end)
+        elseif state.autoSellOnFull then
+            pcall(function()
+                local carry = LocalPlayer:GetAttribute("CarryCount") or 0
+                local cap = LocalPlayer:GetAttribute("SatchelCapacity") or 10
+                if carry >= cap then
+                    sellSelectedBackpackTools()
+                end
+            end)
+        end
+    end
+end)
+
+-- Base Plot & Treadmill Auto Loops
+task.spawn(function()
+    while true do
+        task.wait(2.5)
+        pcall(function()
+            if state.autoUpgradePlot and remotes.UpgradePlotRequest then
+                remotes.UpgradePlotRequest:FireServer()
+            end
+            if state.autoUnlockTread and remotes.UnlockTreadmillRequest then
+                remotes.UnlockTreadmillRequest:FireServer()
+            end
+            if state.autoUpgradeTread and remotes.UpgradeTreadmillRequest then
+                remotes.UpgradeTreadmillRequest:FireServer()
+            end
+        end)
+    end
+end)
+
+-- Auto Treadmill Training Loop
+task.spawn(function()
+    while true do
+        task.wait(1)
+        if state.autoTreadTrain then
+            pcall(function()
+                local plot = getMyPlot()
+                if plot then
+                    local tMill = plot:FindFirstChild("Treadmill") or plot:FindFirstChild("Treadmills")
+                    local pad = tMill and (tMill:FindFirstChild("Belt") or tMill:FindFirstChild("Hitbox") or tMill.PrimaryPart)
+                    local char = LocalPlayer.Character
+                    if pad and char then
+                        char:PivotTo(pad.CFrame * CFrame.new(0, 2.5, 0))
+                    end
+                end
+            end)
+        end
+    end
+end)
+
+-- Auto Buy & Equip Best Pickaxe Loop
+task.spawn(function()
+    while true do
+        task.wait(3.0)
+        pcall(function()
+            if state.autoBuyPickaxe and remotes.PickaxeShopRequest then
+                local money = LocalPlayer:GetAttribute("Cash") or 0
+                for i = #PICKAXE_TIERS, 1, -1 do
+                    local p = PICKAXE_TIERS[i]
+                    if money >= p.Price then
+                        remotes.PickaxeShopRequest:FireServer("Buy", p.Tier)
+                        break
+                    end
+                end
+            end
+            if state.autoEquipPickaxe and remotes.PickaxeShopRequest then
+                local myTier = LocalPlayer:GetAttribute("PickaxeTier") or 1
+                remotes.PickaxeShopRequest:FireServer("Equip", myTier)
+            end
+        end)
+    end
+end)
+
+-- Auto Buy & Equip Best Trail Loop
+task.spawn(function()
+    while true do
+        task.wait(3.0)
+        pcall(function()
+            if state.autoBuyTrail and remotes.TrailShopRequest then
+                local money = LocalPlayer:GetAttribute("Cash") or 0
+                for i = #TRAILS_TIERS, 1, -1 do
+                    local t = TRAILS_TIERS[i]
+                    if money >= t.Price then
+                        remotes.TrailShopRequest:FireServer("Buy", t.Id)
+                        break
+                    end
+                end
+            end
+        end)
+    end
+end)
+
+-- Auto Claim Free Rewards Loop
+task.spawn(function()
+    while true do
+        task.wait(15.0)
+        pcall(function()
+            if state.autoClaimGroup and remotes.GroupRewardRemote then
+                remotes.GroupRewardRemote:FireServer("Claim")
+            end
+            if state.autoClaimDiscord and remotes.DiscordRewardRemote then
+                remotes.DiscordRewardRemote:FireServer("Verify", LocalPlayer.Name)
+            end
+            if state.autoClaimOffline and remotes.OfflineRewardRemote then
+                remotes.OfflineRewardRemote:FireServer("Claim")
+            end
+            if state.autoClaimIndex and remotes.IndexRemote then
+                remotes.IndexRemote:FireServer("ClaimAll", nil)
+            end
+        end)
+    end
+end)
+
+-- Auto Bat Attack (Kill Aura) Loop
+task.spawn(function()
+    while true do
+        task.wait(config.attackDelay)
+        if state.autoBatAttack and remotes.BatHitRequest then
+            pcall(function()
+                equipBat()
+                local char = LocalPlayer.Character
+                local hrp = char and char:FindFirstChild("HumanoidRootPart")
+                if not hrp then return end
+
+                for _, p in ipairs(Players:GetPlayers()) do
+                    if p ~= LocalPlayer then
+                        if not (state.whitelistFriends and LocalPlayer:IsFriendsWith(p.UserId)) then
+                            local tChar = p.Character
+                            local tHrp = tChar and tChar:FindFirstChild("HumanoidRootPart")
+                            if tHrp and (tHrp.Position - hrp.Position).Magnitude <= config.attackRange then
+                                remotes.BatHitRequest:FireServer(tChar)
+                            end
+                        end
+                    end
+                end
+            end)
+        end
+    end
+end)
+
+
+-- Auto Place Animals Loop
+local placeSeq = 0
+task.spawn(function()
+    while true do
+        task.wait(2.0)
+        if state.autoPlaceAnimals and remotes.PlaceAnimalRemote then
+            pcall(function()
+                local hb = getMyPlotHitbox()
+                if not hb then return end
+                local tools = getBackpackTools()
+                for _, t in ipairs(tools) do
+                    if t:GetAttribute("AnimalName") or t:FindFirstChild("Handle") then
+                        placeSeq = placeSeq + 1
+                        local offset = Vector3.new(math.random(-8, 8), 0.5, math.random(-8, 8))
+                        remotes.PlaceAnimalRemote:FireServer(t, hb.Position + offset, placeSeq)
+                        task.wait(0.3)
+                    end
+                end
+            end)
+        end
+    end
+end)
+
+-- Visuals & ESP Engine
+local Lighting = game:GetService("Lighting")
+local origLighting = {
+    Brightness = Lighting.Brightness,
+    ClockTime = Lighting.ClockTime,
+    FogEnd = Lighting.FogEnd,
+    GlobalShadows = Lighting.GlobalShadows,
+}
+
+local espHolder = Instance.new("Folder", ScreenGui)
+espHolder.Name = "ESPHolder"
+
+local function clearEsp(tag)
+    for _, c in ipairs(espHolder:GetChildren()) do
+        if c.Name == tag then c:Destroy() end
+    end
+end
+
+-- Egg ESP Loop
+task.spawn(function()
+    while true do
+        task.wait(0.6)
+        if state.eggEsp then
+            pcall(function()
+                local char = LocalPlayer.Character
+                local hrp = char and char:FindFirstChild("HumanoidRootPart")
+                local eggs = getBreakableEggs()
+                clearEsp("EggESP")
+                for _, egg in ipairs(eggs) do
+                    if egg and egg.Parent and hrp then
+                        local dist = math.floor((egg.Position - hrp.Position).Magnitude)
+                        if dist <= 350 then
+                            local bb = Instance.new("BillboardGui", espHolder)
+                            bb.Name = "EggESP"
+                            bb.Adornee = egg
+                            bb.Size = UDim2.fromOffset(130, 30)
+                            bb.AlwaysOnTop = true
+                            bb.ExtentsOffset = Vector3.new(0, 2.5, 0)
+
+                            local lbl = Instance.new("TextLabel", bb)
+                            lbl.Size = UDim2.new(1, 0, 1, 0)
+                            lbl.BackgroundTransparency = 1
+                            local eggName = egg.Parent and egg.Parent.Name or egg.Name
+                            lbl.Text = string.format("🥚 %s\n[%dm]", eggName, dist)
+                            lbl.TextColor3 = THEME.Yellow
+                            lbl.Font = THEME.Font
+                            lbl.TextSize = 11
+                            lbl.TextStrokeTransparency = 0
+                            lbl.TextStrokeColor3 = Color3.new(0, 0, 0)
+                        end
+                    end
+                end
+            end)
+        else
+            clearEsp("EggESP")
+        end
+    end
+end)
+
+-- Player ESP Loop
+task.spawn(function()
+    while true do
+        task.wait(0.8)
+        if state.playerEsp then
+            pcall(function()
+                local char = LocalPlayer.Character
+                local hrp = char and char:FindFirstChild("HumanoidRootPart")
+                clearEsp("PlayerESP")
+                for _, p in ipairs(Players:GetPlayers()) do
+                    if p ~= LocalPlayer and p.Character and p.Character:FindFirstChild("HumanoidRootPart") and hrp then
+                        local pHrp = p.Character.HumanoidRootPart
+                        local dist = math.floor((pHrp.Position - hrp.Position).Magnitude)
+                        local bb = Instance.new("BillboardGui", espHolder)
+                        bb.Name = "PlayerESP"
+                        bb.Adornee = pHrp
+                        bb.Size = UDim2.fromOffset(140, 34)
+                        bb.AlwaysOnTop = true
+                        bb.ExtentsOffset = Vector3.new(0, 3, 0)
+
+                        local lbl = Instance.new("TextLabel", bb)
+                        lbl.Size = UDim2.new(1, 0, 1, 0)
+                        lbl.BackgroundTransparency = 1
+                        local isFriend = LocalPlayer:IsFriendsWith(p.UserId)
+                        local prefix = isFriend and "💚 [Friend] " or "👤 "
+                        lbl.Text = string.format("%s%s\n[%dm]", prefix, p.DisplayName or p.Name, dist)
+                        lbl.TextColor3 = isFriend and THEME.Green or THEME.Cyan
+                        lbl.Font = THEME.Font
+                        lbl.TextSize = 11
+                        lbl.TextStrokeTransparency = 0
+                        lbl.TextStrokeColor3 = Color3.new(0, 0, 0)
+                    end
+                end
+            end)
+        else
+            clearEsp("PlayerESP")
+        end
+    end
+end)
+
+-- Entrance Animation
+MainScale.Scale = 0
+TweenService:Create(MainScale, tweenBounce, {Scale = 1}):Play()
+
+-- Success Loader Notification
+pcall(function()
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = "👑 BROTHER HUB",
+        Text  = L("Break and Steal an Egg dimuat dengan sukses!",
+                  "Break and Steal an Egg loaded successfully!"),
+        Duration = 5
+    })
+end)
