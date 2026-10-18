@@ -1,0 +1,8042 @@
+-- discord.gg/syncrypt
+
+local function geniter(f, s, c)
+	if type(f) ~= "function" then
+		local mt = getmetatable(f)
+
+		if type(mt) == "table" and mt.__iter then
+			f, s, c = mt.__iter(f)
+		elseif type(f) == "table" then
+			f, s, c = next, f, nil
+		end
+	end
+
+	return function()
+		local r = table.pack(f(s, c))
+
+		if r[1] == nil then
+			return false
+		end
+
+		c = r[1]
+
+		return true, table.unpack(r, 1, r.n)
+	end
+end
+
+local v4 = ...
+local Instance_ = Instance
+local instanceNew = Instance_ and Instance_.new
+
+do
+	local v7 = v4
+
+	local function v8(p1)
+		if type(p1) ~= "function" then
+			return false
+		end
+
+		local ok, result = pcall(p1, "e5564300c360ac729086e2cc806e828a84877f1eb8e5d974d873e065224901555fb8821590a33bacc61e39701cf9b46bd25bf5f0595bbe24655141438e7a100b", "", "d75a980182b10ab7d54bfed3c964073a0ee172f3daa62325af021a68f707511a")
+
+		if not ok or result ~= true then
+			return false
+		end
+
+		local ok2, result2 = pcall(p1, ("e5564300c360ac729086e2cc806e828a84877f1eb8e5d974d873e065224901555fb8821590a33bacc61e39701cf9b46bd25bf5f0595bbe24655141438e7a100b"):sub(1, 126) .. "00", "", "d75a980182b10ab7d54bfed3c964073a0ee172f3daa62325af021a68f707511a")
+
+		if not ok2 or result2 ~= false then
+			return false
+		end
+
+		local ok3, result3 = pcall(p1, "e5564300c360ac729086e2cc806e828a84877f1eb8e5d974d873e065224901555fb8821590a33bacc61e39701cf9b46bd25bf5f0595bbe24655141438e7a100b", "zeroin_differential_test", "d75a980182b10ab7d54bfed3c964073a0ee172f3daa62325af021a68f707511a")
+
+		if not ok3 or result3 ~= false then
+			return false
+		end
+
+		local ok4, result4 = pcall(p1, "e5564300c360ac729086e2cc806e828a84877f1eb8e5d974d873e065224901555fb8821590a33bacc61e39701cf9b46bd25bf5f0595bbe24655141438e7a100b", "", ("d75a980182b10ab7d54bfed3c964073a0ee172f3daa62325af021a68f707511a"):sub(1, 62) .. "00")
+
+		if ok4 and result4 == false then
+			return true
+		end
+
+		return false
+	end
+	local function v17(p2)
+		if type(p2) ~= "table" or p2.valid ~= true then
+			return false, "Execution rejected: Script was not launched via Zeroin Key System."
+		end
+
+		local ok, result = pcall(function()
+			return game:GetService("RbxAnalyticsService"):GetClientId()
+		end)
+		local v20 = ok and result and result ~= "" and tostring(result)
+
+		v20 = v20 or tostring(game:GetService("Players").LocalPlayer.UserId)
+
+		if tostring(p2.hwid) ~= v20 then
+			return false, "Hardware ID mismatch: Unauthorized device detected."
+		end
+
+		local now = os.time()
+		local v22 = now - (tonumber(p2.timestamp) or tonumber(p2.sessionTime) or now)
+
+		if v22 > 300 or v22 < -100 then
+			return false, "Session expired: Please re-authenticate via Zeroin Key System."
+		end
+
+		if not p2.signature or not p2.nonce then
+			return false, "Security error: Cryptographic signature missing."
+		end
+
+		local verify = p2.verify
+
+		if not v8(verify) then
+			local v24 = tostring(p2.serverUrl or "https://zeroinhub.com")
+			local ok2, result2 = pcall(function()
+				return game:HttpGet(v24 .. "/api/ed25519")
+			end)
+
+			if ok2 and result2 and result2 ~= "" then
+				local ok3, result3 = pcall(loadstring, result2)
+
+				if ok3 and type(result3) == "function" then
+					local ok4, result4 = pcall(result3)
+
+					if ok4 and result4 and type(result4.verify) == "function" then
+						verify = result4.verify
+					end
+				end
+			end
+		end
+
+		if not v8(verify) then
+			return false, "Security error: Cryptographic verification engine spoofed or unavailable."
+		end
+
+		local v31 = tostring(p2.nonce) .. "|true|" .. tostring(p2.message or "")
+		local ok2, result2 = pcall(verify, tostring(p2.signature), v31, "8ea91cb482075e9bd4f19a3b0e2278a02efee3f20ab6d2b2812b235826b8f95e")
+
+		if not ok2 or result2 ~= true then
+			return false, "Security error: Signature verification failed (tampered payload detected)."
+		end
+
+		return true
+	end
+
+	local v34, v35 = v17(v7)
+
+	if not v34 then
+		pcall(function()
+			local LocalPlayer = game:GetService("Players").LocalPlayer
+			local v37 = LocalPlayer
+			local Kick = LocalPlayer.Kick
+
+			Kick(v37, "\n[Zeroin Security]\n" .. tostring(v35 or "Unauthorized execution.") .. "\nPlease launch the script via Zeroin Key System.")
+		end)
+
+		return
+	end
+end
+
+print("[Zeroin Hub] Authentication successful. Initializing script...")
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local Workspace = game:GetService("Workspace")
+local CoreGui = game:GetService("CoreGui")
+
+game:GetService("TweenService")
+
+local LocalPlayer = Players.LocalPlayer
+local CurrentCamera = Workspace.CurrentCamera
+local genv = getgenv and getgenv() or _G
+local v46 = (genv.__ZeroinRideAPetGeneration or 0) + 1
+
+genv.__ZeroinRideAPetGeneration = v46
+
+local u47 = true
+
+local function v48()
+	return u47 and genv.__ZeroinRideAPetGeneration == v46
+end
+
+do
+	genv.__ZeroinResolveUIHost = function()
+		local PlayerGui = LocalPlayer:FindFirstChildOfClass("PlayerGui")
+
+		PlayerGui = PlayerGui or LocalPlayer:WaitForChild("PlayerGui", 5)
+
+		local cloneref = genv.cloneref
+
+		if type(cloneref) == "function" and PlayerGui then
+			local ok, result = pcall(cloneref, PlayerGui)
+
+			if ok and result then
+				PlayerGui = result
+			end
+		end
+
+		if PlayerGui then
+			genv.__ZeroinUIHost = PlayerGui
+
+			return PlayerGui
+		end
+
+		for _, v in ipairs({
+			"gethui",
+			"get_hidden_gui",
+			"gethiddengui"
+		}) do
+			local v55 = genv[v]
+
+			if type(v55) ~= "function" then
+				continue
+			end
+
+			local ok, result = pcall(v55)
+
+			if not ok or typeof(result) ~= "Instance" then
+				continue
+			end
+
+			genv.__ZeroinUIHost = result
+
+			return result
+		end
+
+		local ok, result = pcall(function()
+			return type(cloneref) == "function" and cloneref(CoreGui) or CoreGui
+		end)
+
+		if not ok then
+			return
+		end
+
+		genv.__ZeroinUIHost = result
+
+		return result
+	end
+end
+
+genv.__ZeroinEnterUICallback = function()
+end
+
+do
+	genv.__ZeroinRunUICallback = function(p3, ...)
+		return p3(...)
+	end
+end
+
+genv.__ZeroinWrapUICallback = function(p4)
+	return p4
+end
+genv.__ZeroinSetCapFps = function(p5)
+	local clamp = math.clamp
+	local floor = math.floor
+	local v62 = clamp(floor(tonumber(p5) or 240), 1, 999)
+	local value = rawget(_G, "setfpscap") or rawget(_G, "set_fps_cap")
+
+	value = value or type(setfpscap) == "function" and setfpscap
+
+	if type(value) == "function" then
+		return pcall(value, v62)
+	end
+
+	return false
+end
+genv.__ZeroinResolveUIHost()
+
+local toggleEnableAutoFarm, Folder, t1, t2, t3, t4, s1, v71, t5, v73
+local v74, v75, t6, v77, v78, v79, v80, v81, v82, v83
+
+do
+	local function v84()
+		local lua
+
+		if isfile and readfile and isfile("Zeroin_ZeroLib_cached_v15.lua") then
+			pcall(function()
+				lua = readfile("Zeroin_ZeroLib_cached_v15.lua")
+			end)
+		end
+
+		if not lua or #lua < 100 then
+			for i = 1, 3 do
+				local ok, result = pcall(game.HttpGet, game, "https://raw.githubusercontent.com/iSylvesterr/library/1e50c1a/ZeroLib.lua")
+
+				if ok and type(result) == "string" and #result > 100 and not result:find("404: Not Found", 1, true) then
+					lua = result
+
+					if writefile then
+						pcall(writefile, "Zeroin_ZeroLib_cached_v15.lua", lua)
+					end
+
+					break
+				else
+					task.wait(1)
+				end
+			end
+		end
+
+		if not lua or #lua < 100 or not genv.__ZeroinUIHost then
+			return nil
+		end
+
+		lua = lua:gsub("game:GetService%(\"CoreGui\"%)", "((getgenv and getgenv().__ZeroinUIHost) or _G.__ZeroinUIHost)")
+		lua = lua:gsub("game:GetService%('CoreGui'%)", "((getgenv and getgenv().__ZeroinUIHost) or _G.__ZeroinUIHost)")
+		lua = lua:gsub("(Instance%.new%s*%(%s*[\"']ScreenGui[\"']%s*%))", "(function() local _sg = %1; _sg.ResetOnSpawn = false; return _sg end)()")
+		lua = lua:gsub("ZeroinOnTop%.Destroying:Connect%s*%(%s*function%s*%(%s*%)%s*if%s+runCleanup%s+then%s+runCleanup%(true%)%s*end%s*end%)", "")
+		lua = lua:gsub("(:Connect%s*%(%s*function%s*%b())", "%1\nif getgenv and getgenv().__ZeroinEnterUICallback then getgenv().__ZeroinEnterUICallback() elseif _G.__ZeroinEnterUICallback then _G.__ZeroinEnterUICallback() end")
+		lua = lua:gsub("(:Once%s*%(%s*function%s*%b())", "%1\nif getgenv and getgenv().__ZeroinEnterUICallback then getgenv().__ZeroinEnterUICallback() elseif _G.__ZeroinEnterUICallback then _G.__ZeroinEnterUICallback() end")
+		lua = lua:gsub("(task%.spawn%s*%(%s*function%s*%b())", "%1\nif getgenv and getgenv().__ZeroinEnterUICallback then getgenv().__ZeroinEnterUICallback() elseif _G.__ZeroinEnterUICallback then _G.__ZeroinEnterUICallback() end")
+		lua = lua:gsub("(task%.defer%s*%(%s*function%s*%b())", "%1\nif getgenv and getgenv().__ZeroinEnterUICallback then getgenv().__ZeroinEnterUICallback() elseif _G.__ZeroinEnterUICallback then _G.__ZeroinEnterUICallback() end")
+		lua = lua:gsub("([^%w_%.])spawn%s*%(%s*function%s*(%b())", "%1spawn(function%2\nif getgenv and getgenv().__ZeroinEnterUICallback then getgenv().__ZeroinEnterUICallback() elseif _G.__ZeroinEnterUICallback then _G.__ZeroinEnterUICallback() end")
+		lua = lua:gsub("(task%.wait%s*%b())", "%1\nif getgenv and getgenv().__ZeroinEnterUICallback then getgenv().__ZeroinEnterUICallback() elseif _G.__ZeroinEnterUICallback then _G.__ZeroinEnterUICallback() end")
+		lua = lua:gsub("([^%w_%.])wait%s*(%b())", "%1wait%2\nif getgenv and getgenv().__ZeroinEnterUICallback then getgenv().__ZeroinEnterUICallback() elseif _G.__ZeroinEnterUICallback then _G.__ZeroinEnterUICallback() end")
+		lua = lua:gsub("(function%s+LoadConfigElements%s*%b())", [[%1
+if getgenv and getgenv().__ZeroinEnterUICallback then getgenv().__ZeroinEnterUICallback() elseif _G.__ZeroinEnterUICallback then _G.__ZeroinEnterUICallback() end
+]])
+		lua = lua:gsub("(function%s+[A-Za-z_][A-Za-z0-9_]*Func:Set%s*%b())", [[%1
+if getgenv and getgenv().__ZeroinEnterUICallback then getgenv().__ZeroinEnterUICallback() elseif _G.__ZeroinEnterUICallback then _G.__ZeroinEnterUICallback() end
+]])
+		lua = lua:gsub(":Connect%s*%(([A-Za-z_][A-Za-z0-9_%.]*)%)", ":Connect(((getgenv and getgenv().__ZeroinWrapUICallback) or _G.__ZeroinWrapUICallback)(%1))")
+		lua = lua:gsub(":Once%s*%(([A-Za-z_][A-Za-z0-9_%.]*)%)", ":Once(((getgenv and getgenv().__ZeroinWrapUICallback) or _G.__ZeroinWrapUICallback)(%1))")
+
+		local chunk, v90 = loadstring(lua)
+
+		if not chunk then
+			warn("[ZeroinUI] Parse Error: " .. tostring(v90))
+
+			return nil
+		end
+
+		local ok, result = pcall(chunk)
+
+		if ok then
+			return result
+		end
+
+		warn("[ZeroinUI] Execution Error: " .. tostring(result))
+
+		return nil
+	end
+
+	local v93 = v84()
+
+	if not v93 then
+		error("Zeroin UI Library failed to load")
+	end
+
+	toggleEnableAutoFarm = nil
+
+	local u94
+	local u95
+
+	pcall(function()
+		local HttpService = game:GetService("HttpService")
+		local v97 = tostring(game.GameId)
+
+		if v97 == "0" or v97 == "" then
+			v97 = tostring(game.PlaceId)
+		end
+
+		local v98 = "Zeroin/Config/Zeroin_" .. v97 .. ".json"
+
+		u95 = v98
+
+		if isfile and isfile(v98) then
+			local data = HttpService:JSONDecode(readfile(v98))
+
+			if data and type(data) == "table" then
+				u94 = data
+
+				if data["Toggle_Enable Auto Farm"] ~= nil then
+					toggleEnableAutoFarm = data["Toggle_Enable Auto Farm"]
+				elseif data["Toggle_Enable Auto Farm Loop"] == nil then
+					if data["Toggle_Auto Farm Egg"] ~= nil then
+						toggleEnableAutoFarm = data["Toggle_Auto Farm Egg"]
+					end
+				else
+					toggleEnableAutoFarm = data["Toggle_Enable Auto Farm Loop"]
+				end
+			end
+		end
+	end)
+	_G.ZeroinScriptReloading = true
+
+	if _G.ZeroinRideAPetCleanup then
+		pcall(_G.ZeroinRideAPetCleanup)
+	end
+
+	_G.ZeroinScriptReloading = false
+
+	if u94 then
+		pcall(function()
+			local HttpService = game:GetService("HttpService")
+
+			if u95 and writefile then
+				writefile(u95, HttpService:JSONEncode(u94))
+			end
+
+			local ConfigData_ = ConfigData or getgenv and getgenv().ConfigData or _G and _G.ConfigData
+
+			if ConfigData_ and type(ConfigData_) == "table" then
+				table.clear(ConfigData_)
+
+				for k, v in pairs(u94) do
+					ConfigData_[k] = v
+				end
+			end
+		end)
+	end
+
+	local Zeroin_RideAPet_ESP = CoreGui:FindFirstChild("Zeroin_RideAPet_ESP") or LocalPlayer and LocalPlayer:FindFirstChild("PlayerGui") and LocalPlayer.PlayerGui:FindFirstChild("Zeroin_RideAPet_ESP")
+
+	if Zeroin_RideAPet_ESP then
+		pcall(function()
+			Zeroin_RideAPet_ESP:Destroy()
+		end)
+	end
+
+	Folder = instanceNew("Folder")
+	Folder.Name = "Zeroin_RideAPet_ESP"
+	pcall(function()
+		Folder.Parent = CoreGui
+	end)
+
+	if not Folder.Parent then
+		Folder.Parent = LocalPlayer:WaitForChild("PlayerGui")
+	end
+
+	local t7 = {
+		Common = Color3.fromRGB(200, 205, 215),
+		Rare = Color3.fromRGB(55, 160, 255),
+		Epic = Color3.fromRGB(185, 75, 255),
+		Legendary = Color3.fromRGB(255, 195, 30),
+		Mythic = Color3.fromRGB(255, 55, 75),
+		Divine = Color3.fromRGB(0, 245, 220),
+		Ethereal = Color3.fromRGB(255, 100, 190),
+		Unknown = Color3.fromRGB(255, 255, 255)
+	}
+
+	t1 = {
+		Ethereal = 7,
+		Divine = 6,
+		Mythic = 5,
+		Legendary = 4,
+		Epic = 3,
+		Rare = 2,
+		Common = 1,
+		Unknown = 0
+	}
+	t2 = {
+		["White Egg"] = {
+			Rarity = "Common",
+			Luck = "1"
+		},
+		["Brown Egg"] = {
+			Rarity = "Common",
+			Luck = "5"
+		},
+		["Cracked Egg"] = {
+			Rarity = "Rare",
+			Luck = "30"
+		},
+		["Easter Egg"] = {
+			Rarity = "Rare",
+			Luck = "50"
+		},
+		["Stone Egg"] = {
+			Rarity = "Rare",
+			Luck = "100"
+		},
+		["Leaf Egg"] = {
+			Rarity = "Rare",
+			Luck = "200"
+		},
+		["Mushroom Egg"] = {
+			Rarity = "Epic",
+			Luck = "500"
+		},
+		["Flower Egg"] = {
+			Rarity = "Epic",
+			Luck = "750"
+		},
+		["Slime Egg"] = {
+			Rarity = "Epic",
+			Luck = "1K"
+		},
+		["Ice Egg"] = {
+			Rarity = "Epic",
+			Luck = "3K"
+		},
+		["Glass Egg"] = {
+			Rarity = "Legendary",
+			Luck = "10K"
+		},
+		["Golden Egg"] = {
+			Rarity = "Legendary",
+			Luck = "30K"
+		},
+		["Diamond Egg"] = {
+			Rarity = "Mythic",
+			Luck = "90K"
+		},
+		["Crystal Egg"] = {
+			Rarity = "Mythic",
+			Luck = "150K"
+		},
+		["Skull Egg"] = {
+			Rarity = "Mythic",
+			Luck = "250K"
+		},
+		["Asteroid Egg"] = {
+			Rarity = "Mythic",
+			Luck = "500K"
+		},
+		["Dominus Egg"] = {
+			Rarity = "Mythic",
+			Luck = "700K"
+		},
+		["Flaming Egg"] = {
+			Rarity = "Mythic",
+			Luck = "1M"
+		},
+		["Sinister Egg"] = {
+			Rarity = "Mythic",
+			Luck = "3M"
+		},
+		["Soul Egg"] = {
+			Rarity = "Mythic",
+			Luck = "7M"
+		},
+		["Aurora Egg"] = {
+			Rarity = "Divine",
+			Luck = "300M"
+		},
+		["Galaxy Egg"] = {
+			Rarity = "Divine",
+			Luck = "1.5B"
+		},
+		["Blackhole Egg"] = {
+			Rarity = "Ethereal",
+			Luck = "100B"
+		},
+		["Solaris Egg"] = {
+			Rarity = "Ethereal",
+			Luck = "300B"
+		},
+		["Cherub Egg"] = {
+			Rarity = "Ethereal",
+			Luck = "1T"
+		},
+		["Dragon Egg"] = {
+			Rarity = "Ethereal",
+			Luck = "Event"
+		},
+		["Giant Egg"] = {
+			Rarity = "Ethereal",
+			Luck = "Event"
+		},
+		["Admin Egg"] = {
+			Rarity = "Ethereal",
+			Luck = "Admin"
+		}
+	}
+	t3 = {
+		EspEnabled = true,
+		ShowName = true,
+		ShowDistance = true,
+		ShowRarity = true,
+		ShowLuck = true,
+		Highlight = true,
+		Tracers = false,
+		MaxDistance = 4000,
+		TextSize = 13,
+		RarityFilter = {
+			Common = false,
+			Rare = false,
+			Epic = false,
+			Legendary = false,
+			Mythic = false,
+			Divine = false,
+			Ethereal = false
+		},
+		AutoFarmEnabled = false,
+		AutoFarmRarities = {
+			Ethereal = false,
+			Divine = false,
+			Mythic = false,
+			Legendary = false,
+			Epic = false,
+			Rare = false,
+			Common = false
+		},
+		AutoFarmEggNames = {},
+		FarmMode = "None",
+		FarmMovementMode = "Tween",
+		TeleportDelay = 0.5,
+		TweenInput = 100,
+		TweenSpeed = 1000,
+		FlightAltitude = 10,
+		UseRelayEggReturn = true,
+		RelayEggMaxPlotDistance = 450,
+		CycleDelay = 0.1,
+		AutoPlaceEggEnabled = false,
+		AutoPlaceRarities = {
+			Ethereal = false,
+			Divine = false,
+			Mythic = false,
+			Legendary = false,
+			Epic = false,
+			Rare = false,
+			Common = false
+		},
+		AutoHatchEggEnabled = false,
+		AutoFeedPetEnabled = false,
+		AutoFeedFoods = {
+			Grass = true,
+			Bone = true,
+			Meat = true,
+			["Magic Apple"] = false,
+			Dragonfruit = false
+		},
+		AutoFeedMode = "All Owned Pets",
+		AutoFeedTargetAge = 100,
+		AutoFeedSpecificPetKeys = {},
+		AutoUpgradeHatchLuckEnabled = false,
+		AutoSellPetsEnabled = false,
+		AutoSellRarities = {
+			Ethereal = false,
+			Divine = false,
+			Mythic = false,
+			Legendary = false,
+			Epic = false,
+			Rare = true,
+			Common = true
+		},
+		AutoSellMaxWeight = 15,
+		AutoSellPetNames = {},
+		AutoSellProtectedMutations = {
+			Shocked = true,
+			Volted = true,
+			Rage = true,
+			Void = true,
+			Eternal = true,
+			Gold = true,
+			Rainbow = true
+		},
+		VolcanoDipEnabled = false,
+		AutoIndexEnabled = false,
+		AutoClaimIndexRewards = true,
+		AutoRebirthEnabled = false,
+		TargetRebirth = 6,
+		ShopAutoBuy = {
+			Food = {
+				Enabled = false,
+				Items = {}
+			},
+			Gears = {
+				Enabled = false,
+				Items = {}
+			}
+		},
+		AntiAfkEnabled = true,
+		FpsBoostEnabled = false
+	}
+	t4 = {}
+	s1 = "<font color='#888899'>Idle (Disabled)</font>"
+	v71 = nil
+
+	local t8 = {}
+
+	t5 = {}
+	v73 = function(p6, p7, p8)
+		local v107 = p8 or "None"
+		local t9 = {}
+
+		if type(p6) == "table" then
+			for k, v in pairs(p6) do
+				if type(k) == "number" then
+					table.insert(t9, v)
+				elseif type(k) == "string" and v == true then
+					table.insert(t9, k)
+				end
+			end
+		elseif p6 ~= nil then
+			t9 = { p6 }
+		end
+
+		if p7 and t8[p7] then
+			return t9
+		end
+
+		local v111 = p7 and t5[p7]
+		local v112 = table.find(t9, v107) ~= nil
+		local v113 = false
+
+		if #t9 == 0 then
+			t9 = { v107 }
+			v113 = true
+		elseif #t9 > 1 and v112 then
+			if v111 == false then
+				t9 = { v107 }
+			else
+				local t10 = {}
+
+				for _, v in ipairs(t9) do
+					if v ~= v107 then
+						table.insert(t10, v)
+					end
+				end
+
+				t9 = t10
+			end
+
+			v113 = true
+		end
+
+		if p7 then
+			t5[p7] = table.find(t9, v107) ~= nil
+
+			if v113 then
+				t8[p7] = true
+				pcall(function()
+					p7:Set(t9)
+				end)
+				t8[p7] = nil
+			end
+		end
+
+		return t9
+	end
+	v74 = function(p9)
+		return #p9 > 0 and p9 or { "None" }
+	end
+	v75 = function(p10)
+		s1 = p10
+
+		if v71 and v71.SetContent then
+			pcall(function()
+				v71:SetContent(string.format("<b>Status:</b> %s", p10))
+			end)
+		end
+	end
+	t6 = {
+		WorkflowStatus = {
+			Index = "Off",
+			Rebirth = "Off",
+			Food = "Off",
+			Gears = "Off"
+		},
+		TweenRestores = {},
+		InstantDepositAt = 0,
+		InstantTargetHistory = {},
+		InstantTargetLock = nil,
+		HatchRetryAt = {},
+		PlacePending = nil,
+		PlaceRetryAt = 0
+	}
+	v77 = nil
+	v78 = nil
+	v79 = nil
+	v80 = v93:Window({
+		Title = "Zeroin",
+		Footer = "Ride A Pet",
+		Version = "3.0.0",
+		Discord = "https://discord.gg/9snzkaGkRE",
+		Color = Color3.fromRGB(0, 205, 122),
+		Color2 = Color3.fromRGB(1, 18, 11),
+		["Tab Width"] = 130,
+		Image = "79481584966698",
+		WindowIMG = "124404129684886",
+		LogoHUB = "124404129684886",
+		NotificationIcon = "124404129684886"
+	})
+	v81 = v80
+
+	local function v117()
+		local ConfigData_ = ConfigData or getgenv and getgenv().ConfigData or _G and _G.ConfigData
+
+		if not ConfigData_ or type(ConfigData_) ~= "table" then
+			return
+		end
+
+		local function v119(p11, p12)
+			if ConfigData_[p11] == nil then
+				if p12 then
+					for _, v in ipairs(p12) do
+						if ConfigData_[v] ~= nil then
+							ConfigData_[p11] = ConfigData_[v]
+
+							break
+						end
+					end
+				end
+			end
+		end
+
+		v119("Dropdown_Farm Mode", {
+			"Dropdown_Movement Mode",
+			"Dropdown_Mode Gerakan (Movement Mode)",
+			"Dropdown_Mode Gerakan Navigasi"
+		})
+
+		if ConfigData_["Dropdown_Farm Mode"] == nil then
+			ConfigData_["Dropdown_Farm Mode"] = "None"
+			t3.FarmMode = "None"
+		else
+			local v122 = tostring(ConfigData_["Dropdown_Farm Mode"])
+
+			if v122 == "None" then
+				t3.FarmMode = "None"
+			else
+				t3.FarmMode = (v122:find("Instant") or v122:find("Teleport")) and "Instant" or "Tween"
+			end
+
+			ConfigData_["Dropdown_Farm Mode"] = t3.FarmMode
+		end
+
+		t3.FarmMovementMode = tostring(ConfigData_["Dropdown_Navigation Movement Mode"] or "Tween (Smooth Glide)"):find("Teleport") and "Teleport" or "Tween"
+		ConfigData_["Dropdown_Navigation Movement Mode"] = t3.FarmMovementMode == "Teleport" and "Teleport (Instant)" or "Tween (Smooth Glide)"
+		v119("Dropdown_Target Rarity", {
+			"Dropdown_Target Egg Rarities",
+			"Dropdown_Target Rarity Telur",
+			"Dropdown_Pilih Rarity Target Telur"
+		})
+
+		if type(ConfigData_["Dropdown_Target Rarity"]) == "table" then
+			for k in pairs(t3.AutoFarmRarities) do
+				t3.AutoFarmRarities[k] = table.find(ConfigData_["Dropdown_Target Rarity"], k) ~= nil
+			end
+		end
+
+		v119("Dropdown_Target Egg Name", {
+			"Dropdown_Target Specific Egg",
+			"Dropdown_Target Egg"
+		})
+
+		local dropdownTargetEggName = ConfigData_["Dropdown_Target Egg Name"]
+
+		if type(dropdownTargetEggName) == "table" then
+			for _, v in ipairs(dropdownTargetEggName) do
+				if v ~= "None" then
+					t3.AutoFarmEggNames[v] = true
+				end
+			end
+		elseif type(dropdownTargetEggName) == "string" and dropdownTargetEggName ~= "None" and dropdownTargetEggName ~= "All Eggs" then
+			t3.AutoFarmEggNames[dropdownTargetEggName] = true
+		end
+
+		ConfigData_["Dropdown_Target Egg Name"] = next(t3.AutoFarmEggNames) and dropdownTargetEggName or { "None" }
+		v119("Input_Tween Speed", {
+			"Input_Tween Speed (Input x10)",
+			"Input_Kecepatan Tween (Input x10)",
+			"Slider_Kecepatan Tween (Return Speed)"
+		})
+
+		if ConfigData_["Input_Tween Speed"] ~= nil then
+			local tweenInput = tonumber(ConfigData_["Input_Tween Speed"])
+
+			if tweenInput and tweenInput > 0 then
+				if tweenInput > 300 then
+					tweenInput = math.floor(tweenInput / 10)
+				end
+
+				t3.TweenInput = tweenInput
+				t3.TweenSpeed = tweenInput * 10
+				ConfigData_["Input_Tween Speed"] = tostring(tweenInput)
+			end
+		end
+
+		v119("Toggle_Enable Auto Farm", {
+			"Toggle_Enable Auto Farm Loop",
+			"Toggle_Auto Farm Egg",
+			"Toggle_Auto Farm"
+		})
+
+		if toggleEnableAutoFarm == nil then
+			if ConfigData_["Toggle_Enable Auto Farm"] ~= nil then
+				t3.AutoFarmEnabled = ConfigData_["Toggle_Enable Auto Farm"] == true
+			end
+		else
+			ConfigData_["Toggle_Enable Auto Farm"] = toggleEnableAutoFarm
+			t3.AutoFarmEnabled = toggleEnableAutoFarm == true
+		end
+
+		for _, v in ipairs({
+			"Toggle_Enable Auto Farm Loop",
+			"Toggle_Auto Farm Egg",
+			"Toggle_Auto Farm",
+			"Dropdown_Movement Mode",
+			"Dropdown_Target Egg Rarities",
+			"Dropdown_Target Priority",
+			"Toggle_Auto Safe Return Speed",
+			"Toggle_Fast Proximity Prompt",
+			"Input_Tween Speed (Input x10)"
+		}) do
+			ConfigData_[v] = nil
+		end
+
+		ConfigData_["Dropdown_Select Specific Target Egg"] = "None"
+		v119("Toggle_Enable Egg ESP", { "Toggle_Egg ESP" })
+
+		if ConfigData_["Toggle_Enable Egg ESP"] ~= nil then
+			t3.EspEnabled = ConfigData_["Toggle_Enable Egg ESP"] == true
+		end
+
+		v119("Toggle_Egg Highlight (Chams)", {
+			"Toggle_Egg Highlight / Chams",
+			"Toggle_Highlight"
+		})
+
+		if ConfigData_["Toggle_Egg Highlight (Chams)"] ~= nil then
+			t3.Highlight = ConfigData_["Toggle_Egg Highlight (Chams)"] == true
+		end
+
+		v119("Toggle_ESP Tracers", { "Toggle_Tracers" })
+
+		if ConfigData_["Toggle_ESP Tracers"] ~= nil then
+			t3.Tracers = ConfigData_["Toggle_ESP Tracers"] == true
+		end
+
+		t3.ShowName = true
+		t3.ShowDistance = true
+		t3.ShowRarity = true
+		t3.ShowLuck = true
+
+		local t11 = {
+			"Ethereal",
+			"Divine",
+			"Mythic",
+			"Legendary",
+			"Epic",
+			"Rare",
+			"Common"
+		}
+
+		v119("Dropdown_Visible Rarities", {
+			"Dropdown_Visible Rarity Tiers",
+			"Dropdown_ESP Rarities"
+		})
+
+		if type(ConfigData_["Dropdown_Visible Rarities"]) == "table" then
+			for _, v in ipairs(t11) do
+				t3.RarityFilter[v] = table.find(ConfigData_["Dropdown_Visible Rarities"], v) ~= nil
+			end
+		else
+			v119("Toggle_Ethereal (Top Tier)", { "Toggle_Ethereal" })
+
+			for k in pairs(t3.RarityFilter) do
+				local v134 = k == "Ethereal" and "Toggle_Ethereal (Top Tier)" or "Toggle_" .. k
+
+				if ConfigData_[v134] ~= nil then
+					t3.RarityFilter[k] = ConfigData_[v134] == true
+				end
+			end
+
+			local t12 = {}
+
+			for _, v in ipairs(t11) do
+				if t3.RarityFilter[v] ~= false then
+					table.insert(t12, v)
+				end
+			end
+
+			ConfigData_["Dropdown_Visible Rarities"] = t12
+		end
+
+		if ConfigData_["Slider_Max Render Distance"] ~= nil then
+			t3.MaxDistance = tonumber(ConfigData_["Slider_Max Render Distance"]) or t3.MaxDistance
+		end
+
+		if ConfigData_["Slider_Text Size"] ~= nil then
+			t3.TextSize = tonumber(ConfigData_["Slider_Text Size"]) or t3.TextSize
+		end
+
+		for _, v in ipairs({
+			"Toggle_Enable Auto Sell",
+			"Dropdown_Sell Mode",
+			"Slider_Max Weight to Sell (KG)",
+			"Dropdown_Target Source",
+			"Toggle_Keep Favorited Pets",
+			"Toggle_Auto Travel to Richie",
+			"Toggle_Enable Auto Feed",
+			"Toggle_Feed All Stacks at Once",
+			"Dropdown_Allowed Foods",
+			"Dropdown_Feed Priority / Target",
+			"Slider_Max Pet Age Limit",
+			"Slider_Feed Delay (Seconds)",
+			"Toggle_Enable Auto Open Egg"
+		}) do
+			ConfigData_[v] = nil
+		end
+
+		if ConfigData_["Toggle_Auto Place Egg"] ~= nil then
+			t3.AutoPlaceEggEnabled = ConfigData_["Toggle_Auto Place Egg"] == true
+		end
+
+		ConfigData_["Toggle_Enable Auto Place Egg"] = nil
+
+		if ConfigData_["Toggle_Auto Hatch Egg"] ~= nil then
+			t3.AutoHatchEggEnabled = ConfigData_["Toggle_Auto Hatch Egg"] == true
+		end
+
+		if ConfigData_["Toggle_Auto Feed Pet"] ~= nil then
+			t3.AutoFeedPetEnabled = ConfigData_["Toggle_Auto Feed Pet"] == true
+		end
+
+		if type(ConfigData_["Dropdown_Select Food"]) == "table" then
+			for k in pairs(t3.AutoFeedFoods) do
+				t3.AutoFeedFoods[k] = table.find(ConfigData_["Dropdown_Select Food"], k) ~= nil
+			end
+		end
+
+		v119("Dropdown_Target Mode", { "Dropdown_Target Pets" })
+
+		if ConfigData_["Dropdown_Target Mode"] ~= nil then
+			t3.AutoFeedMode = ConfigData_["Dropdown_Target Mode"]
+		end
+
+		if ConfigData_["Input_Target Age"] ~= nil then
+			t3.AutoFeedTargetAge = tonumber(ConfigData_["Input_Target Age"]) or 100
+		end
+
+		ConfigData_["Slider_Feed Delay (Seconds)"] = nil
+
+		if type(ConfigData_["Dropdown_Egg Rarity"]) == "table" then
+			for k in pairs(t3.AutoPlaceRarities) do
+				t3.AutoPlaceRarities[k] = table.find(ConfigData_["Dropdown_Egg Rarity"], k) ~= nil
+			end
+		end
+
+		ConfigData_["Dropdown_Egg Rarities to Place & Open"] = nil
+
+		local v142 = tonumber(ConfigData_["Input_Max Weight to Sell (KG)"])
+		local dropdownSellRarities = ConfigData_["Dropdown_Sell Rarities"]
+		local dropdownNeverSellMutations = ConfigData_["Dropdown_Never Sell Mutations"]
+		local v145 = not v142 or v142 < 0 or type(dropdownSellRarities) ~= "table" or #dropdownSellRarities == 0 or #dropdownSellRarities == 1 and dropdownSellRarities[1] == "None" or type(dropdownNeverSellMutations) ~= "table" or #dropdownNeverSellMutations == 0
+
+		if ConfigData_.__AutoSellKgConfigVersion ~= 2 or v145 then
+			ConfigData_.__AutoSellKgConfigVersion = 2
+			ConfigData_["Toggle_Auto Sell Pets"] = false
+			ConfigData_["Dropdown_Sell Pet Names"] = { "All Pets" }
+			ConfigData_["Dropdown_Sell Rarities"] = {
+				"Common",
+				"Rare"
+			}
+			ConfigData_["Input_Max Weight to Sell (KG)"] = "15"
+			ConfigData_["Dropdown_Never Sell Mutations"] = {
+				"Shocked",
+				"Volted",
+				"Rage",
+				"Void",
+				"Eternal",
+				"Gold",
+				"Rainbow"
+			}
+		end
+
+		t3.AutoSellPetsEnabled = ConfigData_["Toggle_Auto Sell Pets"] == true
+
+		if type(ConfigData_["Dropdown_Sell Rarities"]) == "table" then
+			for k in pairs(t3.AutoSellRarities) do
+				t3.AutoSellRarities[k] = table.find(ConfigData_["Dropdown_Sell Rarities"], k) ~= nil
+			end
+		end
+
+		if ConfigData_["Input_Max Weight to Sell (KG)"] ~= nil then
+			t3.AutoSellMaxWeight = math.max(0, tonumber(ConfigData_["Input_Max Weight to Sell (KG)"]) or 15)
+		end
+
+		ConfigData_["Slider_Sell Below $/s"] = nil
+		v119("Dropdown_Pet Names", { "Dropdown_Sell Pet Names" })
+
+		if type(ConfigData_["Dropdown_Pet Names"]) == "table" then
+			for _, v in ipairs(ConfigData_["Dropdown_Pet Names"]) do
+				if v ~= "All Pets" then
+					t3.AutoSellPetNames[v] = true
+				end
+			end
+		end
+
+		if type(ConfigData_["Dropdown_Never Sell Mutations"]) == "table" then
+			table.clear(t3.AutoSellProtectedMutations)
+
+			for _, v in ipairs(ConfigData_["Dropdown_Never Sell Mutations"]) do
+				if v ~= "None" then
+					t3.AutoSellProtectedMutations[v] = true
+				end
+			end
+		end
+
+		t3.VolcanoDipEnabled = ConfigData_["Toggle_Dip In Volcano"] == true
+		t3.AutoIndexEnabled = ConfigData_["Toggle_Auto Complete Index"] == true
+
+		if ConfigData_["Toggle_Auto Claim Index Rewards"] ~= nil then
+			t3.AutoClaimIndexRewards = ConfigData_["Toggle_Auto Claim Index Rewards"] == true
+		end
+
+		t3.AutoRebirthEnabled = ConfigData_["Toggle_Auto Rebirth"] == true
+		t3.TargetRebirth = math.clamp(tonumber(tostring(ConfigData_["Dropdown_Target Rebirth"] or ""):match("%d+")) or 6, 1, 6)
+
+		for k, v in pairs({
+			Food = "Food",
+			Gears = "Gear"
+		}) do
+			t3.ShopAutoBuy[k].Enabled = ConfigData_["Toggle_Auto Buy " .. v] == true
+
+			local v153 = ConfigData_["Dropdown_" .. v .. " Items"]
+			local ipairs_ = ipairs
+			local v155 = type(v153) == "table" and v153 or {}
+
+			for _, v2 in ipairs_(v155) do
+				if v2 ~= "None" then
+					t3.ShopAutoBuy[k].Items[v2] = true
+				end
+			end
+		end
+
+		if ConfigData_["Toggle_Anti AFK"] ~= nil then
+			t3.AntiAfkEnabled = ConfigData_["Toggle_Anti AFK"] == true
+		end
+
+		if ConfigData_["Toggle_FPS Boost"] ~= nil then
+			t3.FpsBoostEnabled = ConfigData_["Toggle_FPS Boost"] == true
+		end
+	end
+
+	v117()
+
+	if SaveConfig then
+		pcall(SaveConfig)
+	end
+
+	v82 = function(p13, p14, p15, p16)
+		if v93 and v93.MakeNotify then
+			pcall(function()
+				v93:MakeNotify({
+					Title = p16 or "Ride A Pet",
+					Content = p13,
+					Color = p15 or Color3.fromRGB(255, 175, 25),
+					Delay = p14 or 3
+				})
+			end)
+		end
+	end
+	v83 = function(p17)
+		local Name = p17.Name
+		local v159 = t2[Name]
+		local Rarity = v159 and v159.Rarity or "Unknown"
+		local Luck = v159 and v159.Luck
+
+		Luck = Luck or "?"
+
+		if Luck == "?" then
+			local EggLuck = p17:FindFirstChild("EggLuck", true)
+			local Luck2 = EggLuck and EggLuck:FindFirstChild("Luck")
+
+			if Luck2 and Luck2:IsA("TextLabel") and Luck2.Text ~= "" then
+				Luck = Luck2.Text
+			end
+		end
+
+		return {
+			Name = Name,
+			Rarity = Rarity,
+			Luck = Luck,
+			Color = t7[Rarity] or t7.Unknown,
+			Priority = t1[Rarity] or 0
+		}
+	end
+end
+
+local function v164(p18)
+	if p18 then
+		if p18.Parent then
+			return p18:FindFirstChild("EggBase") or p18:FindFirstChild("Handle") or p18:FindFirstChildWhichIsA("BasePart") or p18.PrimaryPart
+		end
+	end
+
+	return nil
+end
+local function v165()
+	local Character = LocalPlayer.Character
+
+	return Character and (Character:FindFirstChild("HumanoidRootPart") or Character:FindFirstChild("Torso") or Character.PrimaryPart)
+end
+local function v167(p19)
+	if t4[p19] then
+		return
+	end
+
+	local v168 = v164(p19)
+
+	if not v168 then
+		return
+	end
+
+	local v169 = v83(p19)
+	local BillboardGui = instanceNew("BillboardGui")
+
+	BillboardGui.Name = "Zeroin_EggEsp_" .. p19.Name
+	BillboardGui.Adornee = v168
+	BillboardGui.Size = UDim2.new(0, 150, 0, 42)
+	BillboardGui.StudsOffset = Vector3.new(0, 2.4, 0)
+	BillboardGui.AlwaysOnTop = true
+	BillboardGui.MaxDistance = t3.MaxDistance
+	BillboardGui.ResetOnSpawn = false
+	BillboardGui.Enabled = t3.EspEnabled and t3.RarityFilter[v169.Rarity] ~= false
+
+	local Frame = instanceNew("Frame")
+
+	Frame.Name = "Card"
+	Frame.Size = UDim2.new(1, 0, 1, 0)
+	Frame.BackgroundColor3 = Color3.fromRGB(16, 18, 24)
+	Frame.BackgroundTransparency = 0.25
+	Frame.BorderSizePixel = 0
+	Frame.Parent = BillboardGui
+
+	local UICorner = instanceNew("UICorner")
+
+	UICorner.CornerRadius = UDim.new(0, 7)
+	UICorner.Parent = Frame
+
+	local UIStroke = instanceNew("UIStroke")
+
+	UIStroke.Thickness = 1.3
+	UIStroke.Color = v169.Color
+	UIStroke.Transparency = 0.15
+	UIStroke.Parent = Frame
+
+	local UIListLayout = instanceNew("UIListLayout")
+
+	UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+	UIListLayout.FillDirection = Enum.FillDirection.Vertical
+	UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+	UIListLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+	UIListLayout.Padding = UDim.new(0, 1)
+	UIListLayout.Parent = Frame
+
+	local TextLabel = instanceNew("TextLabel")
+
+	TextLabel.Name = "Title"
+	TextLabel.LayoutOrder = 1
+	TextLabel.Size = UDim2.new(1, -8, 0, 18)
+	TextLabel.BackgroundTransparency = 1
+	TextLabel.Font = Enum.Font.GothamBold
+	TextLabel.Text = v169.Name
+	TextLabel.TextColor3 = v169.Color
+	TextLabel.TextSize = t3.TextSize
+	TextLabel.TextTruncate = Enum.TextTruncate.AtEnd
+	TextLabel.Parent = Frame
+
+	local TextLabel2 = instanceNew("TextLabel")
+
+	TextLabel2.Name = "Details"
+	TextLabel2.LayoutOrder = 2
+	TextLabel2.Size = UDim2.new(1, -8, 0, 16)
+	TextLabel2.BackgroundTransparency = 1
+	TextLabel2.Font = Enum.Font.GothamMedium
+	TextLabel2.Text = string.format("%s | x%s", v169.Rarity, v169.Luck)
+	TextLabel2.TextColor3 = Color3.fromRGB(220, 225, 235)
+	TextLabel2.TextSize = math.max(10, t3.TextSize - 2)
+	TextLabel2.TextTruncate = Enum.TextTruncate.AtEnd
+	TextLabel2.Parent = Frame
+	BillboardGui.Parent = Folder
+
+	local Highlight
+
+	if t3.Highlight then
+		Highlight = instanceNew("Highlight")
+		Highlight.Name = "Zeroin_EggHighlight"
+		Highlight.Adornee = p19
+		Highlight.FillColor = v169.Color
+		Highlight.OutlineColor = v169.Color
+		Highlight.FillTransparency = 0.65
+		Highlight.OutlineTransparency = 0.1
+		Highlight.Enabled = t3.EspEnabled and t3.RarityFilter[v169.Rarity] ~= false
+		pcall(function()
+			Highlight.Parent = p19
+		end)
+	end
+
+	local v178
+
+	if Drawing and Drawing.new then
+		local ok, result = pcall(function()
+			local Line = Drawing.new("Line")
+
+			Line.Thickness = 1.2
+			Line.Color = v169.Color
+			Line.Transparency = 0.85
+			Line.Visible = false
+
+			return Line
+		end)
+
+		if ok then
+			v178 = result
+		end
+	end
+
+	t4[p19] = {
+		Gui = BillboardGui,
+		Card = Frame,
+		TitleLabel = TextLabel,
+		InfoLabel = TextLabel2,
+		Highlight = Highlight,
+		Tracer = v178,
+		RootPart = v168,
+		Info = v169
+	}
+end
+local function v182(p20)
+	local v183 = t4[p20]
+
+	if not v183 then
+		return
+	end
+
+	if v183.Gui then
+		pcall(function()
+			v183.Gui:Destroy()
+		end)
+	end
+
+	if v183.Highlight then
+		pcall(function()
+			v183.Highlight:Destroy()
+		end)
+	end
+
+	if v183.Tracer then
+		pcall(function()
+			v183.Tracer.Visible = false
+			v183.Tracer:Remove()
+		end)
+	end
+
+	t4[p20] = nil
+end
+local function v184()
+	for k, v in pairs(t4) do
+		if k and k.Parent then
+			local enabled = t3.EspEnabled and t3.RarityFilter[v.Info.Rarity] ~= false
+
+			if v.Gui then
+				v.Gui.Enabled = enabled
+				v.Gui.MaxDistance = t3.MaxDistance
+
+				if v.TitleLabel then
+					v.TitleLabel.Visible = t3.ShowName
+					v.TitleLabel.TextSize = t3.TextSize
+				end
+
+				if v.InfoLabel then
+					v.InfoLabel.TextSize = math.max(10, t3.TextSize - 2)
+				end
+			end
+
+			if v.Highlight then
+				v.Highlight.Enabled = enabled and t3.Highlight
+			end
+
+			if v.Tracer then
+				if not enabled then
+					v.Tracer.Visible = false
+				end
+			end
+		else
+			v182(k)
+		end
+	end
+end
+
+local RenderedEggs = Workspace:WaitForChild("RenderedEggs", 10)
+
+local function v189()
+	if RenderedEggs then
+		local v190, v191, v192 = ipairs(RenderedEggs:GetChildren())
+
+		for _, v in v190, v191, v192 do
+			if v:IsA("Model") then
+				v167(v)
+			end
+		end
+	end
+
+	local v195, v196, v197 = ipairs(Workspace:GetChildren())
+	local v198 = geniter(v195, v196, v197)
+	local v199 = table.pack(v198())
+
+	if v199[1] then
+		local v200 = v199[3]
+
+		while true do
+			local ok = not v200:IsA("Model")
+
+			if not ok then
+				ok = not v200.Name:lower():find("egg") or v200 == RenderedEggs
+			end
+
+			if ok then
+				local v202 = table.pack(v198())
+
+				if v202[1] then
+					v200 = v202[3]
+
+					continue
+				end
+
+				break
+			end
+
+			v167(v200)
+
+			local v203 = table.pack(v198())
+
+			if v203[1] then
+				v200 = v203[3]
+
+				continue
+			end
+
+			break
+		end
+	end
+end
+
+if RenderedEggs then
+	local connection = RenderedEggs.ChildAdded:Connect(function(child)
+		if child:IsA("Model") then
+			task.wait(0.1)
+			v167(child)
+		end
+	end)
+	local connection2 = RenderedEggs.ChildRemoved:Connect(function(child)
+		v182(child)
+	end)
+
+	v81:AddCleanup(connection)
+	v81:AddCleanup(connection2)
+end
+
+v189()
+
+do
+	local connection = RunService.Heartbeat:Connect(function()
+		local v207 = v165()
+		local Position = v207 and v207.Position
+		local vector2 = CurrentCamera and Vector2.new(CurrentCamera.ViewportSize.X / 2, CurrentCamera.ViewportSize.Y - 10)
+
+		tick()
+
+		for k, v in pairs(t4) do
+			local RootPart = v.RootPart
+
+			if RootPart and RootPart.Parent and k.Parent then
+				local Position2 = RootPart.Position
+				local Magnitude = Position and (Position2 - Position).Magnitude or 0
+
+				if v.Gui and v.Gui.Enabled then
+					local t13 = {}
+
+					if t3.ShowRarity then
+						table.insert(t13, v.Info.Rarity)
+					end
+
+					if t3.ShowLuck then
+						table.insert(t13, "x" .. v.Info.Luck)
+					end
+
+					if t3.ShowDistance and Position then
+						table.insert(t13, string.format("%d studs", math.floor(Magnitude)))
+					end
+
+					if v.InfoLabel then
+						v.InfoLabel.Text = table.concat(t13, " • ")
+					end
+				end
+
+				if v.Tracer then
+					if t3.EspEnabled and t3.Tracers and t3.RarityFilter[v.Info.Rarity] ~= false and Magnitude <= t3.MaxDistance and CurrentCamera then
+						local v216, v217 = CurrentCamera:WorldToViewportPoint(Position2)
+
+						if v217 and v216.Z > 0 then
+							v.Tracer.From = vector2
+							v.Tracer.To = Vector2.new(v216.X, v216.Y)
+							v.Tracer.Visible = true
+						else
+							v.Tracer.Visible = false
+						end
+					else
+						v.Tracer.Visible = false
+					end
+				end
+			else
+				v182(k)
+			end
+		end
+	end)
+
+	v81:AddCleanup(connection)
+end
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local BasketDrop = ReplicatedStorage:FindFirstChild("Remotes") and ReplicatedStorage.Remotes:FindFirstChild("Game") and ReplicatedStorage.Remotes.Game:FindFirstChild("BasketDrop") or ReplicatedStorage:FindFirstChild("BasketDrop", true)
+local EggPickup = ReplicatedStorage:FindFirstChild("Remotes") and ReplicatedStorage.Remotes:FindFirstChild("Game") and ReplicatedStorage.Remotes.Game:FindFirstChild("EggPickup") or ReplicatedStorage:FindFirstChild("EggPickup", true)
+local TeleportToPlot = ReplicatedStorage:FindFirstChild("Remotes") and ReplicatedStorage.Remotes:FindFirstChild("Game") and ReplicatedStorage.Remotes.Game:FindFirstChild("TeleportToPlot") or ReplicatedStorage:FindFirstChild("TeleportToPlot", true)
+local PetDismount = ReplicatedStorage:FindFirstChild("Remotes") and ReplicatedStorage.Remotes:FindFirstChild("Game") and ReplicatedStorage.Remotes.Game:FindFirstChild("PetDismount") or ReplicatedStorage:FindFirstChild("PetDismount", true)
+local EggPlaced = ReplicatedStorage:FindFirstChild("Remotes") and ReplicatedStorage.Remotes:FindFirstChild("Game") and ReplicatedStorage.Remotes.Game:FindFirstChild("EggPlaced") or ReplicatedStorage:FindFirstChild("EggPlaced", true)
+local GameMessage = ReplicatedStorage:FindFirstChild("Remotes") and ReplicatedStorage.Remotes:FindFirstChild("Reusable") and ReplicatedStorage.Remotes.Reusable:FindFirstChild("GameMessage") or ReplicatedStorage:FindFirstChild("GameMessage", true)
+local Remotes = ReplicatedStorage:FindFirstChild("Dialogue") and ReplicatedStorage.Dialogue:FindFirstChild("Remotes")
+local DialogueSelect = Remotes and Remotes:FindFirstChild("DialogueSelect")
+local Pets = require(ReplicatedStorage:WaitForChild("GameData"):WaitForChild("Pets"))
+local t14 = {
+	Used = nil,
+	Max = nil,
+	UpdatedAt = 0
+}
+
+if GameMessage and GameMessage:IsA("RemoteEvent") then
+	local connection = GameMessage.OnClientEvent:Connect(function(p21)
+		if type(p21) ~= "string" then
+			return
+		end
+
+		local match, v231 = p21:match("Max%s+(%d+)%s*/%s*(%d+)%s+Eggs%s+In%s+Plot")
+
+		if not match then
+			local match2, v233 = p21:match("(%d+)%s*/%s*(%d+)%s+Eggs")
+
+			match = match2
+			v231 = v233
+		end
+
+		if match and v231 then
+			t14.Used = tonumber(match)
+			t14.Max = tonumber(v231)
+			t14.UpdatedAt = os.clock()
+		end
+	end)
+
+	v81:AddCleanup(connection)
+end
+
+local function v234()
+	local Plots = Workspace:FindFirstChild("Plots")
+
+	if not Plots then
+		return nil
+	end
+
+	for _, child in ipairs(Plots:GetChildren()) do
+		if child:GetAttribute("NestsOwnerLoaded") == LocalPlayer.UserId then
+			return child
+		end
+
+		local Data = child:FindFirstChild("Data")
+		local Owner = Data and Data:FindFirstChild("Owner")
+
+		if Owner and Owner.Value == LocalPlayer then
+			return child
+		end
+	end
+
+	return nil
+end
+local function v240(p22)
+	local v241 = p22 or v234()
+
+	if not v241 then
+		return nil
+	end
+
+	local Baseplate = v241:FindFirstChild("Baseplate")
+
+	if Baseplate then
+		return Baseplate.Position
+	end
+
+	return v241:GetPivot().Position
+end
+local function v243(p23)
+	local v244 = p23 or v234()
+
+	if not v244 then
+		return nil, nil
+	end
+
+	local Baseplate = v244:FindFirstChild("Baseplate")
+	local CFrame_ = Baseplate and Baseplate.CFrame or v244:GetPivot()
+	local v247 = CFrame_.Position + CFrame_.LookVector * 55
+	local Y = CFrame_.Position.Y
+
+	pcall(function()
+		local raycastParams = RaycastParams.new()
+
+		raycastParams.FilterType = Enum.RaycastFilterType.Exclude
+
+		local filterDescendantsInstances = { v244 }
+
+		if LocalPlayer.Character then
+			table.insert(filterDescendantsInstances, LocalPlayer.Character)
+		end
+
+		local RenderedEggs2 = Workspace:FindFirstChild("RenderedEggs")
+
+		if RenderedEggs2 then
+			table.insert(filterDescendantsInstances, RenderedEggs2)
+		end
+
+		raycastParams.FilterDescendantsInstances = filterDescendantsInstances
+
+		local hit = Workspace:Raycast(v247 + Vector3.new(0, 15, 0), Vector3.new(0, -35, 0), raycastParams)
+
+		if hit then
+			Y = hit.Position.Y
+		end
+	end)
+
+	return Vector3.new(v247.X, Y + 3, v247.Z), CFrame_.Position
+end
+local function v253(p24, p25, p26)
+	local v254 = p26 or v234()
+
+	if not v254 then
+		return { p25 }
+	end
+
+	local Baseplate = v254:FindFirstChild("Baseplate") or v254:FindFirstChildWhichIsA("BasePart")
+	local CFrame_ = Baseplate and Baseplate.CFrame or v254:GetPivot()
+	local v257 = CFrame_:PointToObjectSpace(p24)
+	local v258 = CFrame_:PointToObjectSpace(p25)
+	local X = v257.X
+	local Z = v257.Z
+	local v261 = v258.X - X
+	local v262 = v258.Z - Z
+	local v263 = v261 * v261 + v262 * v262
+	local v264
+
+	if v263 < 0.001 then
+		v264 = X * X + Z * Z
+	else
+		local v265 = math.clamp(-(X * v261 + Z * v262) / v263, 0, 1)
+		local v266 = X + v265 * v261
+		local v267 = Z + v265 * v262
+
+		v264 = v266 * v266 + v267 * v267
+	end
+
+	if not (v264 < 5625 or Z > -45 and math.abs(X) < 65) then
+		return { p25 }
+	end
+
+	local v268 = X >= 0 and 80 or -80
+	local t15 = {}
+
+	local function v270(p27)
+		local Y = p25.Y
+
+		pcall(function()
+			local raycastParams = RaycastParams.new()
+
+			raycastParams.FilterType = Enum.RaycastFilterType.Exclude
+
+			local filterDescendantsInstances = { v254 }
+
+			if LocalPlayer.Character then
+				table.insert(filterDescendantsInstances, LocalPlayer.Character)
+			end
+
+			raycastParams.FilterDescendantsInstances = filterDescendantsInstances
+
+			local hit = Workspace:Raycast(Vector3.new(p27.X, p27.Y + 25, p27.Z), Vector3.new(0, -60, 0), raycastParams)
+
+			if hit then
+				Y = hit.Position.Y + 3
+			end
+		end)
+
+		return Y
+	end
+	local function v275(p28, p29)
+		local v276 = CFrame_:PointToWorldSpace(Vector3.new(p28, v258.Y, p29))
+		local vector3 = Vector3.new(v276.X, v270(v276), v276.Z)
+
+		table.insert(t15, vector3)
+	end
+
+	if Z > 75 then
+		v275(v268, 75)
+		v275(v268, -60)
+	elseif Z > -60 then
+		if math.abs(X) < 80 then
+			v275(v268, Z)
+		end
+
+		v275(v268, -60)
+	end
+
+	table.insert(t15, p25)
+
+	return t15
+end
+local function v278(p30, p31, p32)
+	local RelayEggMaxPlotDistance = p31 or t3.RelayEggMaxPlotDistance
+	local v280 = RelayEggMaxPlotDistance or 800
+	local v281 = v240(p30)
+
+	if not v281 then
+		return nil, 0
+	end
+
+	local u282
+	local u283 = v280
+
+	local function v284(p33)
+		if not p33 then
+			return
+		end
+
+		for _, child in ipairs(p33:GetChildren()) do
+			if child:IsA("Model") then
+				if child.Parent and child ~= p32 then
+					local v287 = v164(child)
+
+					if v287 then
+						local Magnitude = (v287.Position - v281).Magnitude
+
+						if Magnitude < u283 then
+							u283 = Magnitude
+							u282 = child
+						end
+					end
+				end
+			end
+		end
+	end
+
+	v284(RenderedEggs)
+
+	for _, child in ipairs(Workspace:GetChildren()) do
+		if child:IsA("Model") then
+			if child.Name:lower():find("egg") and child ~= RenderedEggs and child ~= p32 and child.Parent then
+				local v291 = v164(child)
+
+				if v291 then
+					local Magnitude = (v291.Position - v281).Magnitude
+
+					if Magnitude < u283 then
+						u283 = Magnitude
+						u282 = child
+					end
+				end
+			end
+		end
+	end
+
+	return u282, u283
+end
+
+do
+	local function v293(p34, p35)
+		local Character = LocalPlayer.Character
+		local HumanoidRootPart = Character and (Character:FindFirstChild("HumanoidRootPart") or Character.PrimaryPart)
+
+		if not HumanoidRootPart then
+			return false
+		end
+
+		if p35 and p35() then
+			return false
+		end
+
+		local Position = p34.Position
+
+		if LocalPlayer.RequestStreamAroundAsync then
+			pcall(function()
+				LocalPlayer:RequestStreamAroundAsync(Position)
+			end)
+		end
+
+		HumanoidRootPart.AssemblyLinearVelocity = Vector3.zero
+		HumanoidRootPart.AssemblyAngularVelocity = Vector3.zero
+		HumanoidRootPart.CFrame = p34
+		HumanoidRootPart.AssemblyLinearVelocity = Vector3.zero
+		HumanoidRootPart.AssemblyAngularVelocity = Vector3.zero
+		task.wait(t3.TeleportDelay or 0.15)
+
+		return true
+	end
+end
+
+do
+	local function v297(p36, p37, p38, p39)
+		local v298 = p37 or 3
+		local v299 = p38 or 18
+		local now = os.clock()
+
+		while true do
+			if not (os.clock() - now < v298) then
+				return false, os.clock() - now
+			end
+
+			if p39 and p39() then
+				break
+			end
+
+			local attribute = LocalPlayer:GetAttribute("TeleportLastPosition")
+
+			if attribute and (attribute - p36).Magnitude <= v299 then
+				return true, os.clock() - now
+			end
+
+			task.wait(0.05)
+		end
+
+		return false, os.clock() - now
+	end
+end
+
+local function v302()
+	local Basket = LocalPlayer:FindFirstChild("Basket")
+	local Character, v305, v306, v307, v308, v309, DisplayEgg
+
+	if Basket then
+		if #Basket:GetChildren() > 0 then
+			local v311 = Basket:GetChildren()[1]
+
+			return true, v311:GetAttribute("Egg") or v311.Name, v311
+		end
+
+		Character = LocalPlayer.Character
+
+		if Character then
+			v305, v306, v307 = ipairs(Character:GetChildren())
+			v308 = geniter(v305, v306, v307)
+
+			local v312 = table.pack(v308())
+
+			if v312[1] then
+				v309 = v312[3]
+
+				while true do
+					if not v309:HasTag("EggPack") or not v309:FindFirstChild("DisplayEgg") then
+						local v313 = table.pack(v308())
+
+						if v313[1] then
+							v309 = v313[3]
+
+							continue
+						end
+
+						return false, nil, nil
+					end
+
+					break
+				end
+
+				DisplayEgg = v309:FindFirstChild("DisplayEgg")
+
+				return true, DisplayEgg.Name, DisplayEgg
+			end
+		end
+	else
+		Character = LocalPlayer.Character
+
+		if Character then
+			v305, v306, v307 = ipairs(Character:GetChildren())
+			v308 = geniter(v305, v306, v307)
+
+			local v314 = table.pack(v308())
+
+			if v314[1] then
+				v309 = v314[3]
+
+				while true do
+					if not v309:HasTag("EggPack") or not v309:FindFirstChild("DisplayEgg") then
+						local v315 = table.pack(v308())
+
+						if v315[1] then
+							v309 = v315[3]
+
+							continue
+						end
+
+						return false, nil, nil
+					end
+
+					break
+				end
+
+				DisplayEgg = v309:FindFirstChild("DisplayEgg")
+
+				return true, DisplayEgg.Name, DisplayEgg
+			end
+		end
+	end
+
+	return false, nil, nil
+end
+
+do
+	local function v316()
+		local ok, result, result2, result3 = pcall(function()
+			local Basket = LocalPlayer:FindFirstChild("Basket")
+
+			if Basket then
+				local serverTimeNow = workspace:GetServerTimeNow()
+				local v323
+				local v324
+				local v325
+
+				for _, child in ipairs(Basket:GetChildren()) do
+					local v328 = tonumber(child:GetAttribute("BreakAt"))
+					local v329 = tonumber(child:GetAttribute("BreakSeconds"))
+
+					if v328 then
+						local v330 = v328 - serverTimeNow
+						local v331
+
+						if v329 and v329 > 0 then
+							v331 = math.clamp(v330 / v329 * 100, 0, 100)
+						end
+
+						if not v323 or v330 < v323 then
+							v323 = v330
+							v324 = v331
+							v325 = v329
+						end
+					end
+				end
+
+				if v323 then
+					if not v324 then
+						local PlayerGui = LocalPlayer:FindFirstChild("PlayerGui")
+						local EggBreaking = PlayerGui and PlayerGui:FindFirstChild("EggBreaking")
+						local Bar = EggBreaking and EggBreaking:FindFirstChild("Bar", true)
+
+						if Bar and Bar:IsA("GuiObject") and Bar.Size.X.Scale > 0 then
+							v324 = math.clamp(Bar.Size.X.Scale * 100, 0, 100)
+						end
+					end
+
+					return v323, v324, v325
+				end
+			end
+
+			local PlayerGui = LocalPlayer:FindFirstChild("PlayerGui")
+			local EggBreaking = PlayerGui and PlayerGui:FindFirstChild("EggBreaking")
+
+			if EggBreaking then
+				local Timer = EggBreaking:FindFirstChild("Timer", true) or EggBreaking:FindFirstChild("Time", true)
+				local Bar = EggBreaking:FindFirstChild("Bar", true)
+				local v339
+				local v340
+
+				if Timer and Timer:IsA("TextLabel") and Timer.Text ~= "" then
+					local v341 = string.match(Timer.Text, "[%d%.]+")
+
+					if v341 then
+						v339 = tonumber(v341)
+					end
+				end
+
+				if Bar and Bar:IsA("GuiObject") and Bar.Size.X.Scale > 0 then
+					v340 = math.clamp(Bar.Size.X.Scale * 100, 0, 100)
+				end
+
+				if v339 or v340 then
+					return v339, v340, nil
+				end
+			end
+
+			return nil, nil, nil
+		end)
+
+		if ok then
+			if result or result2 then
+				return result, result2, result3
+			end
+		end
+
+		return nil, nil, nil
+	end
+	local function v342(p40, p41)
+		local EggBreakTargetPercent = p40 or t3.EggBreakTargetPercent
+		local v344 = EggBreakTargetPercent or 30
+		local now = os.clock()
+
+		while true do
+			if not (os.clock() - now < 50) then
+				return true
+			end
+
+			if p41 and p41() then
+				break
+			end
+
+			if not v302() then
+				return true
+			end
+
+			local v346, v347, v348 = v316()
+
+			if v347 then
+				if v347 <= v344 then
+					return true
+				end
+
+				if v75 then
+					v75(string.format("Waiting at plot front (Timer: <font color='#ffaa30'>%.1f%%</font>%s &rarr; <font color='#55ff55'>%d%%</font>)...", v347, v346 and string.format(" <font color='#aaaaaa'>[%.1fs]</font>", v346) or "", v344))
+				end
+			elseif v346 then
+				local v349 = math.clamp(v346 / (v348 or 30) * 100, 0, 100)
+
+				if v349 <= v344 then
+					return true
+				end
+
+				if v75 then
+					v75(string.format("Waiting at plot front (Timer: <font color='#ffaa30'>%.1f%%</font> <font color='#aaaaaa'>[%.1fs]</font> &rarr; <font color='#55ff55'>%d%%</font>)...", v349, v346, v344))
+				end
+			else
+				if os.clock() - now > 4 then
+					return true
+				end
+
+				if v75 then
+					v75("Waiting at plot front (Reading egg break timer)...")
+				end
+			end
+
+			task.wait(0.25)
+		end
+
+		return false
+	end
+end
+
+local function v350(p42, p43, p44)
+	local Character = LocalPlayer.Character
+	local HumanoidRootPart = Character and (Character:FindFirstChild("HumanoidRootPart") or Character.PrimaryPart)
+
+	if not HumanoidRootPart then
+		return false
+	end
+
+	local Position = p42.Position
+	local Position2 = HumanoidRootPart.Position
+	local v355 = math.max(1, math.ceil((Position - Position2).Magnitude / 380))
+
+	for i = 1, v355 do
+		if p44 and p44() then
+			HumanoidRootPart.AssemblyLinearVelocity = Vector3.zero
+			HumanoidRootPart.AssemblyAngularVelocity = Vector3.zero
+
+			return false
+		end
+
+		local v357 = Position2:Lerp(Position, i / v355)
+		local attribute = LocalPlayer:GetAttribute("TeleportLastClock")
+
+		if LocalPlayer.RequestStreamAroundAsync then
+			task.spawn(function()
+				pcall(function()
+					LocalPlayer:RequestStreamAroundAsync(v357)
+				end)
+			end)
+		end
+
+		HumanoidRootPart.AssemblyLinearVelocity = Vector3.zero
+		HumanoidRootPart.AssemblyAngularVelocity = Vector3.zero
+		HumanoidRootPart.CFrame = CFrame.new(v357, v357 + (p42.LookVector.Magnitude > 0 and p42.LookVector or Vector3.new(0, 0, -1)))
+		HumanoidRootPart.AssemblyLinearVelocity = Vector3.zero
+		HumanoidRootPart.AssemblyAngularVelocity = Vector3.zero
+
+		local now = os.clock()
+
+		while os.clock() - now < 0.75 do
+			if not p44 or not p44() then
+				if LocalPlayer:GetAttribute("TeleportLastClock") == attribute then
+					task.wait(0.04)
+
+					continue
+				end
+
+				break
+			end
+
+			HumanoidRootPart.AssemblyLinearVelocity = Vector3.zero
+			HumanoidRootPart.AssemblyAngularVelocity = Vector3.zero
+
+			return false
+		end
+	end
+
+	HumanoidRootPart.AssemblyLinearVelocity = Vector3.zero
+	HumanoidRootPart.AssemblyAngularVelocity = Vector3.zero
+	HumanoidRootPart.CFrame = p42
+
+	if p43 ~= false then
+		local attribute = LocalPlayer:GetAttribute("TeleportLastClock")
+		local now = os.clock()
+
+		while os.clock() - now < 0.8 and (not p44 or not p44()) and LocalPlayer:GetAttribute("TeleportLastClock") == attribute do
+			task.wait(0.04)
+		end
+
+		task.wait(t3.TeleportDelay or 0.15)
+	end
+
+	HumanoidRootPart.AssemblyLinearVelocity = Vector3.zero
+	HumanoidRootPart.AssemblyAngularVelocity = Vector3.zero
+
+	return true
+end
+
+local t16 = {}
+
+local function v363()
+	for _, v in ipairs(t16) do
+		pcall(function()
+			v:Disconnect()
+		end)
+	end
+
+	table.clear(t16)
+
+	for k in pairs(t6.TweenRestores) do
+		pcall(k)
+	end
+
+	local Character = LocalPlayer.Character
+	local HumanoidRootPart = Character and (Character:FindFirstChild("HumanoidRootPart") or Character.PrimaryPart)
+
+	if HumanoidRootPart then
+		local TweenAntiGravity = HumanoidRootPart:FindFirstChild("TweenAntiGravity")
+
+		if TweenAntiGravity then
+			pcall(function()
+				TweenAntiGravity:Destroy()
+			end)
+		end
+
+		HumanoidRootPart.Anchored = false
+		HumanoidRootPart.AssemblyLinearVelocity = Vector3.zero
+		HumanoidRootPart.AssemblyAngularVelocity = Vector3.zero
+	end
+end
+local function v370(p45, p46)
+	local TweenSpeed = p46 or t3.TweenSpeed
+	local v372 = TweenSpeed or 720
+
+	if p45 <= 350 then
+		return math.min(v372, 1000)
+	end
+
+	if p45 <= 700 then
+		return math.min(v372, 800)
+	end
+
+	return math.min(v372, 720)
+end
+local function v373(p47, p48, p49, p50, p51)
+	local Character = LocalPlayer.Character
+	local HumanoidRootPart = Character and (Character:FindFirstChild("HumanoidRootPart") or Character.PrimaryPart)
+	local Humanoid = Character and Character:FindFirstChildOfClass("Humanoid")
+
+	if not HumanoidRootPart then
+		return false
+	end
+
+	local v377 = p50
+
+	local function v378()
+		return not v48() or LocalPlayer.Character ~= Character or not HumanoidRootPart.Parent or Humanoid ~= nil and (not Humanoid.Parent or Humanoid.Health <= 0) or v377 ~= nil and v377() == true
+	end
+
+	if v378() then
+		return false
+	end
+
+	local v379 = math.clamp(p48 or t3.TweenSpeed or 1000, 30, 5000)
+	local Position = HumanoidRootPart.Position
+	local Position2 = typeof(p47) == "CFrame" and p47.Position or p47
+
+	if (Position2 - Position).Magnitude < 2 and (not p51 or #p51 <= 1) then
+		return true
+	end
+
+	local v382 = p51 or { Position2 }
+
+	HumanoidRootPart.Anchored = false
+
+	local TweenAntiGravity = HumanoidRootPart:FindFirstChild("TweenAntiGravity")
+
+	if not TweenAntiGravity then
+		TweenAntiGravity = instanceNew("BodyVelocity")
+		TweenAntiGravity.Name = "TweenAntiGravity"
+		TweenAntiGravity.Velocity = Vector3.zero
+		TweenAntiGravity.MaxForce = Vector3.new(1e9, 1e9, 1e9)
+		TweenAntiGravity.Parent = HumanoidRootPart
+	end
+
+	local t17 = {}
+
+	local function v385()
+		for k, v in pairs(t17) do
+			if k.Parent then
+				k.CanCollide = v
+			end
+		end
+
+		table.clear(t17)
+		t6.TweenRestores[v385] = nil
+	end
+
+	t6.TweenRestores[v385] = true
+
+	local connection = RunService.Stepped:Connect(function()
+		if LocalPlayer.Character ~= Character then
+			return
+		end
+
+		for _, descendant in ipairs(Character:GetDescendants()) do
+			if descendant:IsA("BasePart") and descendant.CanCollide then
+				if t17[descendant] == nil then
+					t17[descendant] = true
+				end
+
+				descendant.CanCollide = false
+			end
+		end
+	end)
+
+	table.insert(t16, connection)
+
+	local Position3 = HumanoidRootPart.Position
+	local v392 = true
+
+	for _, v in ipairs(v382) do
+		if v378 and v378() then
+			v392 = false
+
+			break
+		end
+
+		local Position4 = typeof(v) == "CFrame" and v.Position or v
+		local Magnitude = (Position4 - Position3).Magnitude
+
+		if Magnitude > 0.5 then
+			local v397 = math.max(0.04, Magnitude / v379)
+			local v398 = Position3
+			local now = os.clock()
+			local Unit = Magnitude > 0.001 and (Position4 - v398).Unit or Vector3.zero
+			local connection2 = RunService.Heartbeat:Connect(function()
+				if v378() then
+					return
+				end
+
+				local v402 = math.clamp((os.clock() - now) / v397, 0, 1)
+				local v403 = v398:Lerp(Position4, v402)
+
+				HumanoidRootPart.CFrame = CFrame.new(v403, v403 + (Unit.Magnitude > 0 and Unit or HumanoidRootPart.CFrame.LookVector))
+				HumanoidRootPart.AssemblyLinearVelocity = Vector3.zero
+				HumanoidRootPart.AssemblyAngularVelocity = Vector3.zero
+			end)
+
+			table.insert(t16, connection2)
+
+			while os.clock() - now < v397 do
+				if v378 and v378() then
+					v392 = false
+
+					break
+				else
+					RunService.Heartbeat:Wait()
+				end
+			end
+
+			pcall(function()
+				connection2:Disconnect()
+			end)
+
+			for i = #t16, 1, -1 do
+				if t16[i] == connection2 then
+					table.remove(t16, i)
+
+					break
+				end
+			end
+
+			if v392 then
+				Position3 = Position4
+				HumanoidRootPart.CFrame = CFrame.new(Position4, Position4 + (Unit.Magnitude > 0 and Unit or HumanoidRootPart.CFrame.LookVector))
+				HumanoidRootPart.AssemblyLinearVelocity = Vector3.zero
+				HumanoidRootPart.AssemblyAngularVelocity = Vector3.zero
+			else
+				break
+			end
+		else
+		end
+	end
+
+	pcall(function()
+		connection:Disconnect()
+	end)
+
+	for i = #t16, 1, -1 do
+		if t16[i] == connection then
+			table.remove(t16, i)
+
+			break
+		end
+	end
+
+	if TweenAntiGravity and TweenAntiGravity.Parent then
+		TweenAntiGravity:Destroy()
+	end
+
+	v385()
+
+	if v392 and v378() then
+		v392 = false
+	end
+
+	if v392 then
+		HumanoidRootPart.CFrame = p47
+	end
+
+	HumanoidRootPart.AssemblyLinearVelocity = Vector3.zero
+	HumanoidRootPart.AssemblyAngularVelocity = Vector3.zero
+	HumanoidRootPart.Anchored = false
+
+	if Humanoid then
+		pcall(function()
+			Humanoid:ChangeState(Enum.HumanoidStateType.Landed)
+		end)
+	end
+
+	if v392 then
+		task.wait(0.35)
+		HumanoidRootPart.AssemblyLinearVelocity = Vector3.zero
+		HumanoidRootPart.AssemblyAngularVelocity = Vector3.zero
+	end
+
+	return v392
+end
+local function v406(p52, p53, p54)
+	local Character = LocalPlayer.Character
+
+	if not (Character and (Character:FindFirstChild("HumanoidRootPart") or Character.PrimaryPart)) then
+		v82("Character not found!", 2, Color3.fromRGB(255, 60, 60), "Navigation Error")
+
+		return false
+	end
+
+	local cFrame = CFrame.new(p52 + Vector3.new(0, 2.5, 0))
+
+	if t3.FarmMovementMode ~= "Teleport" then
+		v82("Gliding (Tween) to: " .. (p53 or "Egg"), 2, Color3.fromRGB(80, 255, 120), "Tween Navigation")
+
+		return v373(cFrame, t3.TweenSpeed, t3.FlightAltitude, p54)
+	end
+
+	v82("Teleporting to: " .. (p53 or "Egg"), 1.5, Color3.fromRGB(80, 255, 120), "Teleport Navigation")
+
+	return (v350(cFrame, true, p54))
+end
+local function v409(p55, p56)
+	if not p55 or not p55.Parent then
+		v82("Egg no longer exists on map!", 2, Color3.fromRGB(255, 60, 60), "Navigation Error")
+
+		return false
+	end
+
+	local v410 = v164(p55)
+
+	if v410 then
+		return v406(v410.Position, p55.Name, p56)
+	end
+
+	v82("Failed to locate egg part!", 2, Color3.fromRGB(255, 60, 60), "Navigation Error")
+
+	return false
+end
+local function v411()
+	if genv.__ZeroinRideAutomationOwner then
+		v82("Wait until the active automation finishes.", 2, Color3.fromRGB(255, 160, 40), "Radar")
+
+		return
+	end
+
+	local v412 = v165()
+
+	if not v412 then
+		return
+	end
+
+	local Position = v412.Position
+	local v414
+	local huge = math.huge
+
+	for k, v in pairs(t4) do
+		if k.Parent and v.RootPart then
+			local Magnitude = (v.RootPart.Position - Position).Magnitude
+
+			if Magnitude < huge then
+				huge = Magnitude
+				v414 = k
+			end
+		end
+	end
+
+	if v414 then
+		v409(v414)
+	else
+		v82("No eggs detected on server!", 2, Color3.fromRGB(255, 160, 40), "Radar")
+	end
+end
+local function v419()
+	if genv.__ZeroinRideAutomationOwner then
+		v82("Wait until the active automation finishes.", 2, Color3.fromRGB(255, 160, 40), "Radar")
+
+		return
+	end
+
+	local v420
+	local n1 = -1
+
+	for k, v in pairs(t4) do
+		if k.Parent and v.Info then
+			if n1 < v.Info.Priority then
+				n1 = v.Info.Priority
+				v420 = k
+			end
+		end
+	end
+
+	if v420 then
+		v409(v420)
+	else
+		v82("No eggs available on server!", 2, Color3.fromRGB(255, 160, 40), "Radar")
+	end
+end
+local function v424()
+	local t18 = {
+		Total = 0,
+		Ethereal = 0,
+		Divine = 0,
+		Mythic = 0,
+		Legendary = 0,
+		Epic = 0,
+		Rare = 0,
+		Common = 0
+	}
+
+	for k, v in pairs(t4) do
+		if k.Parent and v.Info then
+			t18.Total += 1
+
+			local Rarity = v.Info.Rarity
+
+			if t18[Rarity] ~= nil then
+				t18[Rarity] += 1
+			end
+		end
+	end
+
+	return (string.format([[<b>Total Eggs:</b> <font color='#ffaa19'>%d</font>
+• <font color='#ff64be'>Ethereal:</font> <b>%d</b>  |  <font color='#00f5dc'>Divine:</font> <b>%d</b>
+• <font color='#ff374b'>Mythic:</font> <b>%d</b>  |  <font color='#ffc31e'>Legendary:</font> <b>%d</b>
+• <font color='#b94bff'>Epic:</font> <b>%d</b>  |  <font color='#37a0ff'>Rare:</font> <b>%d</b>  |  <font color='#c8cdd7'>Common:</font> <b>%d</b>]], t18.Total, t18.Ethereal, t18.Divine, t18.Mythic, t18.Legendary, t18.Epic, t18.Rare, t18.Common))
+end
+
+local thread
+
+do
+	local CollectionService = game:GetService("CollectionService")
+	local vector3 = Vector3.new(-4873.44, 41271.79, -3753.63)
+	local t19 = {}
+	local ok, result = pcall(function()
+		return require(ReplicatedStorage:WaitForChild("GameData"):WaitForChild("Volcano"))
+	end)
+
+	if ok and type(result) == "table" then
+		t19 = result
+	end
+
+	local Tag = type(t19.Tag) == "string" and t19.Tag or "VolcanoTop"
+	local MutationName = type(t19.MutationName) == "string" and t19.MutationName or "Magma"
+	local n2 = 0
+
+	for _, v in ipairs({
+		"TossSeconds",
+		"SinkSeconds",
+		"ShakeSeconds",
+		"RiseSeconds",
+		"TeaseSeconds",
+		"HoverSeconds",
+		"ReturnSeconds"
+	}) do
+		n2 += tonumber(t19[v]) or 0
+	end
+
+	if n2 <= 0 then
+		n2 = 9.2
+	end
+
+	local function v440(p57)
+		local Basket = LocalPlayer:FindFirstChild("Basket")
+		local v442
+		local ipairs_ = ipairs
+		local children = Basket and Basket:GetChildren() or {}
+
+		for _, child in ipairs_(children) do
+			v442 = v442 or child
+
+			if (child:GetAttribute("Egg") or child:GetAttribute("EggName") or child.Name) == p57 then
+				return child, child:GetAttribute("Mutation")
+			end
+		end
+
+		local v447 = v442
+		local attribute = v442 and v442:GetAttribute("Mutation")
+
+		return v447, attribute or nil
+	end
+	local function v449()
+		local CurrentCamera2 = Workspace.CurrentCamera
+		local VolcanoVisuals = CurrentCamera2 and CurrentCamera2:FindFirstChild("VolcanoVisuals")
+		local ipairs_ = ipairs
+		local descendants = VolcanoVisuals and VolcanoVisuals:GetDescendants() or {}
+
+		for _, descendant in ipairs_(descendants) do
+			if descendant:IsA("Highlight") and descendant.Name == "VolcanoOutline" then
+				return true
+			end
+		end
+
+		return false
+	end
+	local function v456()
+		local v457 = v165()
+		local v458
+		local v459
+
+		for _, v in ipairs(CollectionService:GetTagged(Tag)) do
+			if v:IsA("BasePart") and v:IsDescendantOf(Workspace) then
+				local Magnitude = v457 and (v.Position - v457.Position).Magnitude or 0
+
+				if not v459 or Magnitude < v459 then
+					v458 = v
+					v459 = Magnitude
+				end
+			end
+		end
+
+		return v458
+	end
+	local function v463(p58)
+		local v464 = os.clock() + 5
+		local v465
+
+		while true do
+			if not p58() or not (os.clock() < v464) then
+				return nil
+			end
+
+			v465 = v456()
+
+			if not v465 then
+				task.wait(0.1)
+
+				continue
+			end
+
+			break
+		end
+
+		return v465
+	end
+	local function v466(p59, p60)
+		local v467 = p59.CFrame:PointToObjectSpace(p60)
+		local v468 = p59.Size / 2
+
+		return math.abs(v467.X) <= v468.X and math.abs(v467.Y) <= v468.Y and math.abs(v467.Z) <= v468.Z
+	end
+	local function v469(p61)
+		local v470 = v456()
+
+		if v470 then
+			return v470
+		end
+
+		v75("Volcano: streaming VolcanoTop...")
+
+		if LocalPlayer.RequestStreamAroundAsync then
+			task.spawn(function()
+				pcall(LocalPlayer.RequestStreamAroundAsync, LocalPlayer, vector3)
+			end)
+		end
+
+		local v471 = v463(p61)
+
+		if v471 or not p61() then
+			return v471
+		end
+
+		if not v373(CFrame.new(vector3), t3.TweenSpeed, t3.FlightAltitude, function()
+			return not p61()
+		end) then
+			return nil
+		end
+
+		local v472 = v463(p61)
+
+		if v472 or not p61() then
+			return v472
+		end
+
+		local Volcano = Workspace:FindFirstChild("Volcano")
+		local VolcanoEntrance = Volcano and Volcano:FindFirstChild("VolcanoEntrance")
+		local VolcanoValidate = Volcano and Volcano:FindFirstChild("VolcanoValidate")
+		local GuardianBounds = Workspace:FindFirstChild("GuardianBounds")
+
+		if not VolcanoEntrance or not VolcanoEntrance:IsA("BasePart") or not VolcanoValidate or not VolcanoValidate:IsA("BasePart") or not GuardianBounds or not GuardianBounds:IsA("BasePart") then
+			return nil
+		end
+
+		local v477
+		local v478, v479, v480 = ipairs({
+			-1,
+			1
+		})
+		local v481 = geniter(v478, v479, v480)
+
+		while true do
+			local v482 = table.pack(v481())
+
+			if not v482[1] then
+				break
+			end
+
+			local v483 = VolcanoValidate.Position + VolcanoValidate.CFrame.LookVector * (30 * v482[3])
+
+			if v466(GuardianBounds, v483) then
+				if (VolcanoValidate.Position - VolcanoEntrance.Position).Magnitude < (v483 - VolcanoEntrance.Position).Magnitude then
+					v477 = v483
+
+					break
+				end
+			end
+		end
+
+		if not v477 then
+			return nil
+		end
+
+		local v484, v485, v486 = ipairs({
+			VolcanoEntrance.Position,
+			VolcanoValidate.Position,
+			v477
+		})
+
+		for _, v in v484, v485, v486 do
+			local v489 = v456()
+
+			if v489 or not p61() then
+				return v489
+			end
+
+			if v373(CFrame.new(v), t3.TweenSpeed, t3.FlightAltitude, function()
+				return not p61()
+			end) then
+				continue
+			end
+
+			return nil
+		end
+
+		return v463(p61)
+	end
+	local function v490(p62, p63, p64)
+		local v491 = v440(p63)
+		local v492 = v449()
+		local v493 = v491 == nil
+
+		v493 = v493 or v492
+
+		local v494 = v492
+		local v495 = v491 == nil
+		local v496 = os.clock() + 4
+
+		while not v493 and p62() and os.clock() < v496 do
+			local v497, v498 = v440(p63)
+			local v499 = v449()
+
+			v494 = v494 or v499
+			v495 = v495 or v497 == nil
+			v493 = v499 or v497 == nil or v498 ~= p64
+
+			if not v493 then
+				task.wait(0.05)
+			end
+		end
+
+		if not p62() then
+			return false, nil, "cancelled"
+		end
+
+		if not v493 then
+			return false, p64, "Volcano did not accept the egg"
+		end
+
+		local v500 = os.clock() + n2 + 3
+		local exitTo
+
+		while true do
+			if not p62() then
+				exitTo = 1
+
+				break
+			end
+
+			if not (os.clock() < v500) then
+				exitTo = 1
+
+				break
+			end
+
+			local v502, v503 = v440(p63)
+			local v504 = v449()
+
+			v494 = v494 or v504
+			v495 = v495 or v502 == nil
+
+			if not v502 or v504 or not (v494 or v495 or v503 ~= p64) then
+				task.wait(0.05)
+
+				continue
+			end
+
+			break
+		end
+
+		if exitTo ~= 1 then
+			task.wait(0.1)
+
+			local _, v506 = v440(p63)
+
+			return true, v506
+		end
+
+		if p62() then
+			return false, select(2, v440(p63)), "Volcano flight timed out"
+		end
+
+		return false, nil, "cancelled"
+	end
+
+	t6.dipCarriedEggInVolcano = function(p65, p66)
+		if not t3.VolcanoDipEnabled then
+			return true
+		end
+
+		local __ZeroinRideWorkflowEggs = genv.__ZeroinRideWorkflowEggs
+
+		if p65 == "Volcanic Egg" or __ZeroinRideWorkflowEggs and __ZeroinRideWorkflowEggs[p65] then
+			return true
+		end
+
+		local function v508()
+			return t3.VolcanoDipEnabled and not p66() and v302()
+		end
+
+		local _, v510 = v440(p65)
+
+		if v510 == MutationName then
+			v75("Volcano: " .. MutationName .. " already present, returning")
+
+			return not p66()
+		end
+
+		local ServerData = ReplicatedStorage:FindFirstChild("ServerData")
+
+		if not ServerData or ServerData:GetAttribute("VolcanoRevealed") ~= true then
+			v75("Volcano not revealed, returning to plot")
+
+			return not p66()
+		end
+
+		local v512 = v469(v508)
+
+		if p66() then
+			return false
+		end
+
+		if not v512 or not v512.Parent then
+			v75("<font color='#ffaa30'>VolcanoTop unavailable, returning to plot</font>")
+
+			return true
+		end
+
+		v75(string.format("Volcano: carrying <font color='#ffee55'>%s</font> to VolcanoTop...", p65))
+
+		local v513 = v512.CFrame:PointToWorldSpace(Vector3.new(0, v512.Size.Y / 2 + 4, 0))
+
+		if not v373(CFrame.new(v513), t3.TweenSpeed, t3.FlightAltitude, function()
+			return not v508()
+		end) then
+			return not p66()
+		end
+
+		if not v508() then
+			return not p66()
+		end
+
+		if not v449() then
+			local packages = ReplicatedStorage:FindFirstChild("packages")
+			local Net = packages and packages:FindFirstChild("Net")
+			local REVolcanoDip = Net and Net:FindFirstChild("RE/VolcanoDip")
+
+			if not REVolcanoDip or not REVolcanoDip:IsA("RemoteEvent") or not pcall(REVolcanoDip.FireServer, REVolcanoDip) then
+				v75("<font color='#ffaa30'>VolcanoDip unavailable, returning to plot</font>")
+
+				return not p66()
+			end
+		end
+
+		v75("Volcano: dip processing...")
+
+		local v517, v518, v519 = v490(function()
+			return not p66()
+		end, p65, v510)
+
+		if p66() then
+			return false
+		end
+
+		if v517 then
+			if v518 == MutationName then
+				v75("<font color='#00ffaa'>Volcano: " .. MutationName .. " confirmed, returning</font>")
+			else
+				v75("Volcano: dip complete (no " .. MutationName .. "), returning")
+			end
+		else
+			v75("<font color='#ffaa30'>Volcano: " .. tostring(v519) .. ", returning</font>")
+		end
+
+		return true
+	end
+end
+
+local v520, v521
+
+do
+	local function v522()
+		if not t3.AutoFarmEnabled then
+			task.wait(0.5)
+
+			return
+		end
+
+		local Character = LocalPlayer.Character
+		local HumanoidRootPart = Character and (Character:FindFirstChild("HumanoidRootPart") or Character.PrimaryPart)
+
+		if not HumanoidRootPart then
+			v75("<font color='#ff6060'>Waiting for character to respawn...</font>")
+			task.wait(1)
+
+			return
+		end
+
+		local v525 = v234()
+
+		if not v525 then
+			v75("<font color='#ffaa30'>Locating player plot...</font>")
+			task.wait(1.5)
+
+			return
+		end
+
+		local Humanoid = Character:FindFirstChildOfClass("Humanoid")
+
+		local function v527()
+			local v528 = not v48()
+
+			return v528 or not t3.AutoFarmEnabled or t3.FarmMode ~= "Tween" or LocalPlayer.Character ~= Character or not HumanoidRootPart.Parent or not Humanoid or not Humanoid.Parent or Humanoid.Health <= 0
+		end
+
+		local v529, v530 = v302()
+		local t20
+
+		if v529 then
+			t20 = {
+				Name = v530 or "Wild Egg",
+				Color = Color3.fromRGB(255, 200, 50)
+			}
+			v75(string.format("Delivering wild egg <font color='#ffee55'>%s</font> to Plot...", t20.Name))
+		else
+			local t21 = {}
+
+			local function v533(p67)
+				if not p67:IsA("Model") or not p67.Parent then
+					return
+				end
+
+				local v534 = v83(p67)
+				local __ZeroinRideWorkflowEggs = genv.__ZeroinRideWorkflowEggs
+				local v536
+
+				if __ZeroinRideWorkflowEggs and __ZeroinRideWorkflowEggs[v534.Name] then
+					v536 = v164(p67)
+
+					if v536 then
+						table.insert(t21, {
+							Model = p67,
+							Root = v536,
+							Info = v534,
+							Distance = (v536.Position - HumanoidRootPart.Position).Magnitude
+						})
+					end
+				elseif t3.AutoFarmRarities[v534.Rarity] == true then
+					if next(t3.AutoFarmEggNames) == nil or t3.AutoFarmEggNames[v534.Name] == true then
+						v536 = v164(p67)
+
+						if v536 then
+							table.insert(t21, {
+								Model = p67,
+								Root = v536,
+								Info = v534,
+								Distance = (v536.Position - HumanoidRootPart.Position).Magnitude
+							})
+						end
+					end
+				end
+			end
+
+			if RenderedEggs then
+				for _, child in ipairs(RenderedEggs:GetChildren()) do
+					v533(child)
+				end
+			end
+
+			for _, child in ipairs(Workspace:GetChildren()) do
+				if child:IsA("Model") then
+					if child.Name:lower():find("egg") and child ~= RenderedEggs then
+						v533(child)
+					end
+				end
+			end
+
+			if #t21 == 0 then
+				v75("<font color='#888899'>No eggs match active Rarity Filter...</font>")
+				task.wait(1.5)
+
+				return
+			end
+
+			table.sort(t21, function(p68, p69)
+				if p68.Info.Priority == p69.Info.Priority then
+					return p68.Distance < p69.Distance
+				end
+
+				return p68.Info.Priority > p69.Info.Priority
+			end)
+
+			local v541 = t21[1]
+			local Model = v541.Model
+			local Root = v541.Root
+
+			t20 = v541.Info
+
+			if not Model or not Model.Parent or not Root or not Root.Parent then
+				return
+			end
+
+			local v544 = t20.Color and typeof(t20.Color) == "Color3" and t20.Color:ToHex() or "ffffff"
+			local ProximityPrompt = Model:FindFirstChildWhichIsA("ProximityPrompt", true)
+			local Parent = ProximityPrompt and ProximityPrompt.Parent
+			local cFrame = CFrame.new((Parent and Parent:IsA("BasePart") and Parent or Root).Position + Vector3.new(0, 2, 0))
+
+			v75(string.format("Gliding (Tween) to <font color='#%s'>%s</font>...", v544, t20.Name))
+
+			if not v373(cFrame, t3.TweenSpeed, t3.FlightAltitude, v527) or not t3.AutoFarmEnabled then
+				return
+			end
+
+			if not t3.AutoFarmEnabled then
+				return
+			end
+
+			v75(string.format("Collecting <font color='#%s'>%s</font>...", v544, t20.Name))
+			HumanoidRootPart.Anchored = true
+			HumanoidRootPart.AssemblyLinearVelocity = Vector3.zero
+			HumanoidRootPart.AssemblyAngularVelocity = Vector3.zero
+			HumanoidRootPart.CFrame = cFrame
+
+			if not t3.AutoFarmEnabled then
+				HumanoidRootPart.Anchored = false
+
+				return
+			end
+
+			local v548 = false
+			local now = os.clock()
+
+			while os.clock() - now < 3 and not v548 and t3.AutoFarmEnabled do
+				local v550, v551 = v302()
+
+				if v550 then
+					if v551 then
+						t20.Name = v551
+					end
+
+					break
+				elseif Model.Parent then
+					if ProximityPrompt and ProximityPrompt.Parent then
+						ProximityPrompt.Enabled = true
+						ProximityPrompt.HoldDuration = 0
+						v78(ProximityPrompt)
+					end
+
+					task.wait(0.15)
+
+					continue
+				end
+
+				break
+			end
+
+			HumanoidRootPart.Anchored = false
+			HumanoidRootPart.AssemblyLinearVelocity = Vector3.zero
+			HumanoidRootPart.AssemblyAngularVelocity = Vector3.zero
+			task.wait(0.1)
+
+			if not t3.AutoFarmEnabled then
+				return
+			end
+
+			if not v302() then
+				v75(string.format("<font color='#ff6060'>Failed to collect %s, retrying...</font>", t20.Name))
+				task.wait(0.5)
+
+				return
+			end
+		end
+
+		if not t6.dipCarriedEggInVolcano(t20.Name, v527) then
+			return
+		end
+
+		if not v302() then
+			v75("<font color='#ff6060'>Egg lost after volcano; searching again...</font>")
+
+			return
+		end
+
+		local cFrame = CFrame.new(v240(v525) + Vector3.new(0, 3.5, 0))
+		local v553, v554 = v243(v525)
+		local cFrame2 = CFrame.new(v553, (v554 or v553) + Vector3.new(0, 3, 0))
+		local v556 = v253(HumanoidRootPart.Position, v553, v525)
+		local v557 = #v556 > 1
+		local n3 = 0
+		local Position = HumanoidRootPart.Position
+
+		for _, v in ipairs(v556) do
+			local Position2 = typeof(v) == "CFrame" and v.Position or v
+
+			n3 += (Position2 - Position).Magnitude
+			Position = Position2
+		end
+
+		local v563 = v370(n3, t3.TweenSpeed)
+		local v564 = v75
+		local format = string.format
+		local s2 = "Gliding (Tween: %d studs/s%s) to plot front..."
+		local v567 = math.floor(v563)
+		local v568 = v557 and " [Plot Bypass]"
+
+		v564(format(s2, v567, v568 or ""))
+
+		if not v373(cFrame2, v563, t3.FlightAltitude, v527, v556) or not t3.AutoFarmEnabled then
+			return
+		end
+
+		if not t3.AutoFarmEnabled then
+			return
+		end
+
+		HumanoidRootPart.AssemblyLinearVelocity = Vector3.zero
+		HumanoidRootPart.AssemblyAngularVelocity = Vector3.zero
+		task.wait(0.2)
+
+		if not t3.AutoFarmEnabled then
+			return
+		end
+
+		local v569, v570 = v302()
+		local Name = v570 or t20.Name
+
+		if v569 and Name and BasketDrop then
+			v75(string.format("Drop & Re-collect <font color='#ffee55'>%s</font>...", Name))
+			BasketDrop:FireServer(Name)
+
+			local function v572()
+				local u573
+				local n4 = 50
+				local n5 = -1
+
+				local function v576(p70)
+					if not p70 then
+						return
+					end
+
+					for _, child in ipairs(p70:GetChildren()) do
+						if child:IsA("Model") and child.Parent then
+							local v579 = v164(child)
+							local Position2 = v579 and v579.Position or child:GetPivot().Position
+
+							if Position2 then
+								local Magnitude = (Position2 - v553).Magnitude
+
+								if Magnitude < 50 and child:FindFirstChildWhichIsA("ProximityPrompt", true) then
+									local v582 = (child.Name == Name or Name:lower():find(child.Name:lower(), 1, true) ~= nil) and 100 or 10
+
+									if n5 < v582 or v582 == n5 and Magnitude < n4 then
+										n5 = v582
+										n4 = Magnitude
+										u573 = child
+									end
+								end
+							end
+						end
+					end
+				end
+
+				v576(RenderedEggs)
+				v576(Workspace)
+
+				return u573
+			end
+
+			local now = os.clock()
+
+			while os.clock() - now < 0.8 and not v527() and v302() do
+				task.wait(0.01)
+			end
+
+			local now2 = os.clock()
+			local v585 = false
+
+			while os.clock() - now2 < 3 and not v527() do
+				local v586, v587 = v302()
+
+				if v586 then
+					v585 = true
+
+					if v587 then
+						t20.Name = v587
+					end
+
+					break
+				else
+					local v588 = v572()
+
+					if v588 and v588.Parent then
+						local v589 = v164(v588)
+						local Position2 = v589 and v589.Position or v588:GetPivot().Position
+
+						HumanoidRootPart.CFrame = CFrame.new(Position2 + Vector3.new(0, 2, 0), Position2)
+						HumanoidRootPart.AssemblyLinearVelocity = Vector3.zero
+						HumanoidRootPart.AssemblyAngularVelocity = Vector3.zero
+
+						if EggPickup then
+							pcall(function()
+								EggPickup:FireServer(v588.Name)
+							end)
+						end
+
+						local ProximityPrompt = v588:FindFirstChildWhichIsA("ProximityPrompt", true)
+
+						if ProximityPrompt and ProximityPrompt.Parent then
+							ProximityPrompt.Enabled = true
+							ProximityPrompt.HoldDuration = 0
+							ProximityPrompt.RequiresLineOfSight = false
+							ProximityPrompt.MaxActivationDistance = 50
+							v78(ProximityPrompt)
+						end
+					end
+
+					task.wait(0.02)
+				end
+			end
+
+			local v592, v593 = v302()
+
+			if not (v592 or v585) then
+				v75(string.format("<font color='#ff6060'>Failed to re-collect %s! Retrying cycle...</font>", Name))
+				HumanoidRootPart.Anchored = false
+				HumanoidRootPart.AssemblyLinearVelocity = Vector3.zero
+				HumanoidRootPart.AssemblyAngularVelocity = Vector3.zero
+				task.wait(0.8)
+
+				return
+			end
+
+			if v593 then
+				t20.Name = v593
+			end
+		end
+
+		HumanoidRootPart.Anchored = false
+
+		if not t3.AutoFarmEnabled then
+			return
+		end
+
+		local v594 = math.min(t3.TweenSpeed, 500)
+
+		v75(string.format("Gliding into Plot (%d studs/s)...", math.floor(v594)))
+
+		if not v373(cFrame, v594, t3.FlightAltitude, v527) or not t3.AutoFarmEnabled then
+			return
+		end
+
+		if not t3.AutoFarmEnabled then
+			return
+		end
+
+		local now = os.clock()
+		local exitTo
+
+		while true do
+			if os.clock() - now < 3 then
+				if v527() then
+					break
+				end
+
+				if v302() then
+					task.wait(0.05)
+
+					continue
+				end
+
+				exitTo = 1
+
+				break
+			end
+
+			exitTo = 1
+
+			break
+		end
+
+		if exitTo ~= 1 then
+			return
+		end
+
+		if v302() then
+			v75("<font color='#ff6060'>Return not confirmed; retrying delivery...</font>")
+
+			return
+		end
+
+		v75(string.format("<font color='#00ffaa'>Successfully claimed %s to Plot!</font>", t20.Name))
+		v82("Successfully claimed " .. t20.Name .. "!", 2.5, Color3.fromRGB(0, 255, 150), "Auto Farm")
+		v75("<font color='#00ffaa'>Cycle complete. Awaiting next loop...</font>")
+		task.wait(t3.CycleDelay)
+	end
+
+	local n6 = 0
+	local now = os.clock()
+	local u599 = tonumber(LocalPlayer:GetAttribute("TeleportLastClock")) or 0
+	local connection = LocalPlayer:GetAttributeChangedSignal("TeleportLastClock"):Connect(function()
+		now = os.clock()
+		u599 = tonumber(LocalPlayer:GetAttribute("TeleportLastClock")) or 0
+	end)
+
+	v81:AddCleanup(connection)
+
+	if EggPickup and EggPickup:IsA("RemoteEvent") then
+		v81:AddCleanup(EggPickup.OnClientEvent:Connect(function(p71)
+			if p71 == "Deposited" then
+				t6.InstantDepositAt = os.clock()
+			end
+		end))
+	end
+
+	local function v601()
+		return u599 + (os.clock() - now)
+	end
+	local function v602(p72)
+		if not TeleportToPlot then
+			return false
+		end
+
+		local v603 = os.clock() - n6
+
+		if v603 < 1.7 then
+			local v604 = os.clock() + (1.7 - v603)
+			local exitTo
+
+			while true do
+				if not (os.clock() < v604) then
+					exitTo = 1
+
+					break
+				end
+
+				if not p72 or not p72() then
+					task.wait(0.03)
+
+					continue
+				end
+
+				break
+			end
+
+			if exitTo ~= 1 then
+				return false
+			end
+		end
+
+		if p72 then
+			if p72() then
+				return false
+			end
+		end
+
+		local attribute = LocalPlayer:GetAttribute("TeleportGraceUntil")
+		local ok = pcall(function()
+			TeleportToPlot:FireServer()
+		end)
+
+		n6 = os.clock()
+
+		if not ok then
+			return false
+		end
+
+		local v608 = os.clock() + 1.5
+
+		while true do
+			if not (os.clock() < v608) then
+				return false
+			end
+
+			if p72 and p72() then
+				break
+			end
+
+			local v609 = tonumber(LocalPlayer:GetAttribute("TeleportGraceUntil")) or 0
+
+			if v609 ~= attribute and v609 - v601() > 0 then
+				return true
+			end
+
+			task.wait(0.03)
+		end
+
+		return false
+	end
+	local function v610(p73)
+		local v611 = v165()
+
+		if not v611 or not v611.Parent then
+			return false
+		end
+
+		local LinearVelocity = v611:FindFirstChildOfClass("LinearVelocity")
+		local BodyVelocity = v611:FindFirstChildOfClass("BodyVelocity")
+
+		if LinearVelocity then
+			LinearVelocity.VectorVelocity = Vector3.zero
+		end
+
+		if BodyVelocity then
+			BodyVelocity.Velocity = Vector3.zero
+		end
+
+		local vector3 = Vector3.new(v611.CFrame.LookVector.X, 0, v611.CFrame.LookVector.Z)
+
+		v611.CFrame = CFrame.lookAt(p73, p73 + (vector3.Magnitude > 0.001 and vector3.Unit or Vector3.new(0, 0, -1)))
+		v611.AssemblyLinearVelocity = Vector3.zero
+		v611.AssemblyAngularVelocity = Vector3.zero
+
+		return true
+	end
+	local function v615(p74, p75)
+		local attribute = LocalPlayer:GetAttribute("TeleportLastPosition")
+
+		return typeof(attribute) == "Vector3" and (attribute - p74).Magnitude <= p75
+	end
+
+	t6.isFarmEggWanted = function(p76, p77)
+		local __ZeroinRideWorkflowEggs = genv.__ZeroinRideWorkflowEggs
+
+		if __ZeroinRideWorkflowEggs and __ZeroinRideWorkflowEggs[p76] then
+			return true, true
+		end
+
+		return t3.AutoFarmRarities[p77] == true and (next(t3.AutoFarmEggNames) == nil or t3.AutoFarmEggNames[p76] == true), false
+	end
+
+	local function v618()
+		local ServerData = ReplicatedStorage:FindFirstChild("ServerData")
+		local ActiveEggs = ServerData and ServerData:FindFirstChild("ActiveEggs")
+
+		if not ActiveEggs then
+			return nil
+		end
+
+		local t22
+		local t23 = {}
+		local v623 = v165()
+
+		for _, child in ipairs(ActiveEggs:GetChildren()) do
+			t23[child.Name] = true
+
+			local attribute = child:GetAttribute("Cycle")
+			local v627 = t6.InstantTargetHistory[child.Name]
+
+			if not v627 or v627.instance ~= child or v627.cycle ~= attribute then
+				v627 = {
+					instance = child,
+					cycle = attribute,
+					attempts = 0,
+					retryAt = 0,
+					consumed = false
+				}
+				t6.InstantTargetHistory[child.Name] = v627
+			end
+
+			local attribute2 = child:GetAttribute("Egg")
+			local attribute3 = child:GetAttribute("Position")
+			local attribute4 = child:GetAttribute("PrivateTo")
+			local v631 = attribute2 and t2[attribute2]
+			local Rarity = v631 and v631.Rarity or "Unknown"
+			local v633 = false
+			local v634 = false
+
+			if attribute2 then
+				v633, v634 = t6.isFarmEggWanted(attribute2, Rarity)
+			end
+
+			if not v627.consumed and v627.retryAt <= os.clock() and attribute2 then
+				if typeof(attribute3) == "Vector3" and (attribute4 == nil or attribute4 == LocalPlayer.UserId) and v633 then
+					local v635 = (t1[Rarity] or 0) + (v634 and 100 or 0)
+					local Magnitude = v623 and (attribute3 - v623.Position).Magnitude or math.huge
+
+					if not t22 or t22.Priority < v635 or v635 == t22.Priority and Magnitude < t22.Distance then
+						t22 = {
+							Instance = child,
+							Cycle = attribute,
+							History = v627,
+							Uid = child.Name,
+							Name = attribute2,
+							Position = attribute3,
+							Rarity = Rarity,
+							Priority = v635,
+							Distance = Magnitude
+						}
+					end
+				end
+			end
+		end
+
+		for k in pairs(t6.InstantTargetHistory) do
+			if not t23[k] then
+				t6.InstantTargetHistory[k] = nil
+			end
+		end
+
+		return t22
+	end
+
+	t6.lockedInstantTargetValid = function(p78)
+		local Instance_2 = p78.Instance
+		local v639 = t2[p78.Name]
+		local v640 = Instance_2.Parent ~= nil and Instance_2:GetAttribute("Cycle") == p78.Cycle
+
+		if v640 then
+			v640 = t6.isFarmEggWanted(p78.Name, v639 and v639.Rarity or "Unknown")
+		end
+
+		return v640
+	end
+	t6.instantMoveAt = function(p79, p80, p81)
+		local v641 = v165()
+
+		if v641 then
+			if not p81() then
+				local Position = v641.Position
+				local v643 = (p79 - Position).Magnitude / math.max(p80, 1)
+				local now2 = os.clock()
+				local Character = LocalPlayer.Character
+				local Humanoid = Character and Character:FindFirstChildOfClass("Humanoid")
+				local AutoRotate = Humanoid and Humanoid.AutoRotate
+				local t24 = {}
+
+				local function v649()
+					for k, v in pairs(t24) do
+						if k.Parent then
+							k.CanCollide = v
+						end
+					end
+
+					if Humanoid then
+						if Humanoid.Parent then
+							Humanoid.AutoRotate = AutoRotate
+						end
+					end
+
+					t6.TweenRestores[v649] = nil
+				end
+
+				t6.TweenRestores[v649] = true
+
+				if Humanoid then
+					Humanoid.AutoRotate = false
+				end
+
+				while not p81() do
+					for _, descendant in ipairs(Character:GetDescendants()) do
+						if descendant:IsA("BasePart") and descendant.CanCollide then
+							t24[descendant] = true
+							descendant.CanCollide = false
+						end
+					end
+
+					local v654 = v643 > 0 and math.clamp((os.clock() - now2) / v643, 0, 1) or 1
+
+					v641.CFrame = CFrame.new(Position:Lerp(p79, v654))
+					v641.AssemblyLinearVelocity = Vector3.zero
+					v641.AssemblyAngularVelocity = Vector3.zero
+
+					if not (v654 >= 1) then
+						task.wait()
+
+						continue
+					end
+
+					v649()
+
+					return true
+				end
+
+				v649()
+
+				return false
+			end
+		end
+
+		return false
+	end
+	t6.instantPickup = function(p82, p83)
+		if not p83() then
+			if p82.Parent then
+				local attribute = p82:GetAttribute("Position")
+
+				if typeof(attribute) ~= "Vector3" then
+					return false
+				end
+
+				local RenderedEggs2 = workspace:FindFirstChild("RenderedEggs")
+				local ipairs_ = ipairs
+				local children = RenderedEggs2 and RenderedEggs2:GetChildren() or {}
+
+				for _, child in ipairs_(children) do
+					if not child:IsA("Model") or not ((child:GetPivot().Position - attribute).Magnitude < 25) then
+						continue
+					end
+
+					local ProximityPrompt = child:FindFirstChildWhichIsA("ProximityPrompt", true)
+
+					if not ProximityPrompt or not ProximityPrompt.Enabled or type(fireproximityprompt) ~= "function" or not pcall(fireproximityprompt, ProximityPrompt) then
+						continue
+					end
+
+					return true
+				end
+
+				local ok = EggPickup ~= nil and pcall(function()
+					EggPickup:FireServer(p82.Name)
+				end)
+
+				return ok
+			end
+		end
+
+		return false
+	end
+	t6.instantRelayReturn = function(p84, p85, p86)
+		local v663 = v165()
+		local Character = LocalPlayer.Character
+		local Humanoid = Character and Character:FindFirstChildOfClass("Humanoid")
+
+		if v663 then
+			if Humanoid and not p86() then
+				local function v666()
+					return math.min(math.max(16, Humanoid.WalkSpeed * 2.2), 400)
+				end
+				local function v667(p87)
+					local v668 = os.clock() + p87
+
+					while not p86() do
+						task.wait(0.05)
+
+						if v668 <= os.clock() then
+							return true
+						end
+					end
+
+					return false
+				end
+
+				local v669 = v663.Position - p85.Position
+				local vector3 = Vector3.new(v669.X, 0, v669.Z)
+
+				if vector3.Magnitude < 1 then
+					vector3 = Vector3.new(1, 0, 0)
+				end
+
+				local v671 = p85.Position + vector3.Unit * 70 + Vector3.new(0, 12, 0)
+				local ActiveEggs = (ReplicatedStorage:FindFirstChild("ServerData") or ReplicatedStorage):FindFirstChild("ActiveEggs")
+				local Remotes2 = ReplicatedStorage:FindFirstChild("Remotes")
+				local Game = Remotes2 and Remotes2:FindFirstChild("Game")
+				local BasketDrop2 = Game and Game:FindFirstChild("BasketDrop")
+
+				if not ActiveEggs or not BasketDrop2 then
+					return false
+				end
+
+				local t25 = {}
+
+				for _, child in ipairs(ActiveEggs:GetChildren()) do
+					t25[child] = true
+				end
+
+				v75("Returning to Ranch - staging drop")
+
+				local v679 = (tonumber(LocalPlayer:GetAttribute("TeleportGraceUntil")) or 0) - v601() > 0.6 or v602(p86)
+
+				if p86() then
+					return false
+				end
+
+				local v680
+
+				if v679 then
+					v680 = v610(v671)
+				else
+					v680 = v373(CFrame.new(v671), t3.TweenSpeed, t3.FlightAltitude, p86)
+				end
+
+				if not v680 or p86() or not v302() then
+					return false
+				end
+
+				if not v667(0.8) then
+					return false
+				end
+
+				if not pcall(function()
+					BasketDrop2:FireServer()
+				end) then
+					return false
+				end
+
+				local v681 = os.clock() + 1.5
+
+				while not p86() and v302() and os.clock() < v681 do
+					task.wait(0.05)
+				end
+
+				if p86() then
+					return false
+				end
+
+				local Position = (p85.CFrame * CFrame.new(0, p85.Size.Y / 2 + 3.5, 0)).Position
+
+				if v302() then
+					v75("Drop unconfirmed; delivering slowly")
+
+					return t6.instantMoveAt(Position, v666(), p86)
+				end
+
+				local v683
+				local v684 = os.clock() + 2.5
+				local exitTo2
+
+				while not p86() do
+					local n7 = 200
+
+					for _, child in ipairs(ActiveEggs:GetChildren()) do
+						local attribute = child:GetAttribute("Position")
+
+						if not t25[child] and child:GetAttribute("Egg") == p84 and typeof(attribute) == "Vector3" then
+							local Magnitude = (attribute - v671).Magnitude
+
+							if Magnitude < n7 then
+								v683 = child
+								n7 = Magnitude
+							end
+						end
+					end
+
+					if v683 then
+						exitTo2 = 1
+
+						break
+					else
+						task.wait(0.1)
+
+						if v684 <= os.clock() then
+							exitTo2 = 1
+
+							break
+						end
+					end
+				end
+
+				if exitTo2 ~= 1 then
+					return false
+				end
+
+				if v683 and not v302() then
+					if not t6.instantMoveAt(v683:GetAttribute("Position") + Vector3.new(0, 3, 0), v666(), p86) then
+						return false
+					end
+
+					local v691 = os.clock() + 4
+					local exitTo
+
+					repeat
+						if p86() or not v683.Parent or v302() or not (os.clock() < v691) then
+							exitTo = 1
+
+							break
+						end
+
+						t6.instantPickup(v683, p86)
+					until not v667(0.6)
+
+					if exitTo ~= 1 then
+						return false
+					end
+				end
+
+				if p86() or not v302() then
+					return false
+				end
+
+				v75("Claiming at limited speed")
+
+				return t6.instantMoveAt(Position, v666(), p86)
+			end
+		end
+
+		return false
+	end
+
+	local function v693()
+		if not t3.AutoFarmEnabled then
+			return
+		end
+
+		local v694 = v165()
+		local v695 = v234()
+
+		if not v694 then
+			v75("<font color='#ff6060'>Waiting for character to respawn...</font>")
+			task.wait(1)
+
+			return
+		end
+
+		if not v695 then
+			v75("<font color='#ffaa30'>Locating player plot...</font>")
+			task.wait(1)
+
+			return
+		end
+
+		local Character = LocalPlayer.Character
+		local Humanoid = Character and Character:FindFirstChildOfClass("Humanoid")
+
+		local function v698()
+			return not v48() or not t3.AutoFarmEnabled or t3.FarmMode ~= "Instant" or LocalPlayer.Character ~= Character or not v694.Parent or not Humanoid or not Humanoid.Parent or Humanoid.Health <= 0
+		end
+
+		if v698() then
+			return
+		end
+
+		local v699, v700 = v302()
+		local v701
+		local Baseplate, InstantDepositAt, v704
+
+		if v699 then
+			local dipCarriedEggInVolcano = t6.dipCarriedEggInVolcano
+			local Name = v700 or v701 and v701.Name or "Egg"
+
+			if not dipCarriedEggInVolcano(Name, v698) then
+				return
+			end
+
+			if not v302() then
+				v75("<font color='#ff6060'>Egg lost after volcano; searching again...</font>")
+
+				return
+			end
+
+			Baseplate = v695:FindFirstChild("Baseplate")
+
+			if Baseplate then
+				if Baseplate:IsA("BasePart") then
+					InstantDepositAt = t6.InstantDepositAt
+
+					local instantRelayReturn = t6.instantRelayReturn
+					local Name2 = v700 or v701 and v701.Name or "Egg"
+
+					if not instantRelayReturn(Name2, Baseplate, v698) or v698() then
+						return
+					end
+
+					v704 = os.clock() + 3
+
+					while true do
+						if not (os.clock() < v704) or not v302() or not (t6.InstantDepositAt <= InstantDepositAt) then
+							if v698() then
+								return
+							end
+
+							if v302() and t6.InstantDepositAt <= InstantDepositAt then
+								v75("<font color='#ff6060'>Instant return was not confirmed.</font>")
+								task.wait(0.3)
+
+								return
+							end
+
+							local v709 = v75
+							local format = string.format
+							local s3 = "<font color='#00ffaa'>Successfully claimed %s to Plot!</font>"
+							local Name3 = v700 or v701 and v701.Name or "Egg"
+
+							v709(format(s3, Name3))
+							task.wait(t3.CycleDelay)
+
+							return
+						end
+
+						if v698() then
+							break
+						end
+
+						task.wait(0.05)
+					end
+
+					return
+				end
+			end
+
+			return
+		end
+
+		local InstantTargetLock = t6.InstantTargetLock
+
+		if not InstantTargetLock or t6.lockedInstantTargetValid(InstantTargetLock) then
+			if InstantTargetLock and os.clock() < InstantTargetLock.History.retryAt then
+				task.wait(0.1)
+
+				return
+			end
+		else
+			InstantTargetLock = nil
+			t6.InstantTargetLock = nil
+		end
+
+		v701 = InstantTargetLock or v618()
+		t6.InstantTargetLock = v701
+
+		if not v701 then
+			v75("<font color='#888899'>No eggs match active rarity filter...</font>")
+			task.wait(1)
+
+			return
+		end
+
+		v75(string.format("Instant pickup <font color='#ffee55'>%s</font>...", v701.Name))
+
+		if LocalPlayer:GetAttribute("IsRiding") == true and PetDismount then
+			pcall(function()
+				PetDismount:FireServer()
+			end)
+
+			local v714 = os.clock() + 1.5
+
+			while not v698() and LocalPlayer:GetAttribute("IsRiding") == true and os.clock() < v714 do
+				task.wait(0.05)
+			end
+		end
+
+		if Humanoid.Sit or Humanoid.SeatPart then
+			Humanoid.Sit = false
+		end
+
+		if v698() then
+			return
+		end
+
+		local v715 = v602(v698)
+
+		if v698() then
+			return
+		end
+
+		local v716 = v701.Position + Vector3.new(0, 3, 0)
+		local v717 = v694.Position - v701.Position
+		local vector3 = Vector3.new(v717.X, 0, v717.Z)
+
+		if vector3.Magnitude > 78 then
+			v716 = v701.Position + vector3.Unit * 78 + Vector3.new(0, 3, 0)
+		end
+
+		local v719
+
+		if v715 then
+			v719 = v610(v716)
+		else
+			v719 = v373(CFrame.new(v716), t3.TweenSpeed, t3.FlightAltitude, v698)
+		end
+
+		if not v719 or v698() then
+			return
+		end
+
+		local v720 = os.clock() + 0.9
+		local exitTo
+
+		while true do
+			if not (os.clock() < v720) or v615(v701.Position, 86) then
+				exitTo = 1
+
+				break
+			end
+
+			if not v698() then
+				task.wait(0.03)
+
+				continue
+			end
+
+			break
+		end
+
+		if exitTo ~= 1 then
+			return
+		end
+
+		if not EggPickup then
+			v75("<font color='#ff6060'>Egg pickup remote unavailable.</font>")
+			task.wait(1)
+
+			return
+		end
+
+		local Instance_2 = v701.Instance
+		local exitTo2
+
+		while true do
+			if not Instance_2.Parent then
+				exitTo2 = 1
+
+				break
+			end
+
+			local v724 = tonumber(Instance_2:GetAttribute("DropEndsAt")) or 0
+
+			if not (workspace:GetServerTimeNow() < v724) then
+				exitTo2 = 1
+
+				break
+			elseif not v698() then
+				task.wait(0.05)
+
+				continue
+			end
+
+			break
+		end
+
+		if exitTo2 ~= 1 then
+			return
+		end
+
+		local attribute = Instance_2.Parent and Instance_2:GetAttribute("Position")
+
+		if not Instance_2.Parent or Instance_2:GetAttribute("Cycle") ~= v701.Cycle or Instance_2:GetAttribute("Egg") ~= v701.Name or typeof(attribute) ~= "Vector3" or (attribute - v701.Position).Magnitude > 1 then
+			t6.InstantTargetLock = nil
+
+			return
+		end
+
+		local History = v701.History
+
+		History.attempts += 1
+
+		if not pcall(function()
+			EggPickup:FireServer(v701.Uid)
+		end) then
+			v701.History.retryAt = os.clock() + 4
+			t6.InstantTargetLock = nil
+
+			return
+		end
+
+		local v727 = os.clock() + 1.2
+		local RenderedEggs2 = workspace:FindFirstChild("RenderedEggs")
+		local ipairs_ = ipairs
+		local children = RenderedEggs2 and RenderedEggs2:GetChildren() or {}
+
+		for _, child in ipairs_(children) do
+			local attribute2 = child:GetAttribute("Egg") or child:GetAttribute("EggName") or child.Name
+
+			if child:IsA("Model") and attribute2 == v701.Name and (child:GetPivot().Position - v701.Position).Magnitude < 25 then
+				local ProximityPrompt = child:FindFirstChildWhichIsA("ProximityPrompt", true)
+
+				if ProximityPrompt and ProximityPrompt.Enabled and type(fireproximityprompt) == "function" then
+					pcall(fireproximityprompt, ProximityPrompt)
+				end
+
+				break
+			end
+		end
+
+		local exitTo3
+		local v736
+
+		while not v698() do
+			task.wait(0.03)
+			v736, v700 = v302()
+
+			if v736 or v727 <= os.clock() then
+				exitTo3 = 1
+
+				break
+			end
+		end
+
+		if exitTo3 ~= 1 then
+			return
+		end
+
+		if not v736 then
+			local v737 = v701.History.attempts >= 3
+
+			v701.History.retryAt = os.clock() + (v737 and 4 or 0.3)
+
+			if v737 then
+				v701.History.attempts = 0
+				t6.InstantTargetLock = nil
+			end
+
+			v75(string.format("<font color='#ff6060'>Pickup missed: %s</font>", v701.Name))
+			task.wait(0.3)
+
+			return
+		end
+
+		v701.History.consumed = true
+		t6.InstantTargetLock = nil
+
+		if not t6.dipCarriedEggInVolcano(v700 or v701 and v701.Name or "Egg", v698) then
+			return
+		end
+
+		if not v302() then
+			v75("<font color='#ff6060'>Egg lost after volcano; searching again...</font>")
+
+			return
+		end
+
+		Baseplate = v695:FindFirstChild("Baseplate")
+
+		if Baseplate then
+			if Baseplate:IsA("BasePart") then
+				InstantDepositAt = t6.InstantDepositAt
+
+				if not t6.instantRelayReturn(v700 or v701 and v701.Name or "Egg", Baseplate, v698) or v698() then
+					return
+				end
+
+				v704 = os.clock() + 3
+
+				while true do
+					if not (os.clock() < v704) or not v302() or not (t6.InstantDepositAt <= InstantDepositAt) then
+						if v698() then
+							return
+						end
+
+						if v302() and t6.InstantDepositAt <= InstantDepositAt then
+							v75("<font color='#ff6060'>Instant return was not confirmed.</font>")
+							task.wait(0.3)
+
+							return
+						end
+
+						v75(string.format("<font color='#00ffaa'>Successfully claimed %s to Plot!</font>", v700 or v701 and v701.Name or "Egg"))
+						task.wait(t3.CycleDelay)
+
+						return
+					end
+
+					if v698() then
+						break
+					end
+
+					task.wait(0.05)
+				end
+
+				return
+			end
+		end
+	end
+	local function v738()
+		if t3.FarmMode == "None" then
+			v75("<font color='#888899'>Select a farm mode...</font>")
+			task.wait(1)
+		elseif t3.FarmMode == "Instant" then
+			v693()
+		else
+			v522()
+		end
+	end
+
+	v520 = function()
+		t3.AutoFarmEnabled = false
+
+		if thread then
+			task.cancel(thread)
+			thread = nil
+		end
+
+		if genv.__ZeroinRideAutomationOwner == "auto_farm" then
+			v363()
+			v77("auto_farm")
+		end
+	end
+	v521 = function()
+		v520()
+		t3.AutoFarmEnabled = true
+		v75("<font color='#00ffaa'>Active - Initiating egg search...</font>")
+		thread = task.spawn(function()
+			while t3.AutoFarmEnabled do
+				v79("auto_farm", v738)
+				task.wait(0.1)
+			end
+		end)
+	end
+end
+
+local u739
+
+do
+	local function v740(p88)
+		if u739 ~= nil then
+			return false
+		end
+
+		u739 = p88
+		genv.__ZeroinRideAutomationOwner = p88
+
+		return true
+	end
+
+	v77 = function(p89)
+		if u739 == p89 then
+			u739 = nil
+			genv.__ZeroinRideAutomationOwner = nil
+		end
+	end
+	v78 = function(p90)
+		if not p90 or not p90:IsA("ProximityPrompt") or not p90.Enabled then
+			return false
+		end
+
+		local Character = LocalPlayer.Character
+		local HumanoidRootPart = Character and Character:FindFirstChild("HumanoidRootPart")
+		local Parent = p90.Parent
+
+		if HumanoidRootPart and Parent then
+			if Parent:IsA("BasePart") then
+				if p90.MaxActivationDistance + 1 < (HumanoidRootPart.Position - Parent.Position).Magnitude then
+					return false
+				end
+
+				if not pcall(p90.InputHoldBegin, p90) then
+					return false
+				end
+
+				task.wait(math.max(p90.HoldDuration, 0) + 0.05)
+
+				return pcall(p90.InputHoldEnd, p90)
+			end
+		end
+
+		return false
+	end
+	v79 = function(p91, p92)
+		if not v740(p91) then
+			return false
+		end
+
+		local ok, result = xpcall(p92, debug.traceback)
+
+		v77(p91)
+
+		if not ok then
+			warn(string.format("[RideAPet][%s]\n%s", p91, tostring(result)))
+		end
+
+		return ok
+	end
+end
+
+local Eggs = require(ReplicatedStorage.GameData.Eggs)
+local General = require(ReplicatedStorage.GameData.General)
+local DayNight = require(ReplicatedStorage.GameServices.DayNight)
+local thread2
+
+local function v750(p93)
+	if not p93:IsA("Model") or not p93.PrimaryPart or not p93:GetAttribute("EggKey") or p93:HasTag("Hatching") then
+		return false
+	end
+
+	local EggData = p93:FindFirstChild("EggData")
+	local PlaceTime = EggData
+
+	PlaceTime = PlaceTime and EggData:FindFirstChild("PlaceTime")
+
+	local Weight = EggData and EggData:FindFirstChild("Weight")
+	local v754 = Eggs[p93.Name]
+
+	if not v754 or not PlaceTime or PlaceTime.Value <= 0 then
+		return false
+	end
+
+	local v755 = p93:GetAttribute("FlatGrow") == true and Workspace:GetServerTimeNow() - PlaceTime.Value or DayNight.GrowthElapsed(PlaceTime.Value)
+
+	return v755 >= General.GrowthTimeFor(v754.GrowthTime, Weight and Weight.Value or 1)
+end
+local function v756()
+	if not t3.AutoHatchEggEnabled then
+		return
+	end
+
+	local v757 = v234()
+	local Eggs2 = v757
+
+	Eggs2 = Eggs2 and v757:FindFirstChild("Eggs")
+
+	local v759 = v165()
+
+	if not Eggs2 or not v759 then
+		return
+	end
+
+	local v760
+	local huge = math.huge
+
+	for _, child in ipairs(Eggs2:GetChildren()) do
+		local PrimaryPart = child:IsA("Model") and child.PrimaryPart
+		local attribute = child:GetAttribute("EggKey")
+
+		if PrimaryPart and attribute then
+			if (t6.HatchRetryAt[attribute] or 0) <= os.clock() and tostring(child:GetAttribute("OwnerUserId")) == tostring(LocalPlayer.UserId) then
+				if v750(child) then
+					local Magnitude = (v759.Position - PrimaryPart.Position).Magnitude
+
+					if Magnitude < huge then
+						v760 = child
+						huge = Magnitude
+					end
+				end
+			end
+		end
+	end
+
+	if not v760 then
+		return
+	end
+
+	local Character = LocalPlayer.Character
+	local attribute = v760:GetAttribute("EggKey")
+
+	local function v769()
+		local v770 = not t3.AutoHatchEggEnabled or not v48()
+
+		return v770 or LocalPlayer.Character ~= Character or not v759.Parent
+	end
+
+	local Hatch = v760.PrimaryPart:FindFirstChild("Hatch")
+
+	if (Hatch and Hatch:IsA("ProximityPrompt") and Hatch.MaxActivationDistance or 10) + 1 < (v759.Position - v760.PrimaryPart.Position).Magnitude and not v406(v760.PrimaryPart.Position, v760.Name, v769) then
+		return
+	end
+
+	if v769() or not (v760.Parent == Eggs2 and v760:GetAttribute("EggKey") == attribute and v750(v760)) then
+		return
+	end
+
+	local Remotes2 = ReplicatedStorage:FindFirstChild("Remotes")
+	local Game = Remotes2 and Remotes2:FindFirstChild("Game")
+	local Hatch2 = Game and Game:FindFirstChild("Hatch")
+
+	t6.HatchRetryAt[attribute] = os.clock() + 8
+
+	if not Hatch2 or not Hatch2:IsA("RemoteEvent") then
+		if not Hatch or not Hatch:IsA("ProximityPrompt") or not Hatch.Enabled then
+			return
+		end
+
+		if type(fireproximityprompt) == "function" then
+			fireproximityprompt(Hatch, math.max(Hatch.HoldDuration, 0))
+		else
+			v78(Hatch)
+		end
+	elseif not pcall(function()
+				Hatch2:FireServer({
+					EggKey = attribute
+				})
+			end) then
+		return
+	end
+
+	local v775 = os.clock() + 3
+
+	while true do
+		task.wait(0.1)
+
+		if not v760.Parent then
+			break
+		elseif v760:HasTag("Hatching") or v775 <= os.clock() or v769() then
+			break
+		end
+	end
+end
+local function v776()
+	t3.AutoHatchEggEnabled = false
+
+	if thread2 then
+		task.cancel(thread2)
+		thread2 = nil
+	end
+
+	if u739 == "auto_hatch" then
+		v77("auto_hatch")
+		v363()
+	end
+end
+local function v777()
+	if not v48() then
+		return
+	end
+
+	v776()
+	t3.AutoHatchEggEnabled = true
+	thread2 = task.spawn(function()
+		while t3.AutoHatchEggEnabled and v48() do
+			v79("auto_hatch", v756)
+			task.wait(0.5)
+		end
+	end)
+end
+
+local thread3
+local v779, v780
+
+do
+	local function v781(p94)
+		if type(p94) == "number" then
+			return p94
+		end
+
+		local tostring_ = tostring
+		local v783 = p94
+		local match, v785 = tostring_(v783 or "0"):upper():match("([%d%.]+)%s*([KMBT]?)")
+		local t26 = {
+			K = 1000,
+			M = 1000000,
+			B = 1e9,
+			T = 1e12
+		}
+
+		return (tonumber(match) or 0) * (t26[v785] or 1)
+	end
+	local function v787()
+		local t27
+		local __ZeroinRideWorkflowEggs = genv.__ZeroinRideWorkflowEggs
+
+		local function v790(p95)
+			if not p95:IsA("Tool") then
+				return
+			end
+
+			local v791 = t2[p95.Name]
+			local v792 = __ZeroinRideWorkflowEggs ~= nil and __ZeroinRideWorkflowEggs[p95.Name] == true
+
+			if v791 then
+				if v792 or t3.AutoPlaceRarities[v791.Rarity] == true then
+					local v793 = v781(v791.Luck)
+
+					if v792 then
+						v793 += 1e18
+					end
+
+					if not t27 or t27.Luck < v793 then
+						t27 = {
+							Tool = p95,
+							Name = p95.Name,
+							Rarity = v791.Rarity,
+							Luck = v793
+						}
+					end
+
+					return
+				end
+			end
+		end
+
+		local Backpack = LocalPlayer:FindFirstChildOfClass("Backpack")
+
+		if Backpack then
+			for _, child in ipairs(Backpack:GetChildren()) do
+				v790(child)
+			end
+		end
+
+		local Character = LocalPlayer.Character
+
+		if Character then
+			for _, child in ipairs(Character:GetChildren()) do
+				v790(child)
+			end
+		end
+
+		return t27
+	end
+	local function v800(p96)
+		local Nests = p96 and p96:FindFirstChild("Nests")
+
+		if not Nests then
+			return nil
+		end
+
+		local t28 = {}
+		local Eggs2 = p96:FindFirstChild("Eggs")
+
+		if Eggs2 then
+			for _, child in ipairs(Eggs2:GetChildren()) do
+				local ok, result = pcall(function()
+					return child:GetPivot().Position
+				end)
+
+				if ok then
+					local v808
+					local huge = math.huge
+
+					for _, child2 in ipairs(Nests:GetChildren()) do
+						local Magnitude = (child2:GetPivot().Position - result).Magnitude
+
+						if Magnitude < huge then
+							v808 = child2
+							huge = Magnitude
+						end
+					end
+
+					if v808 then
+						t28[v808.Name] = true
+					end
+				end
+			end
+		end
+
+		for i = 1, 5 do
+			local v814 = Nests:FindFirstChild(tostring(i))
+
+			if not v814 or v814:GetAttribute("Unlocked") ~= true or t28[v814.Name] then
+				continue
+			end
+
+			return v814
+		end
+
+		return nil
+	end
+	local function v815(p97)
+		local Baseplate = p97 and p97:FindFirstChild("Baseplate")
+
+		if not Baseplate then
+			return p97:GetPivot().Position
+		end
+
+		local t29 = {}
+		local Eggs2 = p97:FindFirstChild("Eggs")
+
+		if Eggs2 then
+			for _, child in ipairs(Eggs2:GetChildren()) do
+				local ok, result = pcall(function()
+					return child:GetPivot().Position
+				end)
+
+				if ok then
+					table.insert(t29, result)
+				end
+			end
+		end
+
+		local v823 = math.max(4, Baseplate.Size.X / 2 - 6)
+		local v824 = math.max(4, Baseplate.Size.Z / 2 - 6)
+		local v825
+		local n8 = -1
+
+		for i = -2, 2 do
+			for i2 = -2, 2 do
+				local v829 = Baseplate.CFrame:PointToWorldSpace(Vector3.new(v823 * i / 2, Baseplate.Size.Y / 2 + 0.5, v824 * i2 / 2))
+				local huge = math.huge
+
+				for _, v in ipairs(t29) do
+					huge = math.min(huge, (Vector3.new(v829.X, 0, v829.Z) - Vector3.new(v.X, 0, v.Z)).Magnitude)
+				end
+
+				if n8 < huge then
+					v825 = v829
+					n8 = huge
+				end
+			end
+		end
+
+		local Position = v825 or Baseplate.Position
+
+		return Position
+	end
+	local function v834(p98)
+		if not p98 then
+			return true
+		end
+
+		local Eggs2 = p98:FindFirstChild("Eggs")
+		local v836 = Eggs2 and #Eggs2:GetChildren() or 0
+		local Max = t14.Max
+
+		if LocalPlayer:GetAttribute("NoNest") == true then
+			Max = Max or 10
+		end
+
+		if Max and Max <= v836 then
+			return true
+		end
+
+		return t14.Used ~= nil and t14.Max ~= nil and t14.Used >= t14.Max and os.clock() - t14.UpdatedAt < 30
+	end
+	local function v838()
+		if not t3.AutoPlaceEggEnabled then
+			return
+		end
+
+		local v839 = v234()
+
+		if t6.PlacePending then
+			local PlacePending = t6.PlacePending
+			local Eggs2 = v839 and v839:FindFirstChild("Eggs")
+			local v842 = PlacePending.tool.Parent == nil
+
+			if not v842 then
+				v842 = PlacePending.amount ~= nil and PlacePending.amount.Parent ~= nil and PlacePending.amount.Value < PlacePending.count
+			end
+
+			local v843, v844, v845 = ipairs(Eggs2 and Eggs2:GetChildren() or {})
+			local v846 = geniter(v843, v844, v845)
+
+			while true do
+				local v847 = table.pack(v846())
+
+				if v847[1] then
+					local v848 = v847[3]
+
+					if v848.Name == PlacePending.name and not PlacePending.before[v848] then
+						v842 = true
+
+						break
+					end
+				else
+					break
+				end
+			end
+
+			if v842 then
+				t6.PlacePending = nil
+			else
+				if not (os.clock() - PlacePending.sentAt >= 10) then
+					task.wait(0.2)
+
+					return
+				end
+
+				t6.PlacePending = nil
+				t6.PlaceRetryAt = os.clock() + 8
+			end
+		end
+
+		if os.clock() < t6.PlaceRetryAt or v302() then
+			task.wait(0.5)
+
+			return
+		end
+
+		if v834(v839) then
+			task.wait(1)
+
+			return
+		end
+
+		local v849 = v787()
+
+		if not v849 then
+			task.wait(0.75)
+
+			return
+		end
+
+		local Character = LocalPlayer.Character
+		local Humanoid = Character and Character:FindFirstChildOfClass("Humanoid")
+		local HumanoidRootPart = Character and Character:FindFirstChild("HumanoidRootPart")
+
+		if v839 and Humanoid and HumanoidRootPart then
+			if EggPlaced then
+				local function v853()
+					local v854 = not t3.AutoPlaceEggEnabled or not v48()
+
+					return v854 or LocalPlayer.Character ~= Character or not Humanoid.Parent or Humanoid.Health <= 0
+				end
+
+				local Baseplate = v839:FindFirstChild("Baseplate")
+				local v856 = false
+
+				if Baseplate then
+					local v857 = Baseplate.CFrame:PointToObjectSpace(HumanoidRootPart.Position)
+
+					v856 = math.abs(v857.X) <= Baseplate.Size.X / 2 and math.abs(v857.Z) <= Baseplate.Size.Z / 2
+				end
+
+				if not (v856 or v406(v839:GetPivot().Position + Vector3.new(0, 2, 0), "Plot", v853)) then
+					return
+				end
+
+				if v853() or not v849.Tool.Parent then
+					return
+				end
+
+				if v849.Tool.Parent ~= Character then
+					Humanoid:UnequipTools()
+					task.wait(0.1)
+					Humanoid:EquipTool(v849.Tool)
+
+					local v858 = os.clock() + 1.2
+
+					while true do
+						task.wait(0.05)
+
+						if v849.Tool.Parent == Character then
+							break
+						elseif v858 <= os.clock() or v853() then
+							break
+						end
+					end
+				end
+
+				if v853() or v849.Tool.Parent ~= Character then
+					return
+				end
+
+				local t30
+
+				if LocalPlayer:GetAttribute("NoNest") == true then
+					t30 = {
+						PlantPosition = v815(v839)
+					}
+				else
+					local v860 = v800(v839)
+
+					if not v860 then
+						task.wait(1)
+
+						return
+					end
+
+					t30 = {
+						NestId = v860.Name
+					}
+				end
+
+				if v853() or v849.Tool.Parent ~= Character or v834(v839) then
+					return
+				end
+
+				local t31 = {}
+				local Eggs2 = v839:FindFirstChild("Eggs")
+				local v863, v864, v865 = ipairs(Eggs2 and Eggs2:GetChildren() or {})
+
+				for _, v in v863, v864, v865 do
+					t31[v] = true
+				end
+
+				local Data = v849.Tool:FindFirstChild("Data")
+				local Amount = Data and Data:FindFirstChild("Amount")
+
+				t6.PlacePending = {
+					tool = v849.Tool,
+					name = v849.Name,
+					before = t31,
+					amount = Amount and Amount:IsA("ValueBase") and Amount or nil,
+					count = Amount and Amount:IsA("ValueBase") and tonumber(Amount.Value) or 1,
+					sentAt = os.clock()
+				}
+
+				if not pcall(function()
+					EggPlaced:FireServer(t30)
+				end) then
+					t6.PlacePending = nil
+					t6.PlaceRetryAt = os.clock() + 8
+				end
+
+				task.wait(0.2)
+
+				return
+			end
+		end
+
+		task.wait(1)
+	end
+
+	v779 = function()
+		t3.AutoPlaceEggEnabled = false
+
+		if thread3 then
+			task.cancel(thread3)
+			thread3 = nil
+		end
+
+		if u739 == "auto_place" then
+			v77("auto_place")
+			v363()
+		end
+	end
+	v780 = function()
+		v779()
+		t3.AutoPlaceEggEnabled = true
+		thread3 = task.spawn(function()
+			while t3.AutoPlaceEggEnabled do
+				v79("auto_place", v838)
+				task.wait(0.25)
+			end
+		end)
+	end
+end
+
+local thread4
+local v871, v872
+
+do
+	local Tool
+	local v874
+
+	local function v875()
+		local SavedData = LocalPlayer:FindFirstChild("SavedData")
+		local Cash = SavedData and SavedData:FindFirstChild("Cash")
+
+		return Cash and Cash:IsA("ValueBase") and tonumber(Cash.Value) or nil
+	end
+	local function v878()
+		if v874 and v874() then
+			return nil
+		end
+
+		local Character = LocalPlayer.Character
+		local HumanoidRootPart = Character and Character:FindFirstChild("HumanoidRootPart")
+		local Humanoid = Character and Character:FindFirstChildOfClass("Humanoid")
+
+		if not HumanoidRootPart or not Humanoid or Humanoid.Health <= 0 then
+			return nil
+		end
+
+		if LocalPlayer:GetAttribute("IsRiding") == true or Humanoid.Sit or Humanoid.SeatPart then
+			return nil
+		end
+
+		local v882 = v234()
+		local Pets2 = v882
+
+		Pets2 = Pets2 and v882:FindFirstChild("Pets")
+
+		local Owner = v882 and v882:FindFirstChild("Data") and v882.Data:FindFirstChild("Owner")
+
+		if not v882 or not Pets2 or v882:GetAttribute("NestsOwnerLoaded") ~= LocalPlayer.UserId or not Owner or not Owner:IsA("ObjectValue") or Owner.Value ~= LocalPlayer then
+			return nil
+		end
+
+		local PlayerGui = LocalPlayer:FindFirstChildOfClass("PlayerGui")
+		local Main = PlayerGui and PlayerGui:FindFirstChild("Main")
+		local PetsTracker = Main and Main:FindFirstChild("PetsTracker")
+		local Holder = PetsTracker and PetsTracker:FindFirstChild("Holder")
+
+		if not Holder then
+			return nil
+		end
+
+		local Stalls = Workspace:FindFirstChild("Stalls")
+		local v890 = Stalls
+		local Richie, HumanoidRootPart2, ProximityPrompt
+
+		if v890 then
+			local Sell = Stalls:FindFirstChild("Sell")
+
+			Richie = Sell
+
+			if Richie then
+				Richie = Sell:FindFirstChild("Richie")
+				HumanoidRootPart2 = Richie
+
+				if HumanoidRootPart2 then
+					HumanoidRootPart2 = Richie:FindFirstChild("HumanoidRootPart")
+					ProximityPrompt = HumanoidRootPart2 and HumanoidRootPart2:FindFirstChild("ProximityPrompt")
+				else
+					ProximityPrompt = HumanoidRootPart2
+				end
+			else
+				HumanoidRootPart2 = Richie
+				ProximityPrompt = HumanoidRootPart2
+			end
+		else
+			Richie = v890
+			HumanoidRootPart2 = Richie
+			ProximityPrompt = HumanoidRootPart2
+		end
+
+		if HumanoidRootPart2 and ProximityPrompt and ProximityPrompt:IsA("ProximityPrompt") then
+			return {
+				Character = Character,
+				Humanoid = Humanoid,
+				Root = HumanoidRootPart,
+				Pets = Pets2,
+				Tracker = Holder,
+				Npc = Richie,
+				NpcRoot = HumanoidRootPart2,
+				Prompt = ProximityPrompt
+			}
+		end
+
+		return nil
+	end
+	local function v895(p99, p100)
+		if p100.Tracker:FindFirstChild(p99) then
+			return true
+		end
+
+		for _, child in ipairs(p100.Pets:GetChildren()) do
+			if child:GetAttribute("PetKey") == p99 then
+				return true
+			end
+		end
+
+		return false
+	end
+	local function v898(p101)
+		local PlayerGui = LocalPlayer:FindFirstChildOfClass("PlayerGui")
+		local Main = PlayerGui and PlayerGui:FindFirstChild("Main")
+		local Index = Main and Main:FindFirstChild("Index")
+		local Holders = Index and Index:FindFirstChild("Holders")
+		local PetsHolder = Holders and Holders:FindFirstChild("PetsHolder")
+		local v904 = PetsHolder and PetsHolder:FindFirstChild(p101)
+		local attribute = v904 and v904:GetAttribute("Rarity")
+
+		if attribute == "Mythical" then
+			attribute = "Mythic"
+		end
+
+		return attribute or Pets[p101] and Pets[p101].Rarity
+	end
+	local function v906(p102, p103)
+		local Backpack = LocalPlayer:FindFirstChildOfClass("Backpack")
+
+		if not p102 or not p102:IsA("Tool") or p102.Parent ~= Backpack and p102.Parent ~= LocalPlayer.Character then
+			return false
+		end
+
+		local attribute = p102:GetAttribute("PetKey")
+		local attribute2 = p102:GetAttribute("PetName")
+
+		if type(attribute) == "string" and attribute ~= "" then
+			if type(attribute2) == "string" then
+				if p102:GetAttribute("Favorited") ~= false or v895(attribute, p103) then
+					return false
+				end
+
+				if not Pets[attribute2] then
+					return false
+				end
+
+				local v910 = v898(attribute2)
+
+				if not v910 then
+					return false
+				end
+
+				local attribute3 = p102:GetAttribute("Mutation") or p102:GetAttribute("SpawnMutation") or "None"
+				local v912 = tonumber(p102:GetAttribute("Weight"))
+				local v913 = next(t3.AutoSellPetNames) == nil
+
+				return (v913 or t3.AutoSellPetNames[attribute2] == true) and t3.AutoSellRarities[v910] == true and v912 ~= nil and (t3.AutoSellMaxWeight == 0 or v912 <= t3.AutoSellMaxWeight) and t3.AutoSellProtectedMutations[attribute3] ~= true
+			end
+		end
+
+		return false
+	end
+	local function v914(p104)
+		local t32 = {}
+		local Backpack = LocalPlayer:FindFirstChildOfClass("Backpack")
+
+		if not Backpack then
+			return t32
+		end
+
+		for _, child in ipairs(Backpack:GetChildren()) do
+			if v906(child, p104) then
+				table.insert(t32, {
+					Tool = child,
+					Key = child:GetAttribute("PetKey"),
+					Name = child:GetAttribute("PetName"),
+					Weight = tonumber(child:GetAttribute("Weight"))
+				})
+			end
+		end
+
+		table.sort(t32, function(p105, p106)
+			return p105.Weight < p106.Weight
+		end)
+
+		return t32
+	end
+
+	v874 = function()
+		if v302() then
+			return true
+		end
+
+		local Character = LocalPlayer.Character
+
+		if Character then
+			for _, child in ipairs(Character:GetChildren()) do
+				if child:IsA("Tool") and (child:HasTag("Egg") or t2[child.Name]) then
+					return true
+				end
+			end
+		end
+
+		return false
+	end
+
+	local function v922(p107)
+		local ipairs_ = ipairs
+		local t33 = {
+			LocalPlayer:FindFirstChildOfClass("Backpack"),
+			LocalPlayer.Character
+		}
+
+		for _, v in ipairs_(t33) do
+			if not v then
+				continue
+			end
+
+			for _, child in ipairs(v:GetChildren()) do
+				if child:IsA("Tool") and child:GetAttribute("PetKey") == p107 then
+					return true
+				end
+			end
+		end
+
+		return false
+	end
+	local function v929()
+		if not t3.AutoSellPetsEnabled then
+			return
+		end
+
+		local v930 = v878()
+
+		if not v930 then
+			task.wait(0.5)
+
+			return
+		end
+
+		if v930.Character:FindFirstChildOfClass("Tool") then
+			v930.Humanoid:UnequipTools()
+			task.wait(0.2)
+		end
+
+		local v931 = v914(v930)
+
+		if #v931 == 0 then
+			task.wait(1)
+
+			return
+		end
+
+		local v932 = v931[1]
+
+		if not v906(v932.Tool, v930) or not DialogueSelect then
+			return
+		end
+
+		local Humanoid, v934, v935, v936, now, v938
+
+		if v930.Prompt.MaxActivationDistance < (v930.Root.Position - v930.NpcRoot.Position).Magnitude then
+			if not v406((v930.NpcRoot.CFrame * CFrame.new(0, 0, -8)).Position, "Richie", function()
+				return not t3.AutoSellPetsEnabled
+			end) then
+				return
+			end
+
+			local v939 = v878()
+
+			if not v939 or v939.Prompt.MaxActivationDistance < (v939.Root.Position - v939.NpcRoot.Position).Magnitude or not v906(v932.Tool, v939) then
+				return
+			end
+
+			Humanoid = v939.Humanoid
+			Tool = v932.Tool
+			Humanoid:EquipTool(v932.Tool)
+
+			local v940 = os.clock() + 2
+
+			while true do
+				task.wait(0.05)
+
+				if v932.Tool.Parent == v939.Character then
+					break
+				elseif v940 <= os.clock() or not t3.AutoSellPetsEnabled then
+					break
+				end
+			end
+
+			if t3.AutoSellPetsEnabled then
+				v934 = v878()
+
+				if not v934 or not v906(v932.Tool, v934) or v932.Tool.Parent ~= v934.Character then
+					if v932.Tool.Parent == LocalPlayer.Character then
+						Humanoid:UnequipTools()
+					end
+
+					Tool = nil
+
+					return
+				end
+
+				task.wait(0.2)
+				v935 = v875()
+
+				if v935 == nil then
+					Humanoid:UnequipTools()
+					Tool = nil
+
+					return
+				end
+
+				if not v78(v934.Prompt) then
+					Humanoid:UnequipTools()
+					Tool = nil
+
+					return
+				end
+
+				task.wait(0.35)
+
+				if not t3.AutoSellPetsEnabled then
+					return
+				end
+
+				DialogueSelect:FireServer(v934.Npc, "I would like to sell this")
+				v936 = os.clock() + 5
+				now = nil
+
+				while true do
+					task.wait(0.1)
+					v938 = v875()
+
+					if not v922(v932.Key) and v938 and v935 < v938 then
+						now = now or os.clock()
+
+						if os.clock() - now >= 0.5 then
+							break
+						end
+					else
+						now = nil
+					end
+
+					if v936 <= os.clock() or not t3.AutoSellPetsEnabled then
+						if Tool and Tool.Parent == LocalPlayer.Character then
+							Humanoid:UnequipTools()
+						end
+
+						Tool = nil
+
+						return
+					end
+				end
+
+				Tool = nil
+
+				return
+			end
+		else
+			Humanoid = v930.Humanoid
+			Tool = v932.Tool
+			Humanoid:EquipTool(v932.Tool)
+
+			local v941 = os.clock() + 2
+
+			while true do
+				task.wait(0.05)
+
+				if v932.Tool.Parent == v930.Character then
+					break
+				elseif v941 <= os.clock() or not t3.AutoSellPetsEnabled then
+					break
+				end
+			end
+
+			if t3.AutoSellPetsEnabled then
+				v934 = v878()
+
+				if not v934 or not v906(v932.Tool, v934) or v932.Tool.Parent ~= v934.Character then
+					if v932.Tool.Parent == LocalPlayer.Character then
+						Humanoid:UnequipTools()
+					end
+
+					Tool = nil
+
+					return
+				end
+
+				task.wait(0.2)
+				v935 = v875()
+
+				if v935 == nil then
+					Humanoid:UnequipTools()
+					Tool = nil
+
+					return
+				end
+
+				if not v78(v934.Prompt) then
+					Humanoid:UnequipTools()
+					Tool = nil
+
+					return
+				end
+
+				task.wait(0.35)
+
+				if not t3.AutoSellPetsEnabled then
+					return
+				end
+
+				DialogueSelect:FireServer(v934.Npc, "I would like to sell this")
+				v936 = os.clock() + 5
+				now = nil
+
+				while true do
+					task.wait(0.1)
+					v938 = v875()
+
+					if not v922(v932.Key) and v938 and v935 < v938 then
+						local now2 = now or os.clock()
+
+						now = now2
+
+						if os.clock() - now >= 0.5 then
+							break
+						end
+					else
+						now = nil
+					end
+
+					if v936 <= os.clock() or not t3.AutoSellPetsEnabled then
+						if Tool and Tool.Parent == LocalPlayer.Character then
+							Humanoid:UnequipTools()
+						end
+
+						Tool = nil
+
+						return
+					end
+				end
+
+				Tool = nil
+
+				return
+			end
+		end
+	end
+
+	v871 = function()
+		t3.AutoSellPetsEnabled = false
+
+		if thread4 then
+			task.cancel(thread4)
+			thread4 = nil
+		end
+
+		if Tool and Tool.Parent == LocalPlayer.Character then
+			local Humanoid = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+
+			if Humanoid then
+				Humanoid:UnequipTools()
+			end
+		end
+
+		Tool = nil
+
+		if u739 == "auto_sell" then
+			v77("auto_sell")
+			v363()
+		end
+	end
+	v872 = function()
+		if not v48() then
+			return
+		end
+
+		v871()
+		t3.AutoSellPetsEnabled = true
+		thread4 = task.spawn(function()
+			while t3.AutoSellPetsEnabled and v48() do
+				v79("auto_sell", v929)
+				task.wait(1)
+			end
+		end)
+	end
+end
+
+do
+	local GameData = ReplicatedStorage:WaitForChild("GameData")
+	local t34 = {
+		Turtle = "Brown Egg",
+		Axolotl = "Cracked Egg",
+		Koala = "Easter Egg",
+		Snail = "White Egg",
+		Sloth = "White Egg",
+		Capybara = "Stone Egg",
+		Pig = "Leaf Egg",
+		Chicken = "Leaf Egg",
+		Elephant = "Mushroom Egg",
+		Panda = "Slime Egg",
+		Kangaroo = "Ice Egg",
+		Deer = "Glass Egg",
+		Spider = "Golden Egg",
+		Crocodile = "Diamond Egg",
+		Gorilla = "Crystal Egg",
+		Snake = "Crystal Egg",
+		Horse = "Golden Egg",
+		Wolf = "Dominus Egg",
+		Lion = "Flaming Egg",
+		Shark = "Flaming Egg",
+		Ostrich = "Sinister Egg",
+		Fox = "Asteroid Egg",
+		Giraffe = "Soul Egg",
+		Cheetah = "Sinister Egg",
+		Unicorn = "Aurora Egg",
+		TRex = "Galaxy Egg",
+		Phoenix = "Galaxy Egg",
+		Cerberus = "Blackhole Egg",
+		Kitsune = "Solaris Egg",
+		Dragon = "Cherub Egg",
+		Platypus = "Tidal Egg",
+		Boar = "Tidal Egg",
+		Monkey = "Tidal Egg",
+		Flamingo = "Bloom Egg",
+		Peacock = "Bloom Egg",
+		Komodo = "Bloom Egg",
+		Griffin = "Volcanic Egg",
+		Volkaris = "Volcanic Egg"
+	}
+	local t35 = {
+		"Horse",
+		"Fox",
+		"Unicorn",
+		"Phoenix",
+		"Kitsune",
+		"Dragon"
+	}
+	local t36 = {
+		500000000,
+		2.5e9,
+		1.25e11,
+		6.25e12,
+		1e15,
+		[0] = 1000000
+	}
+	local t37 = {}
+	local t38 = {}
+	local t39 = {
+		Food = {},
+		Gears = {}
+	}
+	local thread5
+	local t40 = {}
+	local u953
+	local n9 = 0
+	local u955
+	local ok, result = pcall(require, GameData:WaitForChild("Pets"))
+	local v958 = ok and type(result) == "table" and result or {}
+
+	for k, v in pairs(v958) do
+		if type(k) == "string" and type(v) == "table" then
+			table.insert(t37, k)
+		end
+	end
+
+	table.sort(t37)
+
+	local ok2, result2 = pcall(require, GameData:WaitForChild("Eggs"))
+	local t41 = {}
+	local v964 = ok2 and type(result2) == "table" and result2 or {}
+
+	for k, v in pairs(v964) do
+		if type(k) == "string" and type(v) == "table" then
+			if not (type(v.Rarity) ~= "string" or t2[k]) then
+				t2[k] = {
+					Rarity = v.Rarity,
+					Luck = tostring(v.Luck or "0")
+				}
+			end
+
+			local ipairs_ = ipairs
+			local Pets2 = type(v.Pets) == "table" and v.Pets or {}
+
+			for _, v2 in ipairs_(Pets2) do
+				local PetSampleSizes = type(v.PetSampleSizes) == "table" and v.PetSampleSizes
+				local huge = PetSampleSizes and tonumber(PetSampleSizes[v2]) or math.huge
+				local v973 = t41[v2]
+
+				if type(v2) == "string" and not t34[v2] and (not v973 or huge < v973.Sample) then
+					t41[v2] = {
+						Egg = k,
+						Sample = huge
+					}
+				end
+			end
+		end
+	end
+
+	for k, v in pairs(t41) do
+		t34[k] = v.Egg
+	end
+
+	local ok3, result3 = pcall(require, GameData:WaitForChild("IndexRewards"))
+	local Stages = ok3 and type(result3) == "table" and (result3.Stages or result3) or {}
+	local v979 = type(Stages) == "table" and Stages or {}
+
+	for _, v in ipairs(v979) do
+		if type(v) == "table" and tonumber(v.Goal) then
+			table.insert(t38, {
+				Goal = tonumber(v.Goal)
+			})
+		end
+	end
+
+	local ok4, result4 = pcall(require, GameData:WaitForChild("Shop"))
+	local Categories = ok4 and type(result4) == "table" and result4.Categories
+
+	for _, v in ipairs({
+		"Food",
+		"Gears"
+	}) do
+		local v987 = type(Categories) == "table" and Categories[v]
+		local pairs_ = pairs
+		local v989 = type(v987) == "table" and v987 or {}
+
+		for k, v2 in pairs_(v989) do
+			if type(k) == "string" and type(v2) == "table" and tonumber(v2.Price) then
+				t39[v][k] = true
+			end
+		end
+	end
+
+	genv.__ZeroinRideShopCatalog = t39
+
+	local function v992(p108)
+		local SavedData = LocalPlayer:FindFirstChild("SavedData")
+		local v994 = SavedData and SavedData:FindFirstChild(p108)
+		local Value = v994 and v994:IsA("ValueBase") and v994.Value
+
+		return Value or nil
+	end
+	local function v996()
+		local t42 = {}
+		local n10 = 0
+		local tostring_ = tostring
+		local OwnedPets = v992("OwnedPets") or ""
+
+		for match in tostring_(OwnedPets):gmatch("([^,]+)") do
+			local match2 = match:match("^%s*(.-)%s*$")
+
+			if not (match2 == "" or t42[match2]) then
+				t42[match2] = true
+				n10 += 1
+			end
+		end
+
+		return t42, n10
+	end
+	local function v1003(p109)
+		local v1004 = p109:lower()
+		local ipairs_ = ipairs
+		local t43 = {
+			LocalPlayer:FindFirstChildOfClass("Backpack"),
+			LocalPlayer.Character
+		}
+
+		for _, v in ipairs_(t43) do
+			local ipairs_2 = ipairs
+			local children = v and v:GetChildren() or {}
+
+			for _, child in ipairs_2(children) do
+				local attribute = child:GetAttribute("PetName") or child.Name
+
+				if not child:IsA("Tool") then
+					continue
+				end
+
+				if tostring(attribute):lower() == v1004 then
+					return true
+				end
+			end
+		end
+
+		local v1016 = v234()
+		local Pets2 = v1016 and v1016:FindFirstChild("Pets")
+		local ipairs_2 = ipairs
+		local children = Pets2 and Pets2:GetChildren() or {}
+
+		for _, child in ipairs_2(children) do
+			if tostring(child:GetAttribute("PetName") or child.Name):lower() == v1004 and tostring(child:GetAttribute("OwnerUserId")) == tostring(LocalPlayer.UserId) then
+				return true
+			end
+		end
+
+		return false
+	end
+	local function v1022(p110, ...)
+		local Remotes2 = ReplicatedStorage:FindFirstChild("Remotes")
+		local Game = Remotes2 and Remotes2:FindFirstChild("Game")
+		local v1025 = Game and Game:FindFirstChild(p110)
+
+		if not v1025 or not v1025:IsA("RemoteEvent") then
+			return false
+		end
+
+		local v1026 = table.pack(...)
+
+		local function v1027()
+			v1025:FireServer(table.unpack(v1026, 1, v1026.n))
+		end
+
+		return pcall(v1027)
+	end
+	local function v1028()
+		if t40.Farm then
+			v520()
+		end
+
+		if t40.Place then
+			v779()
+		end
+
+		if t40.Hatch then
+			v776()
+		end
+
+		table.clear(t40)
+	end
+
+	genv.__ZeroinRideWorkflowOwns = function(p111)
+		t40[p111] = nil
+	end
+
+	local function v1029()
+		local t44 = {}
+		local v1031, v1032 = v996()
+		local v1033 = tonumber(v992("Rebirths")) or 0
+
+		if t3.AutoIndexEnabled then
+			local n11 = 0
+
+			for _, v in ipairs(t37) do
+				if not v1031[v] then
+					n11 += 1
+
+					local v1037 = t34[v]
+
+					if v1037 then
+						t44[v1037] = true
+					end
+				end
+			end
+
+			t6.WorkflowStatus.Index = n11 == 0 and "Index complete" or string.format("Missing %d / %d pets", n11, #t37)
+
+			local v1038 = tonumber(v992("IndexRewardStage")) or 0
+
+			if u953 and u953 <= v1038 then
+				u953 = nil
+			end
+
+			local v1039 = t38[v1038 + 1]
+
+			if t3.AutoClaimIndexRewards and not u953 and v1039 and v1039.Goal <= v1032 and n9 <= os.clock() then
+				n9 = os.clock() + 4
+
+				if v1022("ClaimIndexReward") then
+					u953 = v1038 + 1
+				end
+			end
+		else
+			t6.WorkflowStatus.Index = "Off"
+		end
+
+		if t3.AutoRebirthEnabled then
+			local v1040 = tonumber(v992("Cash")) or 0
+
+			if u955 and (u955.Before < v1033 or os.clock() - u955.SentAt >= 5) then
+				u955 = nil
+			end
+
+			local v1041 = t35[v1033 + 1]
+			local huge = t36[v1033] or math.huge
+
+			if t3.TargetRebirth <= v1033 then
+				t6.WorkflowStatus.Rebirth = string.format("Target reached (%d/%d)", v1033, t3.TargetRebirth)
+			elseif u955 then
+				t6.WorkflowStatus.Rebirth = "Waiting for rebirth confirmation"
+			elseif v1041 and not v1003(v1041) then
+				local v1043 = t34[v1041]
+
+				if v1043 then
+					t44[v1043] = true
+				end
+
+				t6.WorkflowStatus.Rebirth = string.format("Need %s (%s)", v1041, v1043 or "egg unknown")
+			elseif v1040 < huge then
+				t6.WorkflowStatus.Rebirth = string.format("Need %.3g cash", huge)
+			elseif v1022("Rebirth") then
+				u955 = {
+					Before = v1033,
+					SentAt = os.clock()
+				}
+				t6.WorkflowStatus.Rebirth = string.format("Rebirth sent (%d -> %d)", v1033, v1033 + 1)
+			end
+		else
+			t6.WorkflowStatus.Rebirth = "Off"
+		end
+
+		local key = next(t44) and t44
+
+		genv.__ZeroinRideWorkflowEggs = key or nil
+	end
+
+	t6.syncShopAutoBuy = function(p112, p113, p114)
+		local n12 = 0
+		local n13 = 0
+		local pairs_ = pairs
+		local v1048 = p114 or {}
+
+		for k in pairs_(v1048) do
+			if not p113 or not t3.ShopAutoBuy[p112].Items[k] then
+				if v1022("Autobuy", p112, k, false) then
+					n12 += 1
+				else
+					n13 += 1
+				end
+			end
+		end
+
+		if p113 then
+			for k in pairs(t3.ShopAutoBuy[p112].Items) do
+				if t39[p112][k] then
+					if v1022("Autobuy", p112, k, true) then
+						n12 += 1
+					else
+						n13 += 1
+					end
+				end
+			end
+		end
+
+		t6.WorkflowStatus[p112] = n13 > 0 and "Sync failed for " .. n13 .. " item(s)" or p113 and (next(t3.ShopAutoBuy[p112].Items) and "Native Auto-Buy active" or "Select items") or "Off"
+	end
+	t6.stopWorkflowWorker = function()
+		if thread5 then
+			if thread5 ~= coroutine.running() then
+				task.cancel(thread5)
+			end
+		end
+
+		thread5 = nil
+		genv.__ZeroinRideWorkflowEggs = nil
+		v1028()
+	end
+	t6.startWorkflowWorker = function()
+		if not v48() then
+			return
+		end
+
+		if t3.AutoIndexEnabled or t3.AutoRebirthEnabled then
+			if not thread5 then
+				thread5 = task.spawn(function()
+					while v48() and (t3.AutoIndexEnabled or t3.AutoRebirthEnabled) do
+						local ok5, result5 = pcall(v1029)
+
+						if not ok5 then
+							warn("[RideAPet][workflow] " .. tostring(result5))
+						end
+
+						if genv.__ZeroinRideWorkflowEggs then
+							if not t3.AutoFarmEnabled then
+								if t3.FarmMode ~= "None" then
+									t40.Farm = true
+									v521()
+								end
+							end
+
+							if not t3.AutoPlaceEggEnabled then
+								t40.Place = true
+								v780()
+							end
+
+							if not t3.AutoHatchEggEnabled then
+								t40.Hatch = true
+								v777()
+							end
+						else
+							v1028()
+						end
+
+						task.wait(0.5)
+					end
+
+					thread5 = nil
+					genv.__ZeroinRideWorkflowEggs = nil
+					v1028()
+				end)
+
+				return
+			end
+
+			return
+		end
+
+		t6.stopWorkflowWorker()
+
+		local WorkflowStatus = t6.WorkflowStatus
+
+		t6.WorkflowStatus.Index = "Off"
+		WorkflowStatus.Rebirth = "Off"
+	end
+end
+
+local v1054, v1055
+
+do
+	local thread5
+	local PetRenderer
+	local PetAging
+	local t45 = {
+		"Grass",
+		"Bone",
+		"Meat",
+		"Magic Apple",
+		"Dragonfruit"
+	}
+
+	local function v1060()
+		if not PetRenderer then
+			pcall(function()
+				PetRenderer = require(LocalPlayer.PlayerScripts.Game.Pets.PetRenderer)
+			end)
+		end
+
+		return PetRenderer
+	end
+	local function v1061()
+		if not PetAging then
+			pcall(function()
+				PetAging = require(ReplicatedStorage.GameServices.PetAging)
+			end)
+		end
+
+		return PetAging
+	end
+	local function v1062()
+		local Backpack = LocalPlayer:FindFirstChildOfClass("Backpack")
+		local Character = LocalPlayer.Character
+
+		for _, v in ipairs(t45) do
+			if t3.AutoFeedFoods[v] ~= true then
+				continue
+			end
+
+			local v1067 = Backpack and Backpack:FindFirstChild(v) or Character and Character:FindFirstChild(v)
+
+			if not v1067 or not v1067:IsA("Tool") then
+				continue
+			end
+
+			local Data = v1067:FindFirstChild("Data")
+			local Value = Data and Data:FindFirstChild("Amount") and Data.Amount.Value
+
+			if Value == nil or Value > 0 then
+				return v
+			end
+		end
+
+		return nil
+	end
+	local function v1070()
+		local Character = LocalPlayer.Character
+		local HumanoidRootPart = Character and Character:FindFirstChild("HumanoidRootPart")
+		local PetMountJoint = HumanoidRootPart and HumanoidRootPart:FindFirstChild("PetMountJoint")
+		local Parent = PetMountJoint and PetMountJoint.Part1 and PetMountJoint.Part1.Parent
+
+		return Parent and Parent:GetAttribute("PetKey") or nil
+	end
+	local function v1075()
+		local v1076 = v1060()
+
+		if not v1076 or type(v1076.GetAll) ~= "function" then
+			return {}
+		end
+
+		local v1077 = v1061()
+		local MaxAge = v1077 and v1077.MaxAge or 100
+		local v1079 = math.min(tonumber(t3.AutoFeedTargetAge) or 100, MaxAge)
+
+		if t3.AutoFeedMode ~= "Riding Pet Only" then
+			local t46 = {}
+			local v1081 = next(t3.AutoFeedSpecificPetKeys) ~= nil
+
+			for _, v in pairs(v1076.GetAll()) do
+				if v.OwnerUserId == LocalPlayer.UserId and v.Model and v.Model.Parent then
+					local PetKey = v.PetKey
+
+					if not v1081 or t3.AutoFeedSpecificPetKeys[PetKey] == true then
+						local attribute = v.Model and v.Model:GetAttribute("Age") or 0
+
+						if attribute < v1079 then
+							table.insert(t46, {
+								PetKey = PetKey,
+								Age = attribute
+							})
+						end
+					end
+				end
+			end
+
+			table.sort(t46, function(p115, p116)
+				return p115.Age < p116.Age
+			end)
+
+			local t47 = {}
+
+			for _, v in ipairs(t46) do
+				table.insert(t47, v.PetKey)
+			end
+
+			return t47
+		end
+
+		local v1089 = v1070()
+
+		if not v1089 then
+			return {}
+		end
+
+		for _, v in pairs(v1076.GetAll()) do
+			if v.OwnerUserId == LocalPlayer.UserId and v.PetKey == v1089 then
+				if not ((v.Model and v.Model:GetAttribute("Age") or 0) < v1079) then
+					return {}
+				end
+
+				return { v1089 }
+			end
+		end
+
+		return {}
+	end
+	local function v1092()
+		if not t3.AutoFeedPetEnabled then
+			return
+		end
+
+		local Remotes2 = ReplicatedStorage:FindFirstChild("Remotes")
+		local Game = Remotes2 and Remotes2:FindFirstChild("Game")
+		local FeedPet = Game and Game:FindFirstChild("FeedPet")
+
+		if not FeedPet then
+			return
+		end
+
+		local v1096 = v1075()
+
+		if #v1096 == 0 then
+			task.wait(1)
+
+			return
+		end
+
+		local v1097, v1098, v1099 = ipairs(v1096)
+		local v1100 = geniter(v1097, v1098, v1099)
+		local v1101 = table.pack(v1100())
+
+		if v1101[1] then
+			local v1102 = v1101[3]
+
+			if t3.AutoFeedPetEnabled then
+				while v48() do
+					local v1103 = v1062()
+
+					if not v1103 then
+						task.wait(1)
+
+						break
+					end
+
+					FeedPet:FireServer(v1102, v1103)
+					task.wait(0.1)
+
+					local v1104 = table.pack(v1100())
+
+					if v1104[1] then
+						v1102 = v1104[3]
+
+						if not t3.AutoFeedPetEnabled then
+							break
+						end
+
+						continue
+					end
+
+					break
+				end
+			end
+		end
+	end
+
+	v1054 = function()
+		t3.AutoFeedPetEnabled = false
+
+		if thread5 then
+			task.cancel(thread5)
+			thread5 = nil
+		end
+	end
+	v1055 = function()
+		if not v48() then
+			return
+		end
+
+		v1054()
+		t3.AutoFeedPetEnabled = true
+		thread5 = task.spawn(function()
+			while t3.AutoFeedPetEnabled and v48() do
+				local ok, result = pcall(v1092)
+
+				if not ok then
+					warn(string.format("[RideAPet][auto_feed]\n%s", tostring(result)))
+				end
+
+				task.wait(0.1)
+			end
+		end)
+	end
+end
+
+do
+	local thread5
+
+	local function v1108()
+		local Remotes2 = ReplicatedStorage:FindFirstChild("Remotes")
+		local v1110 = Remotes2
+		local Plot
+
+		if v1110 then
+			local Game = Remotes2:FindFirstChild("Game")
+
+			Plot = Game and Game:FindFirstChild("Plot")
+		else
+			Plot = v1110
+		end
+
+		return Plot and Plot:FindFirstChild("Upgrades")
+	end
+
+	local n14 = 0
+
+	local function v1114(p117)
+		local PlayerGui = LocalPlayer:FindFirstChildOfClass("PlayerGui")
+		local ipairs_ = ipairs
+		local children = PlayerGui and PlayerGui:GetChildren() or {}
+
+		for _, child in ipairs_(children) do
+			local BonusProgress = child.Name == "Upgrade" and child:FindFirstChild("BonusProgress")
+			local Bar = BonusProgress and BonusProgress:FindFirstChild("Bar")
+
+			if not Bar then
+				continue
+			end
+
+			if tostring(Bar:GetAttribute("FillOwnerId")) == tostring(LocalPlayer.UserId) then
+				local Purchase = child:FindFirstChild("Purchase")
+				local Price = Purchase and Purchase:FindFirstChild("Price")
+				local FreeCount = Purchase and Purchase:FindFirstChild("FreeCount")
+				local NotEnough = Purchase and Purchase:FindFirstChild("NotEnough")
+
+				if FreeCount and FreeCount.Visible then
+					if (tonumber(FreeCount.Text:match("%d+")) or 0) > 0 then
+						return true
+					end
+				end
+
+				if NotEnough and NotEnough.Visible then
+					return false
+				end
+
+				local match, v1127 = (Price and Price.Text:gsub("[$,%s]", "") or ""):match("^([%d%.]+)([KMBT]?)$")
+				local v1128 = tonumber(match)
+
+				if v1128 then
+					return p117 >= v1128 * (({
+						K = 1000,
+						M = 1000000,
+						B = 1e9,
+						T = 1e12
+					})[v1127] or 1)
+				end
+
+				return false
+			end
+		end
+
+		return nil
+	end
+	local function v1129()
+		if not t3.AutoUpgradeHatchLuckEnabled or os.clock() < n14 then
+			return
+		end
+
+		local v1130 = v1108()
+
+		if not v1130 or not v1130:IsA("RemoteEvent") then
+			return
+		end
+
+		if LocalPlayer:GetAttribute("Setting_LuckMultiplier") == false then
+			pcall(function()
+				LocalPlayer:SetAttribute("Setting_LuckMultiplier", true)
+			end)
+		end
+
+		local SavedData = LocalPlayer:FindFirstChild("SavedData")
+		local HatchUpgrades = SavedData and SavedData:FindFirstChild("HatchUpgrades")
+		local Cash = SavedData and SavedData:FindFirstChild("Cash")
+		local v1134 = Cash
+
+		if v1134 then
+			v1134 = v1114(tonumber(Cash.Value) or 0)
+		end
+
+		if v1134 == false then
+			return
+		end
+
+		local v1135 = HatchUpgrades and tonumber(HatchUpgrades.Value)
+
+		v1135 = v1135 or nil
+		n14 = os.clock() + 5
+
+		if not pcall(function()
+			v1130:FireServer("Max")
+		end) or not v1135 then
+			return
+		end
+
+		local v1136 = os.clock() + 5
+
+		while true do
+			if not t3.AutoUpgradeHatchLuckEnabled or not v48() or not (os.clock() < v1136) then
+				return
+			end
+
+			if not (v1135 < (tonumber(HatchUpgrades.Value) or v1135)) then
+				task.wait(0.1)
+
+				continue
+			end
+
+			break
+		end
+
+		n14 = 0
+	end
+
+	genv.__ZeroinStopAutoUpgradeLuck = function()
+		t3.AutoUpgradeHatchLuckEnabled = false
+
+		if thread5 then
+			task.cancel(thread5)
+			thread5 = nil
+		end
+	end
+	genv.__ZeroinStartAutoUpgradeLuck = function()
+		if not v48() then
+			return
+		end
+
+		genv.__ZeroinStopAutoUpgradeLuck()
+		t3.AutoUpgradeHatchLuckEnabled = true
+		thread5 = task.spawn(function()
+			while t3.AutoUpgradeHatchLuckEnabled and v48() do
+				local ok, result = pcall(v1129)
+
+				if not ok then
+					warn(string.format("[RideAPet][auto_upgrade_luck]\n%s", tostring(result)))
+				end
+
+				task.wait(1)
+			end
+		end)
+	end
+end
+
+genv.__ZeroinCleanupLuckListeners = function()
+end
+
+local v1139, v1140
+
+do
+	local connection
+	local thread5
+	local v1143
+
+	local function v1144()
+		if type(getconnections) == "function" then
+			pcall(function()
+				local v1145, v1146, v1147 = pairs(getconnections(LocalPlayer.Idled))
+				local v1148 = geniter(v1145, v1146, v1147)
+
+				while true do
+					local v1149 = table.pack(v1148())
+
+					if not v1149[1] then
+						break
+					end
+
+					local v1150 = v1149[3]
+
+					if v1150.Function ~= v1143 and v1150.Enabled == false and v1150.Enable then
+						local exitTo
+
+						repeat
+							v1150:Enable()
+							exitTo = nil
+
+							while true do
+								local v1152 = table.pack(v1148())
+
+								if v1152[1] then
+									v1150 = v1152[3]
+
+									if v1150.Function ~= v1143 and v1150.Enabled == false and v1150.Enable then
+										exitTo = 1
+
+										break
+									end
+								else
+									break
+								end
+							end
+						until exitTo ~= 1
+
+						return
+					end
+				end
+			end)
+		end
+	end
+	local function v1153()
+		pcall(function()
+			local VirtualUser = game:GetService("VirtualUser")
+
+			if VirtualUser then
+				local CurrentCamera2 = workspace.CurrentCamera
+
+				VirtualUser:CaptureController()
+				VirtualUser:Button2Down(Vector2.new(0, 0), CurrentCamera2 and CurrentCamera2.CFrame or CFrame.new())
+				task.wait(0.05)
+				VirtualUser:Button2Up(Vector2.new(0, 0), CurrentCamera2 and CurrentCamera2.CFrame or CFrame.new())
+			end
+		end)
+	end
+
+	v1143 = function()
+		if not t3.AntiAfkEnabled then
+			return
+		end
+
+		v1153()
+	end
+	v1139 = function(p118)
+		if not p118 then
+			t3.AntiAfkEnabled = false
+		end
+
+		if connection then
+			pcall(function()
+				connection:Disconnect()
+			end)
+			connection = nil
+		end
+
+		if thread5 then
+			pcall(function()
+				task.cancel(thread5)
+			end)
+			thread5 = nil
+		end
+	end
+	v1140 = function()
+		v1139(true)
+		t3.AntiAfkEnabled = true
+		v1144()
+		connection = LocalPlayer.Idled:Connect(v1143)
+		thread5 = task.spawn(function()
+			while t3.AntiAfkEnabled do
+				task.wait(60)
+
+				if t3.AntiAfkEnabled then
+					v1153()
+
+					continue
+				end
+
+				break
+			end
+		end)
+	end
+	v1144()
+end
+
+do
+	local v1156 = v81:AddTab({
+		Name = "Main",
+		Icon = "house"
+	}):AddSection({
+		Title = "Auto Farm Egg",
+		Layout = "Grid",
+		ItemGap = 4
+	})
+
+	v71 = v1156:AddParagraph({
+		Title = "Bot Farm Status",
+		Content = string.format("<b>Status:</b> %s", s1),
+		Icon = "activity",
+		Column = "Full",
+		Row = 1
+	})
+
+	local v1157 = v1156:AddToggle({
+		Title = "Enable Auto Farm",
+		Content = "Collect eggs and return to your plot",
+		Default = t3.AutoFarmEnabled,
+		Column = "Full",
+		Row = 2,
+		Keybind = false,
+		Callback = function(p119)
+			if _G.ZeroinScriptReloading then
+				return
+			end
+
+			local autoFarmEnabled = p119 == true
+
+			t3.AutoFarmEnabled = autoFarmEnabled
+
+			local ConfigData_ = ConfigData or getgenv and getgenv().ConfigData or _G and _G.ConfigData
+
+			if ConfigData_ and type(ConfigData_) == "table" then
+				ConfigData_["Toggle_Enable Auto Farm"] = autoFarmEnabled
+
+				if SaveConfig then
+					pcall(SaveConfig)
+				end
+			end
+
+			if genv.__ZeroinRideWorkflowOwns then
+				genv.__ZeroinRideWorkflowOwns("Farm")
+			end
+
+			if autoFarmEnabled then
+				v521()
+				v82("Egg Auto Farm enabled!", 2.5, Color3.fromRGB(0, 205, 122), "Auto Farm")
+			else
+				v520()
+				v75("<font color='#888899'>Idle (Disabled)</font>")
+				v82("Egg Auto Farm disabled.", 2, Color3.fromRGB(255, 100, 40), "Auto Farm")
+			end
+		end
+	})
+
+	if v1157 then
+		v1157.Cleanup = function()
+		end
+	end
+
+	v1156:AddToggle({
+		Title = "Dip In Volcano",
+		Content = "Carry each farmed egg through one volcano dip (Magma chance) before returning to plot",
+		Default = t3.VolcanoDipEnabled,
+		Column = "Full",
+		Row = 3,
+		Keybind = false,
+		Callback = function(p120)
+			if _G.ZeroinScriptReloading then
+				return
+			end
+
+			t3.VolcanoDipEnabled = p120 == true
+		end
+	})
+	v1156:AddDropdown({
+		Title = "Farm Mode",
+		Content = "Choose Tween or Instant movement",
+		Column = "Full",
+		Row = 4,
+		Options = {
+			"None",
+			"Tween",
+			"Instant"
+		},
+		Default = t3.FarmMode,
+		Callback = function(p121)
+			local farmMode = p121 == "Instant" and "Instant"
+
+			farmMode = farmMode or p121 == "Tween" and "Tween"
+			t3.FarmMode = farmMode or "None"
+		end
+	})
+
+	local t48 = {
+		"None",
+		"Ethereal",
+		"Divine",
+		"Mythic",
+		"Legendary",
+		"Epic",
+		"Rare",
+		"Common"
+	}
+	local t49 = {}
+
+	for _, v in ipairs(t48) do
+		if v ~= "None" and t3.AutoFarmRarities[v] then
+			table.insert(t49, v)
+		end
+	end
+
+	local v1165 = v74(t49)
+	local v1166
+
+	local function v1167()
+		local t50 = { "None" }
+		local t51 = {}
+		local v1170, v1171, v1172 = pairs(t2)
+
+		for k, v in v1170, v1171, v1172 do
+			if t3.AutoFarmRarities[v.Rarity] == true then
+				table.insert(t50, k)
+				t51[k] = true
+			end
+		end
+
+		table.sort(t50, function(p122, p123)
+			if p122 == "None" then
+				return true
+			end
+
+			if p123 == "None" then
+				return false
+			end
+
+			return p122 < p123
+		end)
+
+		local t52 = {}
+		local v1176, v1177, v1178 = pairs(t3.AutoFarmEggNames)
+		local v1179 = geniter(v1176, v1177, v1178)
+		local exitTo2
+		local v1181
+
+		while true do
+			local v1182 = table.pack(v1179())
+
+			if v1182[1] then
+				v1181 = v1182[2]
+
+				if t51[v1181] then
+					exitTo2 = 1
+
+					break
+				else
+					t3.AutoFarmEggNames[v1181] = nil
+				end
+			else
+				break
+			end
+		end
+
+		local v1183
+
+		if exitTo2 == 1 then
+			local exitTo
+
+			repeat
+				table.insert(t52, v1181)
+				exitTo = nil
+
+				while true do
+					local v1185 = table.pack(v1179())
+
+					if v1185[1] then
+						v1181 = v1185[2]
+
+						if t51[v1181] then
+							exitTo = 1
+
+							break
+						else
+							t3.AutoFarmEggNames[v1181] = nil
+						end
+					else
+						break
+					end
+				end
+			until exitTo ~= 1
+
+			table.sort(t52)
+			v1183 = v74(t52)
+
+			if v1166 then
+				if v1166.SetValues then
+					v1166:SetValues(t50, v1183)
+					t5[v1166] = table.find(v1183, "None") ~= nil
+				end
+			end
+		else
+			table.sort(t52)
+			v1183 = v74(t52)
+
+			if v1166 then
+				if v1166.SetValues then
+					v1166:SetValues(t50, v1183)
+					t5[v1166] = table.find(v1183, "None") ~= nil
+				end
+			end
+		end
+
+		return t50, v1183
+	end
+
+	local v1186
+
+	v1186 = v1156:AddDropdown({
+		Title = "Target Rarity",
+		Content = "Choose rarities to collect",
+		Column = "Left",
+		Row = 5,
+		Options = t48,
+		Default = v1165,
+		Multi = true,
+		Callback = function(p124)
+			local v1187 = v73(p124, v1186)
+
+			for k in pairs(t3.AutoFarmRarities) do
+				t3.AutoFarmRarities[k] = table.find(v1187, k) ~= nil
+			end
+
+			v1167()
+		end
+	})
+	t5[v1186] = table.find(v1165, "None") ~= nil
+
+	local v1189, v1190 = v1167()
+
+	v1166 = v1156:AddDropdown({
+		Title = "Target Egg Name",
+		Content = "Choose eggs from selected rarities",
+		Column = "Right",
+		Row = 5,
+		Options = v1189,
+		Default = v1190,
+		Multi = true,
+		Callback = function(p125)
+			local v1191 = v73(p125, v1166)
+
+			table.clear(t3.AutoFarmEggNames)
+
+			for _, v in ipairs(v1191) do
+				if v ~= "None" then
+					t3.AutoFarmEggNames[v] = true
+				end
+			end
+		end
+	})
+	t5[v1166] = table.find(v1190, "None") ~= nil
+	v1156:AddInput({
+		Title = "Tween Speed",
+		Content = "100 input = 1000 studs/s",
+		Column = "Full",
+		Row = 6,
+		Default = tostring(t3.TweenInput or 100),
+		Callback = function(p126)
+			local tweenInput = tonumber(p126)
+
+			if tweenInput then
+				if not (tweenInput > 0) then
+					t3.TweenInput = 100
+					t3.TweenSpeed = 1000
+
+					return
+				end
+
+				t3.TweenInput = tweenInput
+				t3.TweenSpeed = tweenInput * 10
+			else
+				t3.TweenInput = 100
+				t3.TweenSpeed = 1000
+			end
+		end
+	})
+end
+
+local v1195 = v81:AddTab({
+	Name = "Auto",
+	Icon = "repeat"
+})
+
+do
+	local v1196 = v1195:AddSection({
+		Title = "Auto Hatch Egg",
+		Layout = "Grid",
+		ItemGap = 4
+	}):AddToggle({
+		Title = "Auto Hatch Egg",
+		Content = "Automatically hatch ready eggs on your plot",
+		Default = t3.AutoHatchEggEnabled,
+		Column = "Full",
+		Row = 1,
+		Keybind = false,
+		Callback = function(p127)
+			if _G.ZeroinScriptReloading then
+				return
+			end
+
+			t3.AutoHatchEggEnabled = p127 == true
+
+			if genv.__ZeroinRideWorkflowOwns then
+				genv.__ZeroinRideWorkflowOwns("Hatch")
+			end
+
+			if t3.AutoHatchEggEnabled then
+				v777()
+			else
+				v776()
+			end
+		end
+	})
+
+	if v1196 then
+		v1196.Cleanup = function()
+		end
+	end
+
+	local v1197 = v1195:AddSection({
+		Title = "Auto Place Egg",
+		Layout = "Grid",
+		ItemGap = 4
+	})
+	local v1198 = v1197:AddToggle({
+		Title = "Auto Place Egg",
+		Content = "Automatically place inventory eggs on your plot",
+		Default = t3.AutoPlaceEggEnabled,
+		Column = "Full",
+		Row = 1,
+		Keybind = false,
+		Callback = function(p128)
+			if _G.ZeroinScriptReloading then
+				return
+			end
+
+			t3.AutoPlaceEggEnabled = p128 == true
+
+			if genv.__ZeroinRideWorkflowOwns then
+				genv.__ZeroinRideWorkflowOwns("Place")
+			end
+
+			if t3.AutoPlaceEggEnabled then
+				v780()
+			else
+				v779()
+			end
+		end
+	})
+
+	if v1198 then
+		v1198.Cleanup = function()
+		end
+	end
+
+	local t53 = {
+		"None",
+		"Ethereal",
+		"Divine",
+		"Mythic",
+		"Legendary",
+		"Epic",
+		"Rare",
+		"Common"
+	}
+	local t54 = {}
+
+	for _, v in ipairs(t53) do
+		if v ~= "None" and t3.AutoPlaceRarities[v] then
+			table.insert(t54, v)
+		end
+	end
+
+	local v1203 = v74(t54)
+	local v1204
+
+	v1204 = v1197:AddDropdown({
+		Title = "Egg Rarity",
+		Content = "Choose which egg rarities to place",
+		Options = t53,
+		Default = v1203,
+		Multi = true,
+		Column = "Full",
+		Row = 2,
+		Callback = function(p129)
+			local v1205 = v73(p129, v1204)
+			local v1206, v1207, v1208 = pairs(t3.AutoPlaceRarities)
+			local v1209 = geniter(v1206, v1207, v1208)
+			local v1210 = table.pack(v1209())
+
+			if v1210[1] then
+				local v1211 = v1210[2]
+
+				while true do
+					t3.AutoPlaceRarities[v1211] = table.find(v1205, v1211) ~= nil
+
+					local v1212 = table.pack(v1209())
+
+					if v1212[1] then
+						v1211 = v1212[2]
+					else
+						break
+					end
+				end
+			end
+		end
+	})
+	t5[v1204] = table.find(v1203, "None") ~= nil
+
+	local v1213 = v1195:AddSection({
+		Title = "Auto Feed Pet",
+		Layout = "Grid",
+		ItemGap = 4
+	})
+	local v1214 = v1213:AddToggle({
+		Title = "Auto Feed Pet",
+		Content = "Automatically feeds pets using available food in your inventory",
+		Default = t3.AutoFeedPetEnabled,
+		Column = "Full",
+		Row = 1,
+		Keybind = false,
+		Callback = function(p130)
+			if _G.ZeroinScriptReloading then
+				return
+			end
+
+			t3.AutoFeedPetEnabled = p130 == true
+
+			if t3.AutoFeedPetEnabled then
+				v1055()
+			else
+				v1054()
+			end
+		end
+	})
+
+	if v1214 then
+		v1214.Cleanup = function()
+		end
+	end
+
+	v1213:AddDropdown({
+		Title = "Target Mode",
+		Content = "Choose whether to feed all pets or only the riding pet",
+		Options = {
+			"All Owned Pets",
+			"Riding Pet Only"
+		},
+		Default = t3.AutoFeedMode,
+		Multi = false,
+		Column = "Full",
+		Row = 2,
+		Callback = function(p131)
+			t3.AutoFeedMode = p131
+		end
+	})
+
+	local t55 = { "All Pets" }
+	local t56 = {}
+
+	local function v1217()
+		t55 = { "All Pets" }
+		table.clear(t56)
+
+		local ok, result = pcall(require, LocalPlayer.PlayerScripts.Game.Pets.PetRenderer)
+
+		if not ok or not result or type(result.GetAll) ~= "function" then
+			return
+		end
+
+		local ok2, result2 = pcall(function()
+			local GameServices = game:GetService("ReplicatedStorage"):FindFirstChild("GameServices")
+			local PetAging = GameServices and GameServices:FindFirstChild("PetAging")
+
+			if PetAging then
+				return require(PetAging)
+			end
+
+			return nil
+		end)
+		local t57 = {}
+
+		for _, v in pairs(result.GetAll()) do
+			if v.OwnerUserId == LocalPlayer.UserId then
+				if v.Model and v.Model.Parent then
+					local Name = v.Name or v.Model and v.Model.Name or "Pet"
+					local attribute = v.Model:GetAttribute("Age") or 0
+					local v1229 = tonumber(v.Model:GetAttribute("Weight")) or 0
+					local v1230
+
+					if ok2 and result2 and type(result2.FormatWeight) == "function" then
+						local ok3, result3 = pcall(result2.FormatWeight, v1229, true)
+
+						if ok3 and result3 then
+							v1230 = result3
+						end
+					end
+
+					table.insert(t57, {
+						Key = v.PetKey,
+						Name = Name,
+						Age = attribute,
+						RawWeight = v1229,
+						WeightStr = v1230 or string.format("%.2f KG", v1229)
+					})
+				end
+			end
+		end
+
+		table.sort(t57, function(p132, p133)
+			if p132.Name ~= p133.Name then
+				return p132.Name < p133.Name
+			end
+
+			if p132.Age == p133.Age then
+				return p132.RawWeight < p133.RawWeight
+			end
+
+			return p132.Age < p133.Age
+		end)
+
+		for i, v in ipairs(t57) do
+			local v1235 = string.format("%s (Age: %d, %s) #%d", v.Name, v.Age, v.WeightStr, i)
+
+			table.insert(t55, v1235)
+			t56[v1235] = v.Key
+		end
+	end
+
+	v1217()
+
+	local v1236
+
+	v1236 = v1213:AddDropdown({
+		Title = "Select Plot Pet",
+		Content = "Choose specific pets on plot to feed; 'All Pets' feeds all plot pets",
+		Options = t55,
+		Default = { "All Pets" },
+		Multi = true,
+		Column = "Full",
+		Row = 3,
+		Callback = function(p134)
+			local allPets = v73(p134, v1236, "All Pets")
+
+			table.clear(t3.AutoFeedSpecificPetKeys)
+
+			if table.find(allPets, "All Pets") then
+				return
+			end
+
+			for _, allPet in ipairs(allPets) do
+				local v1240 = t56[allPet]
+
+				if v1240 then
+					t3.AutoFeedSpecificPetKeys[v1240] = true
+				end
+			end
+		end
+	})
+	t5[v1236] = true
+	v1213:AddInput({
+		Title = "Target Age",
+		Content = "Feed pets until they reach this age (max 100)",
+		Default = tostring(t3.AutoFeedTargetAge or 100),
+		Column = "Full",
+		Row = 4,
+		Callback = function(p135)
+			local v1241 = tonumber(p135)
+
+			if v1241 and v1241 > 0 then
+				t3.AutoFeedTargetAge = math.floor(v1241)
+			end
+		end
+	})
+
+	local t58 = {
+		"None",
+		"Grass",
+		"Bone",
+		"Meat",
+		"Magic Apple",
+		"Dragonfruit"
+	}
+	local t59 = {}
+
+	for _, v in ipairs(t58) do
+		if v ~= "None" and t3.AutoFeedFoods[v] then
+			table.insert(t59, v)
+		end
+	end
+
+	local v1246 = v74(t59)
+	local v1247
+
+	v1247 = v1213:AddDropdown({
+		Title = "Select Food",
+		Content = "Choose which foods can be used to feed pets",
+		Options = t58,
+		Default = v1246,
+		Multi = true,
+		Column = "Full",
+		Row = 5,
+		Callback = function(p136)
+			local v1248 = v73(p136, v1247)
+
+			for k in pairs(t3.AutoFeedFoods) do
+				t3.AutoFeedFoods[k] = table.find(v1248, k) ~= nil
+			end
+		end
+	})
+	t5[v1247] = table.find(v1246, "None") ~= nil
+	v1213:AddButton({
+		Title = "Refresh Plot Pets",
+		Icon = "refresh-cw",
+		Column = "Full",
+		Row = 6,
+		Callback = function()
+			v1217()
+
+			if v1236 and v1236.SetValues then
+				v1236:SetValues(t55, { "All Pets" })
+			end
+
+			t5[v1236] = true
+			table.clear(t3.AutoFeedSpecificPetKeys)
+			v82("Plot pets list refreshed!", 2, Color3.fromRGB(0, 205, 122), "Auto Feed")
+		end
+	})
+
+	local v1250 = v1195:AddSection({
+		Title = "Auto Sell Pet",
+		Layout = "Grid",
+		ItemGap = 4
+	})
+	local v1251 = v1250:AddToggle({
+		Title = "Auto Sell Pets",
+		Content = "Automatically travels to Richie; favorites and placed pets stay protected",
+		Default = t3.AutoSellPetsEnabled,
+		Column = "Full",
+		Row = 1,
+		Keybind = false,
+		Callback = function(p137)
+			if _G.ZeroinScriptReloading then
+				return
+			end
+
+			t3.AutoSellPetsEnabled = p137 == true
+
+			if t3.AutoSellPetsEnabled then
+				v872()
+			else
+				v871()
+			end
+		end
+	})
+
+	if v1251 then
+		v1251.Cleanup = function()
+		end
+	end
+
+	local t60 = {
+		"None",
+		"Ethereal",
+		"Divine",
+		"Mythic",
+		"Legendary",
+		"Epic",
+		"Rare",
+		"Common"
+	}
+	local t61 = {}
+
+	for _, v in ipairs(t60) do
+		if v ~= "None" and t3.AutoSellRarities[v] then
+			table.insert(t61, v)
+		end
+	end
+
+	local v1256 = v74(t61)
+	local t62 = { "All Pets" }
+
+	for k in pairs(Pets) do
+		table.insert(t62, k)
+	end
+
+	table.sort(t62, function(p138, p139)
+		if p138 == "All Pets" then
+			return true
+		end
+
+		if p139 == "All Pets" then
+			return false
+		end
+
+		return p138 < p139
+	end)
+
+	local t63 = {}
+
+	for k in pairs(t3.AutoSellPetNames) do
+		if Pets[k] then
+			table.insert(t63, k)
+		end
+	end
+
+	table.sort(t63)
+
+	if #t63 == 0 then
+		t63 = { "All Pets" }
+	end
+
+	local v1261
+
+	v1261 = v1250:AddDropdown({
+		Title = "Pet Names",
+		Content = "Choose pet names to sell; All Pets is a wildcard",
+		Options = t62,
+		Default = t63,
+		Multi = true,
+		Column = "Full",
+		Row = 2,
+		Callback = function(p140)
+			local allPets = v73(p140, v1261, "All Pets")
+
+			table.clear(t3.AutoSellPetNames)
+
+			if table.find(allPets, "All Pets") then
+				return
+			end
+
+			for _, allPet in ipairs(allPets) do
+				if Pets[allPet] then
+					t3.AutoSellPetNames[allPet] = true
+				end
+			end
+		end
+	})
+	t5[v1261] = table.find(t63, "All Pets") ~= nil
+
+	local v1265
+
+	v1265 = v1250:AddDropdown({
+		Title = "Sell Rarities",
+		Content = "Only sell pets from selected rarities",
+		Options = t60,
+		Default = v1256,
+		Multi = true,
+		Column = "Full",
+		Row = 3,
+		Callback = function(p141)
+			local v1266 = v73(p141, v1265)
+
+			for k in pairs(t3.AutoSellRarities) do
+				t3.AutoSellRarities[k] = table.find(v1266, k) ~= nil
+			end
+		end
+	})
+	t5[v1265] = table.find(v1256, "None") ~= nil
+
+	local t64 = {
+		"None",
+		"Shocked",
+		"Volted",
+		"Rage",
+		"Void",
+		"Eternal",
+		"Gold",
+		"Rainbow"
+	}
+	local t65 = {}
+
+	for _, v in ipairs(t64) do
+		if v ~= "None" and t3.AutoSellProtectedMutations[v] then
+			table.insert(t65, v)
+		end
+	end
+
+	local v1272 = v74(t65)
+	local v1273
+
+	v1273 = v1250:AddDropdown({
+		Title = "Never Sell Mutations",
+		Content = "Protect selected mutations from selling",
+		Options = t64,
+		Default = v1272,
+		Multi = true,
+		Column = "Full",
+		Row = 4,
+		Callback = function(p142)
+			local v1274 = v73(p142, v1273)
+
+			table.clear(t3.AutoSellProtectedMutations)
+
+			for _, v in ipairs(v1274) do
+				if v ~= "None" then
+					t3.AutoSellProtectedMutations[v] = true
+				end
+			end
+		end
+	})
+	t5[v1273] = table.find(v1272, "None") ~= nil
+	v1250:AddInput({
+		Title = "Max Weight to Sell (KG)",
+		Content = "Only sell pets at or below this weight; 0 sells all weights",
+		Default = tostring(t3.AutoSellMaxWeight),
+		Column = "Full",
+		Row = 5,
+		Callback = function(p143)
+			local autoSellMaxWeight = tonumber(p143)
+
+			if autoSellMaxWeight and autoSellMaxWeight >= 0 then
+				t3.AutoSellMaxWeight = autoSellMaxWeight
+			end
+		end
+	})
+
+	local v1278 = v1195:AddSection({
+		Title = "Index & Rebirth",
+		Layout = "Grid",
+		ItemGap = 4
+	})
+	local v1279 = v1278:AddParagraph({
+		Title = "Progress Automation",
+		Content = "Index: Off\nRebirth: Off",
+		Icon = "activity",
+		Column = "Full",
+		Row = 1
+	})
+
+	v1278:AddToggle({
+		Title = "Auto Complete Index",
+		Content = "Collect, place, and hatch eggs for missing Index pets (uses the selected Farm Mode)",
+		Default = t3.AutoIndexEnabled,
+		Column = "Full",
+		Row = 2,
+		Keybind = false,
+		Callback = function(p144)
+			if _G.ZeroinScriptReloading then
+				return
+			end
+
+			t3.AutoIndexEnabled = p144 == true
+			t6.startWorkflowWorker()
+		end
+	})
+	v1278:AddToggle({
+		Title = "Auto Claim Index Rewards",
+		Content = "Claim the cash reward when the next Index stage is reached",
+		Default = t3.AutoClaimIndexRewards,
+		Column = "Full",
+		Row = 3,
+		Keybind = false,
+		Callback = function(p145)
+			t3.AutoClaimIndexRewards = p145 == true
+		end
+	})
+	v1278:AddDropdown({
+		Title = "Target Rebirth",
+		Options = {
+			"Rebirth 1",
+			"Rebirth 2",
+			"Rebirth 3",
+			"Rebirth 4",
+			"Rebirth 5",
+			"Rebirth 6"
+		},
+		Default = "Rebirth " .. tostring(t3.TargetRebirth),
+		Multi = false,
+		Column = "Full",
+		Row = 4,
+		Callback = function(p146)
+			local v1280 = type(p146) == "table" and p146[1] or p146
+
+			t3.TargetRebirth = math.clamp(tonumber(tostring(v1280):match("%d+")) or 6, 1, 6)
+		end
+	})
+	v1278:AddToggle({
+		Title = "Auto Rebirth",
+		Content = "Hunt the required pet's egg, then rebirth when cash is enough",
+		Default = t3.AutoRebirthEnabled,
+		Column = "Full",
+		Row = 5,
+		Keybind = false,
+		Callback = function(p147)
+			if _G.ZeroinScriptReloading then
+				return
+			end
+
+			t3.AutoRebirthEnabled = p147 == true
+			t6.startWorkflowWorker()
+		end
+	})
+
+	local v1281 = v1195:AddSection({
+		Title = "Shop Auto-Buy",
+		Layout = "Grid",
+		ItemGap = 4
+	})
+	local v1282 = v1281:AddParagraph({
+		Title = "Native Auto-Buy",
+		Content = "Food: Off\nGear: Off",
+		Icon = "shopping-cart",
+		Column = "Full",
+		Row = 1
+	})
+	local n15 = 2
+
+	for _, v in ipairs({
+		"Food",
+		"Gears"
+	}) do
+		local v1286 = v == "Food" and "Food" or "Gear"
+		local t66 = {}
+
+		for k in pairs(genv.__ZeroinRideShopCatalog[v]) do
+			table.insert(t66, k)
+		end
+
+		table.sort(t66)
+		table.insert(t66, 1, "None")
+
+		local t67 = {}
+
+		for k in pairs(t3.ShopAutoBuy[v].Items) do
+			table.insert(t67, k)
+		end
+
+		table.sort(t67)
+
+		local v1291 = v74(t67)
+		local v1292
+
+		v1292 = v1281:AddDropdown({
+			Title = v1286 .. " Items",
+			Options = t66,
+			Default = v1291,
+			Multi = true,
+			Column = "Full",
+			Row = n15,
+			Callback = function(p148)
+				local v1293 = v73(p148, v1292)
+				local v1294 = table.clone(t3.ShopAutoBuy[v].Items)
+
+				table.clear(t3.ShopAutoBuy[v].Items)
+
+				for _, v2 in ipairs(v1293) do
+					if v2 ~= "None" then
+						t3.ShopAutoBuy[v].Items[v2] = true
+					end
+				end
+
+				if t3.ShopAutoBuy[v].Enabled then
+					t6.syncShopAutoBuy(v, true, v1294)
+				end
+			end
+		})
+		t5[v1292] = table.find(v1291, "None") ~= nil
+		v1281:AddToggle({
+			Title = "Auto Buy " .. v1286,
+			Content = "Use the game's built-in per-item Auto-Buy (cash only)",
+			Default = t3.ShopAutoBuy[v].Enabled,
+			Column = "Full",
+			Row = n15 + 1,
+			Keybind = false,
+			Callback = function(p149)
+				if _G.ZeroinScriptReloading then
+					return
+				end
+
+				t3.ShopAutoBuy[v].Enabled = p149 == true
+				t6.syncShopAutoBuy(v, t3.ShopAutoBuy[v].Enabled, t3.ShopAutoBuy[v].Items)
+			end
+		})
+		n15 += 2
+	end
+
+	local n16 = 0
+
+	v81:AddCleanup(RunService.Heartbeat:Connect(function()
+		if os.clock() < n16 then
+			return
+		end
+
+		n16 = os.clock() + 0.5
+		pcall(function()
+			v1279:SetContent("Index: " .. t6.WorkflowStatus.Index .. "\nRebirth: " .. t6.WorkflowStatus.Rebirth)
+			v1282:SetContent("Food: " .. t6.WorkflowStatus.Food .. "\nGear: " .. t6.WorkflowStatus.Gears)
+		end)
+	end))
+end
+
+local v1298 = v1195:AddSection({
+	Title = "Auto Upgrade Hatch Luck",
+	Layout = "Grid",
+	ItemGap = 4
+}):AddToggle({
+	Title = "Auto Upgrade Hatch Luck",
+	Content = "Automatically upgrades plot Hatch Luck with max affordable cash",
+	Default = t3.AutoUpgradeHatchLuckEnabled,
+	Column = "Full",
+	Row = 1,
+	Keybind = false,
+	Callback = function(p150)
+		if _G.ZeroinScriptReloading then
+			return
+		end
+
+		t3.AutoUpgradeHatchLuckEnabled = p150 == true
+
+		if not t3.AutoUpgradeHatchLuckEnabled then
+			if genv.__ZeroinStopAutoUpgradeLuck then
+				genv.__ZeroinStopAutoUpgradeLuck()
+			end
+		elseif genv.__ZeroinStartAutoUpgradeLuck then
+			genv.__ZeroinStartAutoUpgradeLuck()
+		end
+	end
+})
+
+if v1298 then
+	v1298.Cleanup = function()
+	end
+end
+
+do
+	local v1299 = v81:AddTab({
+		Name = "Egg ESP",
+		Icon = "eye"
+	}):AddSection({
+		Title = "Egg ESP Settings",
+		Layout = "Columns",
+		ColumnGap = 6,
+		ItemGap = 2
+	})
+
+	v1299:AddToggle({
+		Title = "Enable Egg ESP",
+		Content = "Show spawned eggs",
+		Column = "Full",
+		Row = 1,
+		Default = t3.EspEnabled,
+		Keybind = false,
+		Callback = function(p151)
+			t3.EspEnabled = p151
+			v184()
+		end
+	})
+	v1299:AddToggle({
+		Title = "Egg Highlight (Chams)",
+		Content = "Highlight eggs through objects",
+		Column = "Left",
+		Row = 2,
+		Default = t3.Highlight,
+		Callback = function(p152)
+			t3.Highlight = p152
+
+			for _, v in pairs(t4) do
+				if v.Highlight then
+					v.Highlight.Enabled = p152 and t3.EspEnabled and t3.RarityFilter[v.Info.Rarity] ~= false
+				end
+			end
+		end
+	})
+	v1299:AddToggle({
+		Title = "ESP Tracers",
+		Content = "Draw lines toward eggs",
+		Column = "Right",
+		Row = 2,
+		Default = t3.Tracers,
+		Callback = function(p153)
+			t3.Tracers = p153
+
+			if not p153 then
+				for _, v in pairs(t4) do
+					if v.Tracer then
+						v.Tracer.Visible = false
+					end
+				end
+			end
+		end
+	})
+
+	local t68 = {
+		"None",
+		"Ethereal",
+		"Divine",
+		"Mythic",
+		"Legendary",
+		"Epic",
+		"Rare",
+		"Common"
+	}
+	local t69 = {}
+
+	for _, v in ipairs(t68) do
+		if v ~= "None" and t3.RarityFilter[v] ~= false then
+			table.insert(t69, v)
+		end
+	end
+
+	local v1308 = v74(t69)
+	local v1309
+
+	v1309 = v1299:AddDropdown({
+		Title = "Visible Rarities",
+		Content = "Choose egg rarities to show",
+		Column = "Full",
+		Row = 3,
+		Options = t68,
+		Default = v1308,
+		Multi = true,
+		Callback = function(p154)
+			local v1310 = v73(p154, v1309)
+
+			for k in pairs(t3.RarityFilter) do
+				t3.RarityFilter[k] = table.find(v1310, k) ~= nil
+			end
+
+			v184()
+		end
+	})
+	t5[v1309] = table.find(v1308, "None") ~= nil
+	v1299:AddSlider({
+		Title = "Max Render Distance",
+		Content = "Set the ESP visibility range",
+		Column = "Full",
+		Row = 4,
+		Min = 200,
+		Max = 6000,
+		Increment = 100,
+		Default = t3.MaxDistance,
+		Callback = function(p155)
+			t3.MaxDistance = p155
+			v184()
+		end
+	})
+end
+
+do
+	local v1312 = v81:AddTab({
+		Name = "Radar & TP",
+		Icon = "map-pin"
+	})
+	local v1313 = v1312:AddSection({
+		Title = "Server Egg Statistics",
+		Layout = "Grid",
+		ItemGap = 4
+	}):AddParagraph({
+		Title = "Active Egg Overview",
+		Content = v424(),
+		Icon = "activity",
+		Column = "Full",
+		Row = 1,
+		ButtonText = "Refresh Data",
+		ButtonCallback = function()
+			v189()
+
+			if StatsParagraph and StatsParagraph.SetContent then
+				StatsParagraph:SetContent(v424())
+			end
+
+			v82("Server egg data refreshed!", 2, Color3.fromRGB(255, 180, 40), "Radar")
+		end
+	})
+	local v1314 = v1312:AddSection({
+		Title = "Egg Navigation & Teleport",
+		Layout = "Grid",
+		ItemGap = 4
+	})
+
+	v1314:AddDropdown({
+		Title = "Navigation Movement Mode",
+		Column = "Full",
+		Row = 1,
+		Options = {
+			"Tween (Smooth Glide)",
+			"Teleport (Instant)"
+		},
+		Default = t3.FarmMovementMode == "Teleport" and "Teleport (Instant)" or "Tween (Smooth Glide)",
+		Callback = function(p156)
+			local farmMovementMode = tostring(p156):find("Teleport") and "Teleport"
+
+			t3.FarmMovementMode = farmMovementMode or "Tween"
+		end
+	})
+	v1314:AddButton({
+		Title = "Go to Nearest Egg",
+		Icon = "navigation",
+		Column = "Full",
+		Row = 2,
+		Callback = function()
+			v411()
+		end,
+		SubTitle = "Go to Rarest Egg",
+		SubIcon = "crown",
+		SubCallback = function()
+			v419()
+		end
+	})
+
+	local u1316
+	local t70 = {}
+	local t71 = {}
+
+	local function v1319()
+		t70 = { "None" }
+		t71 = {
+			None = nil
+		}
+
+		local t72 = {}
+
+		for k, v in pairs(t4) do
+			if k.Parent and v.Info then
+				table.insert(t72, {
+					Model = k,
+					Name = v.Info.Name,
+					Rarity = v.Info.Rarity,
+					Priority = v.Info.Priority
+				})
+			end
+		end
+
+		table.sort(t72, function(p157, p158)
+			return p157.Priority > p158.Priority
+		end)
+
+		for i, v in ipairs(t72) do
+			if i <= 40 then
+				local v1325 = string.format("[%s] %s (#%d)", v.Rarity, v.Name, i)
+
+				table.insert(t70, v1325)
+				t71[v1325] = v.Model
+			end
+		end
+	end
+
+	v1319()
+
+	local v1326 = v1314:AddDropdown({
+		Title = "Select Specific Target Egg",
+		Column = "Full",
+		Row = 3,
+		Options = t70,
+		Default = "None",
+		Multi = false,
+		Callback = function(p159)
+			if p159 == "None" then
+			end
+
+			u1316 = t71[p159]
+		end
+	})
+
+	v1314:AddButton({
+		Title = "Go to Selected Egg",
+		Icon = "map-pin",
+		Column = "Full",
+		Row = 4,
+		Callback = function()
+			if u1316 and u1316.Parent then
+				v409(u1316)
+			else
+				v82("Select an egg from the list or refresh!", 2, Color3.fromRGB(255, 100, 40), "Navigation")
+			end
+		end,
+		SubTitle = "Refresh Egg List",
+		SubIcon = "refresh-cw",
+		SubCallback = function()
+			v189()
+			v1319()
+
+			if v1326 and v1326.SetValues then
+				v1326:SetValues(t70, "None")
+			end
+
+			if v1313 and v1313.SetContent then
+				v1313:SetContent(v424())
+			end
+
+			v82("Egg list refreshed!", 2, Color3.fromRGB(0, 205, 122), "Radar")
+		end
+	})
+end
+
+do
+	local v1327 = v81:AddTab({
+		Name = "Misc",
+		Icon = "settings"
+	}):AddSection({
+		Title = "Utilities & Safety",
+		Layout = "Grid",
+		ItemGap = 4
+	})
+
+	if type(genv.__ZeroinDecomBoostCleanup) == "function" then
+		pcall(genv.__ZeroinDecomBoostCleanup)
+	end
+
+	local t73 = {}
+	local u1329 = false
+
+	genv.__ZeroinDecomBoostCleanup = function()
+		for _, v in ipairs(t73) do
+			pcall(function()
+				v:Disconnect()
+			end)
+		end
+
+		table.clear(t73)
+		u1329 = false
+	end
+
+	local function v1332(descendant)
+		pcall(function()
+			if descendant:IsA("BasePart") then
+				descendant.Material = Enum.Material.SmoothPlastic
+				descendant.CastShadow = false
+			elseif descendant:IsA("Decal") or descendant:IsA("Texture") then
+				descendant.Texture = ""
+				descendant.Transparency = 1
+			elseif descendant:IsA("Sound") then
+				descendant.PlayOnRemove = false
+				descendant:Stop()
+			elseif descendant:IsA("ParticleEmitter") or descendant:IsA("Trail") then
+				descendant.Enabled = false
+			elseif descendant:IsA("Beam") or descendant:IsA("Sparkles") or descendant:IsA("Fire") or descendant:IsA("Smoke") or descendant:IsA("PostEffect") then
+				descendant.Enabled = false
+
+				return
+			end
+		end)
+	end
+	local function v1333()
+		if u1329 then
+			return
+		end
+
+		u1329 = true
+		table.insert(t73, Workspace.DescendantAdded:Connect(v1332))
+	end
+	local function v1334()
+		genv.__ZeroinSetCapFps(240)
+
+		local Lighting = game:GetService("Lighting")
+
+		pcall(function()
+			settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
+			settings().Physics.PhysicsEnvironmentalThrottle = Enum.EnviromentalPhysicsThrottle.Always
+			Lighting.Technology = Enum.Technology.Compatibility
+			Lighting.GlobalShadows = false
+			Lighting.FogEnd = 9e9
+			Lighting.Brightness = 2
+			Lighting.Ambient = Color3.new(1, 1, 1)
+			Lighting.OutdoorAmbient = Color3.new(1, 1, 1)
+		end)
+
+		for _, descendant in ipairs(game:GetDescendants()) do
+			v1332(descendant)
+		end
+
+		local Terrain = Workspace:FindFirstChildOfClass("Terrain")
+
+		if Terrain then
+			pcall(function()
+				Terrain.WaterWaveSize = 0
+				Terrain.WaterWaveSpeed = 0
+				Terrain.WaterReflectance = 0
+				Terrain.WaterTransparency = 1
+				Terrain.Decoration = false
+			end)
+		end
+
+		v1333()
+	end
+
+	genv.__ZeroinApplySmoothGraphic = v1334
+
+	local function v1339(p160)
+		if type(p160) == "number" then
+			return p160
+		end
+
+		if type(p160) ~= "string" then
+			return 0
+		end
+
+		local match, v1341 = p160:match("^([%d%.]+)%s*([%a]*)$")
+
+		if not match then
+			return 0
+		end
+
+		local v1342 = tonumber(match) or 0
+		local v1343 = v1341:upper()
+
+		if v1343 == "T" then
+			return v1342 * 1e12
+		end
+
+		if v1343 == "B" then
+			return v1342 * 1e9
+		end
+
+		if v1343 == "M" then
+			return v1342 * 1000000
+		end
+
+		if v1343 == "K" then
+			return v1342 * 1000
+		end
+
+		return v1342
+	end
+	local function v1344(p161)
+		if p161 == nil then
+			p161 = true
+		end
+
+		local Backpack = LocalPlayer:FindFirstChildOfClass("Backpack") or LocalPlayer:FindFirstChild("Backpack")
+		local Character = LocalPlayer.Character
+
+		if not Backpack then
+			return 0
+		end
+
+		local ReplicatedStorage2 = game:GetService("ReplicatedStorage")
+		local GameData = ReplicatedStorage2:FindFirstChild("GameData")
+		local Pets2 = GameData and require(GameData:WaitForChild("Pets")) or {}
+		local Eggs2 = GameData and require(GameData:WaitForChild("Eggs")) or {}
+		local Foods = GameData and require(GameData:WaitForChild("Foods")) or {}
+		local t74 = {
+			Ethereal = 7,
+			Divine = 6,
+			Mythic = 5,
+			Legendary = 4,
+			Epic = 3,
+			Rare = 2,
+			Common = 1,
+			Unknown = 0
+		}
+
+		local function v1353(p162)
+			local attribute = p162:GetAttribute("PetKey")
+			local attribute2 = p162:GetAttribute("PetName")
+			local Name = p162.Name
+			local v1357 = Name:gsub("%s*%[.*%]", "")
+			local attribute3 = p162:GetAttribute("Rarity")
+			local s4 = "Other"
+			local n17 = 0
+
+			if attribute or attribute2 then
+				s4 = "Pet"
+
+				if not attribute3 and attribute2 and Pets2[attribute2] then
+					attribute3 = Pets2[attribute2].Rarity
+				end
+
+				n17 = tonumber(p162:GetAttribute("Weight")) or 0
+			elseif Eggs2[v1357] or Eggs2[Name] or t2 and (t2[v1357] or t2[Name]) then
+				s4 = "Egg"
+
+				local v1361 = Eggs2[v1357] or Eggs2[Name] or t2 and (t2[v1357] or t2[Name])
+
+				attribute3 = attribute3 or v1361 and v1361.Rarity
+				n17 = v1339(v1361 and v1361.Luck)
+			elseif Foods[v1357] or Foods[Name] then
+				s4 = "Food"
+
+				local v1362 = Foods[v1357] or Foods[Name]
+
+				attribute3 = attribute3 or v1362 and v1362.Rarity
+				n17 = tonumber(v1362 and v1362.XP) or 0
+			else
+				attribute3 = attribute3 or "Unknown"
+			end
+
+			return {
+				Tool = p162,
+				Name = p162.Name,
+				Category = s4,
+				Rarity = attribute3,
+				Priority = t74[attribute3] or 0,
+				SubSort = n17,
+				ItemId = attribute and attribute ~= "" and "Pet:" .. attribute or p162.Name
+			}
+		end
+
+		local t75 = {}
+
+		for _, child in ipairs(Backpack:GetChildren()) do
+			if child:IsA("Tool") then
+				table.insert(t75, v1353(child))
+			end
+		end
+
+		if Character then
+			for _, child in ipairs(Character:GetChildren()) do
+				if child:IsA("Tool") then
+					table.insert(t75, v1353(child))
+				end
+			end
+		end
+
+		if #t75 == 0 then
+			return 0
+		end
+
+		table.sort(t75, function(p163, p164)
+			if p163.Priority ~= p164.Priority then
+				if p161 then
+					return p163.Priority > p164.Priority
+				end
+
+				return p163.Priority < p164.Priority
+			end
+
+			if p163.Category == p164.Category then
+				if p163.SubSort == p164.SubSort then
+					return p163.Name < p164.Name
+				end
+
+				return p163.SubSort > p164.SubSort
+			end
+
+			local t76 = {
+				Pet = 4,
+				Egg = 3,
+				Food = 2,
+				Other = 1
+			}
+
+			return (t76[p163.Category] or 0) > (t76[p164.Category] or 0)
+		end)
+
+		local t77 = {}
+		local t78 = {}
+
+		for i, v in ipairs(t75) do
+			if i <= 10 then
+				table.insert(t77, v.ItemId)
+			else
+				table.insert(t78, v.ItemId)
+			end
+		end
+
+		local savedOrder = {
+			Hotbar = t77,
+			Backpack = t78
+		}
+
+		pcall(function()
+			local attributeChangedSignal = LocalPlayer:GetAttributeChangedSignal("SatchelOrder")
+			local getconnections_ = getconnections and getconnections(attributeChangedSignal)
+
+			if getconnections_ and #getconnections_ > 0 then
+				local Function = getconnections_[1].Function
+				local v1377 = Function and type(getupvalues) == "function" and getupvalues(Function)
+
+				if v1377 and v1377[1] and v1377[3] then
+					local v1378 = v1377[1]
+					local v1379 = v1377[3]
+					local v1380 = v1377[5]
+
+					v1378.SavedOrder = savedOrder
+					v1378.SavedOrderLoaded = true
+					v1378.OrderApplied = true
+					v1379()
+
+					if v1380 then
+						pcall(v1380)
+					end
+				end
+			end
+		end)
+
+		local Remotes2 = ReplicatedStorage2:FindFirstChild("Remotes")
+		local SaveSatchelOrder = Remotes2 and Remotes2:FindFirstChild("Game") and Remotes2.Game:FindFirstChild("SaveSatchelOrder")
+
+		if SaveSatchelOrder then
+			pcall(function()
+				SaveSatchelOrder:FireServer(savedOrder)
+			end)
+		end
+
+		return #t75
+	end
+
+	v1327:AddToggle({
+		Title = "Anti AFK",
+		Content = "Prevents idle disconnections",
+		Column = "Full",
+		Row = 1,
+		Default = t3.AntiAfkEnabled ~= false,
+		Callback = function(p165)
+			t3.AntiAfkEnabled = p165
+
+			if p165 then
+				v1140()
+				v82("Anti-AFK protection enabled!", 2, Color3.fromRGB(0, 205, 120), "Misc")
+			else
+				v1139()
+				v82("Anti-AFK protection disabled.", 2, Color3.fromRGB(255, 120, 40), "Misc")
+			end
+		end
+	})
+	v1327:AddToggle({
+		Title = "FPS Boost",
+		Content = "Unlock up to 240 FPS",
+		Column = "Full",
+		Row = 2,
+		Default = t3.FpsBoostEnabled,
+		Callback = function(p166)
+			t3.FpsBoostEnabled = p166 == true
+
+			if t3.FpsBoostEnabled then
+				v1334()
+			end
+		end
+	})
+	v1327:AddButton({
+		Title = "Sort Inventory (Rarest)",
+		Icon = "arrow-down-narrow-wide",
+		Column = "Full",
+		Row = 3,
+		Callback = function()
+			local v1383 = v1344(true)
+
+			if v1383 then
+				if not (v1383 > 0) then
+					v82("No items in inventory to sort!", 2, Color3.fromRGB(255, 180, 40), "Inventory")
+
+					return
+				end
+
+				v82(string.format("Sorted %d inventory items (Rarest First)!", v1383), 2.5, Color3.fromRGB(0, 205, 122), "Inventory")
+			else
+				v82("No items in inventory to sort!", 2, Color3.fromRGB(255, 180, 40), "Inventory")
+			end
+		end,
+		SubTitle = "Common First",
+		SubIcon = "arrow-up-narrow-wide",
+		SubCallback = function()
+			local v1384 = v1344(false)
+
+			if v1384 and v1384 > 0 then
+				v82(string.format("Sorted %d inventory items (Common First)!", v1384), 2.5, Color3.fromRGB(0, 205, 122), "Inventory")
+			else
+				v82("No items in inventory to sort!", 2, Color3.fromRGB(255, 180, 40), "Inventory")
+			end
+		end
+	})
+end
+
+task.defer(function()
+	if not v48() then
+		return
+	end
+
+	local ConfigData_ = ConfigData or getgenv and getgenv().ConfigData or _G and _G.ConfigData
+	local v1386 = toggleEnableAutoFarm == true or ConfigData_ and ConfigData_["Toggle_Enable Auto Farm"] == true or t3.AutoFarmEnabled == true
+
+	if v1386 then
+		t3.AutoFarmEnabled = true
+
+		local toggleEnableAutoFarm2 = Elements and Elements["Toggle_Enable Auto Farm"]
+
+		if toggleEnableAutoFarm2 and toggleEnableAutoFarm2.Set and not toggleEnableAutoFarm2.Value then
+			pcall(function()
+				toggleEnableAutoFarm2:Set(true, true)
+			end)
+		end
+
+		v521()
+	else
+		v520()
+		v75("<font color='#888899'>Idle (Disabled)</font>")
+	end
+
+	if t3.AntiAfkEnabled then
+		v1140()
+	end
+
+	if t3.FpsBoostEnabled and genv.__ZeroinApplySmoothGraphic then
+		pcall(genv.__ZeroinApplySmoothGraphic)
+	end
+
+	if t3.AutoHatchEggEnabled then
+		v777()
+	end
+
+	if t3.AutoPlaceEggEnabled then
+		v780()
+	end
+
+	if t3.AutoSellPetsEnabled then
+		v872()
+	end
+
+	if t3.AutoFeedPetEnabled then
+		v1055()
+	end
+
+	if t3.AutoUpgradeHatchLuckEnabled and genv.__ZeroinStartAutoUpgradeLuck then
+		genv.__ZeroinStartAutoUpgradeLuck()
+	end
+
+	t6.startWorkflowWorker()
+
+	for _, v in ipairs({
+		"Food",
+		"Gears"
+	}) do
+		if t3.ShopAutoBuy[v].Enabled then
+			t6.syncShopAutoBuy(v, true)
+		end
+	end
+
+	v184()
+end)
+v81:OnClose(function()
+	if thread then
+		task.cancel(thread)
+		thread = nil
+	end
+
+	if thread3 then
+		task.cancel(thread3)
+		thread3 = nil
+	end
+
+	if thread2 then
+		task.cancel(thread2)
+		thread2 = nil
+	end
+
+	if thread4 then
+		task.cancel(thread4)
+		thread4 = nil
+	end
+
+	if v1054 then
+		v1054()
+	end
+
+	if t6.stopWorkflowWorker then
+		t6.stopWorkflowWorker()
+	end
+
+	if genv.__ZeroinStopAutoUpgradeLuck then
+		genv.__ZeroinStopAutoUpgradeLuck()
+	end
+
+	if genv.__ZeroinCleanupLuckListeners then
+		genv.__ZeroinCleanupLuckListeners()
+	end
+
+	v1139(true)
+	u739 = nil
+	v363()
+
+	if Folder then
+		pcall(function()
+			Folder:Destroy()
+		end)
+	end
+
+	for k in pairs(t4) do
+		v182(k)
+	end
+
+	t4 = {}
+end)
+_G.ZeroinRideAPet = {
+	State = t3,
+	Start = v521,
+	Stop = v520,
+	StartAutoPlace = v780,
+	StopAutoPlace = v779,
+	StartAutoHatch = v777,
+	StopAutoHatch = v776,
+	StartAutoSell = v872,
+	StopAutoSell = v871,
+	StartAutoFeed = v1055,
+	StopAutoFeed = v1054,
+	StartAutoLuck = function()
+		if genv.__ZeroinStartAutoUpgradeLuck then
+			genv.__ZeroinStartAutoUpgradeLuck()
+		end
+	end,
+	StopAutoLuck = function()
+		if genv.__ZeroinStopAutoUpgradeLuck then
+			genv.__ZeroinStopAutoUpgradeLuck()
+		end
+	end,
+	StartAntiAfk = v1140,
+	StopAntiAfk = v1139
+}
+
+do
+	_G.ZeroinRideAPetCleanup = function()
+		_G.ZeroinScriptReloading = true
+		u47 = false
+		t3.AutoFarmEnabled = false
+		t3.AutoHatchEggEnabled = false
+		t3.AutoPlaceEggEnabled = false
+		t3.AutoSellPetsEnabled = false
+		t3.AutoFeedPetEnabled = false
+		t3.AutoUpgradeHatchLuckEnabled = false
+
+		if thread then
+			task.cancel(thread)
+			thread = nil
+		end
+
+		if thread3 then
+			task.cancel(thread3)
+			thread3 = nil
+		end
+
+		if thread2 then
+			task.cancel(thread2)
+			thread2 = nil
+		end
+
+		if thread4 then
+			task.cancel(thread4)
+			thread4 = nil
+		end
+
+		if v1054 then
+			v1054()
+		end
+
+		if t6.stopWorkflowWorker then
+			t6.stopWorkflowWorker()
+		end
+
+		if genv.__ZeroinStopAutoUpgradeLuck then
+			genv.__ZeroinStopAutoUpgradeLuck()
+		end
+
+		if genv.__ZeroinCleanupLuckListeners then
+			genv.__ZeroinCleanupLuckListeners()
+		end
+
+		v1139(true)
+		u739 = nil
+		v363()
+
+		local ZeroinOnTop = CoreGui:FindFirstChild("ZeroinOnTop") or LocalPlayer:FindFirstChild("PlayerGui") and LocalPlayer.PlayerGui:FindFirstChild("ZeroinOnTop")
+
+		if ZeroinOnTop then
+			pcall(function()
+				ZeroinOnTop:Destroy()
+			end)
+		end
+
+		local ToggleUIZeroin = CoreGui:FindFirstChild("ToggleUIZeroin") or LocalPlayer:FindFirstChild("PlayerGui") and LocalPlayer.PlayerGui:FindFirstChild("ToggleUIZeroin")
+
+		if ToggleUIZeroin then
+			pcall(function()
+				ToggleUIZeroin:Destroy()
+			end)
+		end
+
+		_G.ZeroinScriptReloading = false
+	end
+end
+
+v82("Zeroin Egg ESP successfully loaded!", 3, Color3.fromRGB(255, 175, 25), "Ride A Pet")
+
+return v80
